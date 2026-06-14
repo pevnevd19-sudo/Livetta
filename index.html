@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div class="lava-background">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+
+    <div>
+        <img src="img/Logo.png" alt="Логотип" class="logo">
+    </div>
+
+    <nav class="nav">
+        <a href="index.html">ГЛАВНАЯ</a>
+        <a href="catalog.html">КАТАЛОГ</a>
+        <a href="#">ДОСТАВКА</a>
+        <a href="#">ВОПРОСЫ</a>
+        <a href="constructor.html">КОНСТРУКТОР</a>
+        <a href="#">КОРЗИНА</a>
+    </nav>
+    <main class="home-page">
+        <section class="home-carousel" aria-label="Главная карусель Livetta">
+            <div class="home-carousel__viewport">
+                <div class="home-carousel__track" id="homeCarouselTrack">
+                    <article class="home-carousel__slide is-active">
+                        <img src="img/home-slide-1.jpg" alt="Подарочный сертификат Livetta">
+                    </article>
+
+                    <article class="home-carousel__slide">
+                        <img src="img/home-slide-2.jpg" alt="Летняя коллекция украшений Livetta">
+                    </article>
+                </div>
+
+                <button class="home-carousel__button home-carousel__button--prev" type="button" id="homeCarouselPrev" aria-label="Предыдущий слайд">
+                    ‹
+                </button>
+
+                <button class="home-carousel__button home-carousel__button--next" type="button" id="homeCarouselNext" aria-label="Следующий слайд">
+                    ›
+                </button>
+
+                <div class="home-carousel__dots" id="homeCarouselDots" aria-label="Переключатели слайдов"></div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const carouselTrack = document.querySelector('#homeCarouselTrack');
+        const carouselPrev = document.querySelector('#homeCarouselPrev');
+        const carouselNext = document.querySelector('#homeCarouselNext');
+        const carouselDotsWrap = document.querySelector('#homeCarouselDots');
+
+        const fallbackCarouselSlides = [
+            {
+                image: 'img/home-slide-1.jpg',
+                alt: 'Подарочный сертификат Livetta'
+            },
+            {
+                image: 'img/home-slide-2.jpg',
+                alt: 'Летняя коллекция украшений Livetta'
+            }
+        ];
+
+        let carouselSlidesData = [...fallbackCarouselSlides];
+        let currentSlide = 0;
+        let carouselTimer = null;
+
+        function getApiUrl() {
+            if (
+                window.location.protocol === 'file:' ||
+                window.location.hostname === 'localhost' ||
+                window.location.hostname === '127.0.0.1'
+            ) {
+                return 'http://localhost:3000/api';
+            }
+
+            return `${window.location.origin}/api`;
+        }
+
+        function resolveCarouselImage(image) {
+            if (!image) {
+                return '';
+            }
+
+            if (image.startsWith('http://') || image.startsWith('https://') || image.startsWith('data:')) {
+                return image;
+            }
+
+            if (image.startsWith('/uploads')) {
+                return `${getApiUrl().replace('/api', '')}${image}`;
+            }
+
+            return image;
+        }
+
+        function normalizeCarouselSlides(data) {
+            if (Array.isArray(data)) {
+                return data;
+            }
+
+            if (Array.isArray(data?.slides)) {
+                return data.slides;
+            }
+
+            const slides = [];
+
+            if (data?.slide1) {
+                slides.push({ image: data.slide1, alt: 'Фото карусели 1' });
+            }
+
+            if (data?.slide2) {
+                slides.push({ image: data.slide2, alt: 'Фото карусели 2' });
+            }
+
+            return slides;
+        }
+
+        function renderHomeCarousel(slides) {
+            carouselSlidesData = slides.length ? slides : [...fallbackCarouselSlides];
+
+            carouselTrack.innerHTML = carouselSlidesData.map((slide, index) => {
+                const image = typeof slide === 'string' ? slide : slide.image;
+                const alt = typeof slide === 'string' ? `Фото карусели ${index + 1}` : (slide.alt || `Фото карусели ${index + 1}`);
+
+                return `
+                    <article class="home-carousel__slide ${index === 0 ? 'is-active' : ''}">
+                        <img src="${resolveCarouselImage(image)}" alt="${alt}">
+                    </article>
+                `;
+            }).join('');
+
+            carouselDotsWrap.innerHTML = carouselSlidesData.map((_, index) => {
+                return `<button class="${index === 0 ? 'is-active' : ''}" type="button" aria-label="Показать слайд ${index + 1}"></button>`;
+            }).join('');
+
+            Array.from(carouselDotsWrap.querySelectorAll('button')).forEach((dot, index) => {
+                dot.addEventListener('click', () => {
+                    showHomeSlide(index);
+                    startHomeCarousel();
+                });
+            });
+
+            carouselPrev.hidden = carouselSlidesData.length <= 1;
+            carouselNext.hidden = carouselSlidesData.length <= 1;
+            carouselDotsWrap.hidden = carouselSlidesData.length <= 1;
+
+            showHomeSlide(0);
+        }
+
+        function showHomeSlide(index) {
+            const carouselSlides = Array.from(document.querySelectorAll('.home-carousel__slide'));
+            const carouselDots = Array.from(document.querySelectorAll('#homeCarouselDots button'));
+
+            if (!carouselSlides.length) {
+                return;
+            }
+
+            currentSlide = (index + carouselSlides.length) % carouselSlides.length;
+            carouselTrack.style.transform = `translateX(-${currentSlide * 100}%)`;
+
+            carouselSlides.forEach((slide, slideIndex) => {
+                slide.classList.toggle('is-active', slideIndex === currentSlide);
+            });
+
+            carouselDots.forEach((dot, dotIndex) => {
+                dot.classList.toggle('is-active', dotIndex === currentSlide);
+            });
+        }
+
+        function nextHomeSlide() {
+            showHomeSlide(currentSlide + 1);
+        }
+
+        function startHomeCarousel() {
+            stopHomeCarousel();
+
+            if (carouselSlidesData.length > 1) {
+                carouselTimer = setInterval(nextHomeSlide, 4500);
+            }
+        }
+
+        function stopHomeCarousel() {
+            if (carouselTimer) {
+                clearInterval(carouselTimer);
+                carouselTimer = null;
+            }
+        }
+
+        async function loadHomeCarouselImages() {
+            try {
+                const response = await fetch(`${getApiUrl()}/carousel?cache=${Date.now()}`);
+
+                if (!response.ok) {
+                    renderHomeCarousel(fallbackCarouselSlides);
+                    return;
+                }
+
+                const data = await response.json();
+                renderHomeCarousel(normalizeCarouselSlides(data));
+            } catch (error) {
+                console.warn('Не удалось загрузить фото карусели из админки:', error);
+                renderHomeCarousel(fallbackCarouselSlides);
+            }
+
+            startHomeCarousel();
+        }
+
+        carouselPrev.addEventListener('click', () => {
+            showHomeSlide(currentSlide - 1);
+            startHomeCarousel();
+        });
+
+        carouselNext.addEventListener('click', () => {
+            nextHomeSlide();
+            startHomeCarousel();
+        });
+
+        carouselTrack.addEventListener('mouseenter', stopHomeCarousel);
+        carouselTrack.addEventListener('mouseleave', startHomeCarousel);
+
+        loadHomeCarouselImages();
+    </script>
+
+
+</body>
+
+</html>

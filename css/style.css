@@ -1,0 +1,2579 @@
+.nav {
+display: flex;
+justify-content: center;
+gap: 14px;
+}
+.logo{
+    display: block;
+    margin: 0 auto;
+    margin-top: 2%;
+
+    height: 20%;
+    width: 10%;
+   
+}
+.nav a{
+    display: inline-block;
+    background: #ee9ac5;
+    margin-top: 2%;
+    color: rgba(0, 0, 0, 0.801);
+    text-decoration: none;
+    padding: 5px 14px;
+    border-radius: 24px;
+    box-shadow: inset 0 -3 0 rgba(0, 0, 0, 0.1);
+    font-size: 18px;
+    border: 2px solid #ae9bf3;
+    
+}
+.nav a:hover {
+  transform: scale(1.06);
+
+  box-shadow:
+    0 10px 30px rgba(238,154,197,.35);
+}
+.nav a:active {
+  animation: buttonBounce 0.7s ease;
+}
+@keyframes buttonBounce {
+  0% {
+    transform: scale(1.06);
+  }
+
+  40% {
+    transform: scale(.92);
+  }
+
+  70% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+
+
+
+.lava-background {
+  position: fixed;
+  inset: 0;
+  overflow: hidden;
+  background: #fffafc;
+
+  z-index: -1;
+}
+.blob{
+    position: absolute;
+    width: 260px;
+    height: 260px;
+
+    border-radius: 50%;
+    filter: blur(110px);
+    opacity: .7;
+
+    mix-blend-mode: multiply;
+}
+.blob1{
+    background: #ff6ec7;
+    animation: move1 35s ease-in-out infinite alternate;
+    top: 0%;
+    left: 0%;
+}
+.blob2{
+    background: #c77dff;
+    animation: move1 51s ease-in-out infinite alternate;
+    top: 80%;
+    left: 10%;
+}
+.blob3{
+    background: #ff4fa3;
+    animation: move1 42s ease-in-out infinite alternate;
+    top: 40%;
+    left: 30%;
+}
+.blob4{
+    background: #ff95d5;
+    animation: move1 28s ease-in-out infinite alternate;
+    top: 20%;
+    left: 15%;
+}
+@keyframes move1 {
+  0% {
+    transform:
+      translate(0vw, 0vh)
+      scale(1);
+  }
+
+  25% {
+    transform:
+      translate(40vw, 10vh)
+      scale(1.3);
+  }
+
+  50% {
+    transform:
+      translate(70vw, 40vh)
+      scale(.9);
+  }
+
+  75% {
+    transform:
+      translate(20vw, 70vh)
+      scale(1.2);
+  }
+
+  100% {
+    transform:
+      translate(60vw, 20vh)
+      scale(1);
+  }
+  
+}
+@keyframes move2 {
+  0% {
+    transform:
+      translate(80vw, 10vh)
+      scale(.8);
+  }
+
+  50% {
+    transform:
+      translate(10vw, 60vh)
+      scale(1.5);
+  }
+
+  100% {
+    transform:
+      translate(70vw, 80vh)
+      scale(1);
+  }
+}
+@keyframes move3 {
+  0% {
+    transform:
+      translate(80vw, 10vh)
+      scale(.8);
+  }
+
+  50% {
+    transform:
+      translate(10vw, 60vh)
+      scale(1.5);
+  }
+  75% {
+    transform:
+      translate(40vw, 70vh)
+      scale(1.5);
+  }
+
+  100% {
+    transform:
+      translate(70vw, 80vh)
+      scale(1);
+  }
+}
+@keyframes move4 {
+  0% {
+    transform:
+      translate(80vw, 10vh)
+      scale(.8);
+  }
+  30%{
+    transform:
+      translate(50vw, 120vh)
+      scale(1.5);
+  }
+
+  50% {
+    transform:
+      translate(10vw, 60vh)
+      scale(1.5);
+  }
+
+  100% {
+    transform:
+      translate(70vw, 80vh)
+      scale(1);
+  }
+}
+.constructor {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 40px;
+  padding: 40px;
+}
+
+.constructor-preview {
+  text-align: center;
+}
+
+.jewelry-frame {
+  width: 350px;
+  height: 350px;
+  border: 6px solid #c9a46b;
+  border-radius: 50%;
+  margin: 40px auto;
+  position: relative;
+}
+
+.stone-slot {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: #eee;
+  border: 3px solid white;
+
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.stone-card {
+  width: 100%;
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background: white;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  text-align: left;
+}
+
+.stone-card__circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.stone-card small {
+  display: block;
+  margin: 5px 0;
+}
+.constructor-options {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.constructor-options label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 14px;
+}
+
+.constructor-options select {
+  padding: 10px;
+  border: 1px solid #ccc;
+}
+
+
+/* Livetta constructor upgrade */
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: Arial, sans-serif;
+  color: rgba(28, 20, 32, .9);
+}
+
+button,
+select,
+input,
+textarea {
+  font: inherit;
+}
+
+.glass-card,
+.admin-card {
+  background: rgba(255, 255, 255, .72);
+  border: 1px solid rgba(174, 155, 243, .35);
+  border-radius: 28px;
+  box-shadow: 0 22px 70px rgba(174, 155, 243, .18);
+  backdrop-filter: blur(16px);
+}
+
+.constructor {
+  max-width: 1220px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 28px;
+  padding: 38px 24px 70px;
+}
+
+.constructor-preview {
+  padding: 34px;
+  text-align: center;
+}
+
+.eyebrow {
+  display: inline-block;
+  margin: 0 0 10px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(238, 154, 197, .22);
+  color: #9c4f82;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.constructor-preview h1 {
+  margin: 0;
+  font-size: 42px;
+  line-height: 1.08;
+}
+
+.constructor-lead,
+.muted-text {
+  color: rgba(28, 20, 32, .62);
+  line-height: 1.55;
+}
+
+.constructor-lead {
+  max-width: 650px;
+  margin: 14px auto 0;
+}
+
+.constructor-options {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin: 26px 0 10px;
+}
+
+.constructor-options label,
+.admin-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  text-align: left;
+  color: rgba(28, 20, 32, .68);
+  font-size: 14px;
+}
+
+.constructor-options select,
+.admin-form input,
+.admin-form select,
+.admin-form textarea {
+  min-width: 190px;
+  padding: 12px 14px;
+  border: 1px solid rgba(174, 155, 243, .55);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .86);
+  outline: none;
+}
+
+.admin-form textarea {
+  min-height: 88px;
+  resize: vertical;
+}
+
+.jewelry-stage {
+  display: flex;
+  justify-content: center;
+  padding: 18px 0;
+}
+
+.jewelry-frame {
+  width: 440px;
+  height: 365px;
+  border: 0;
+  margin: 24px auto;
+  position: relative;
+  border-radius: 44% 44% 52% 52%;
+}
+
+.thread-line {
+  position: absolute;
+  inset: 18px 30px 8px;
+  border: 5px solid rgba(201, 164, 107, .78);
+  border-top-color: rgba(201, 164, 107, .16);
+  border-radius: 44% 44% 52% 52%;
+  box-shadow: inset 0 -12px 24px rgba(201, 164, 107, .08), 0 12px 35px rgba(174, 155, 243, .12);
+}
+
+.thread-line::before,
+.thread-line::after {
+  content: '';
+  position: absolute;
+  top: 8px;
+  width: 18px;
+  height: 18px;
+  border: 4px solid rgba(201, 164, 107, .8);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, .7);
+}
+
+.thread-line::before {
+  left: 28px;
+}
+
+.thread-line::after {
+  right: 28px;
+}
+
+.stone-slot {
+  position: absolute;
+  inset: 0;
+  transform: none;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+}
+
+.thread-stone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 0;
+  border-radius: 50%;
+  border: 4px solid rgba(255, 255, 255, .95);
+  box-shadow: 0 10px 24px rgba(28, 20, 32, .16), 0 0 0 2px var(--stone-color, #e0b0ff);
+  overflow: hidden;
+  cursor: pointer;
+  transition: transform .2s ease, box-shadow .2s ease;
+  background: var(--stone-color, #e0b0ff);
+}
+
+.thread-stone:hover {
+  box-shadow: 0 14px 34px rgba(238, 154, 197, .34), 0 0 0 3px var(--stone-color, #e0b0ff);
+}
+
+.thread-stone img,
+.stone-card__circle img,
+.stone-admin-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.thread-stone img {
+  transform: scale(1.12);
+}
+
+.constructor-info {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.constructor-info div {
+  padding: 15px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .78);
+  border: 1px solid rgba(238, 154, 197, .25);
+}
+
+.constructor-info span {
+  display: block;
+  margin-bottom: 5px;
+  color: rgba(28, 20, 32, .55);
+  font-size: 13px;
+}
+
+.constructor-info strong {
+  font-size: 18px;
+}
+
+.constructor-actions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.constructor-actions button,
+.admin-form button,
+.product-card button {
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ee9ac5, #ae9bf3);
+  color: white;
+  cursor: pointer;
+  box-shadow: 0 12px 28px rgba(174, 155, 243, .25);
+}
+
+.capacity-hint {
+  margin-top: 18px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(224, 176, 255, .18);
+  color: rgba(28, 20, 32, .72);
+}
+
+.stones-panel {
+  padding: 24px;
+  align-self: start;
+  max-height: 760px;
+  overflow: auto;
+}
+
+.stones-panel h2 {
+  margin-top: 0;
+}
+
+.stone-card {
+  width: 100%;
+  display: flex;
+  gap: 13px;
+  padding: 14px;
+  margin-bottom: 12px;
+  background: rgba(255, 255, 255, .84);
+  border: 1px solid rgba(174, 155, 243, .28);
+  border-radius: 20px;
+  cursor: pointer;
+  text-align: left;
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.stone-card:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 14px 30px rgba(238, 154, 197, .18);
+}
+
+.stone-card--disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.stone-card__circle {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  border: 3px solid white;
+  box-shadow: 0 7px 18px rgba(28, 20, 32, .12);
+}
+
+.stone-card__content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stone-card small {
+  color: rgba(28, 20, 32, .56);
+}
+
+.stone-meta {
+  color: #9c4f82;
+  font-size: 13px;
+}
+
+.stone-color-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(28, 20, 32, .52);
+  font-size: 12px;
+}
+
+.stone-color-line i {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  box-shadow: 0 3px 8px rgba(28, 20, 32, .12);
+}
+
+.admin {
+  max-width: 1180px;
+  margin: 30px auto 70px;
+  padding: 0 24px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.admin-card {
+  padding: 26px;
+}
+
+.admin-card--accent {
+  border-color: rgba(238, 154, 197, .45);
+}
+
+.admin-form {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.color-field input {
+  min-width: 0;
+  width: 100%;
+  height: 48px;
+  padding: 6px;
+}
+
+.admin-list-block {
+  margin-top: 22px;
+}
+
+.admin-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 14px;
+}
+
+.admin-mini-card {
+  aspect-ratio: auto;
+  border: 1px solid rgba(174, 155, 243, .25);
+  border-radius: 20px;
+  background: rgba(255, 255, 255, .82);
+}
+
+.stone-admin-card {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  align-items: start;
+}
+
+.stone-admin-card button {
+  grid-column: 1 / -1;
+}
+
+.admin-color-dot {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 2px solid white;
+  vertical-align: middle;
+  box-shadow: 0 3px 10px rgba(28, 20, 32, .14);
+}
+
+@media (max-width: 900px) {
+  .constructor,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .constructor-info {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .logo {
+    width: 28%;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 520px) {
+  .constructor-preview h1 {
+    font-size: 30px;
+  }
+
+  .jewelry-frame {
+    width: 330px;
+    height: 285px;
+  }
+
+  .constructor-info {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Правки конструктора: размер, цвет и круглые фото камней */
+.thread-line {
+  inset: 18px 22px 4px;
+  border-width: 5px;
+}
+
+.thread-line::before {
+  left: 18px;
+}
+
+.thread-line::after {
+  right: 18px;
+}
+
+.thread-stone {
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+  aspect-ratio: 1 / 1;
+  display: grid;
+  place-items: center;
+  transform-origin: center;
+  background: var(--stone-color, #e0b0ff);
+  border: 4px solid rgba(255, 255, 255, .96);
+}
+
+.thread-stone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 7px 12px rgba(255, 255, 255, .34), inset 0 -10px 16px rgba(28, 20, 32, .16);
+  pointer-events: none;
+}
+
+.thread-stone img,
+.stone-card__circle img,
+.stone-admin-card img {
+  width: 100%;
+  height: 100%;
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+  object-fit: cover;
+  display: block;
+}
+
+.thread-stone img {
+  transform: scale(1.18);
+}
+
+.stone-card__circle {
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+  background: var(--stone-color, #e0b0ff);
+}
+
+.stone-card__circle img {
+  transform: scale(1.08);
+}
+
+.stone-edit-form {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.stone-edit-form input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 9px 10px;
+  border: 1px solid rgba(174, 155, 243, .45);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .9);
+}
+
+.stone-edit-form input[type="color"] {
+  padding: 3px;
+  min-height: 40px;
+}
+
+.stone-edit-form button {
+  grid-column: 1 / -1;
+}
+
+@media (max-width: 520px) {
+  .stone-edit-form {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Final natural constructor fixes */
+.jewelry-frame {
+  width: 500px;
+  height: 410px;
+  border: 0 !important;
+  border-radius: 46% 46% 56% 56%;
+}
+
+/* Нить стала тонкой и похожей на натуральный вощеный шнур, без коричневого тяжелого кольца */
+.thread-line {
+  position: absolute;
+  inset: 18px 26px 0;
+  border: 2px solid rgba(232, 222, 207, .98) !important;
+  border-top-color: rgba(232, 222, 207, .22) !important;
+  border-left-color: rgba(222, 210, 193, .92) !important;
+  border-right-color: rgba(222, 210, 193, .92) !important;
+  border-radius: 46% 46% 56% 56%;
+  background: transparent !important;
+  box-shadow:
+    0 2px 4px rgba(80, 56, 38, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .9),
+    inset 0 -1px 0 rgba(164, 138, 106, .18) !important;
+  pointer-events: none;
+}
+
+/* Маленькие зоны под застежку */
+.thread-line::before,
+.thread-line::after {
+  content: '';
+  position: absolute;
+  top: 3px;
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(221, 203, 176, .95) !important;
+  border-radius: 999px;
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .9), transparent 42%),
+    linear-gradient(145deg, #f3eadc, #d8c3a0) !important;
+  box-shadow: 0 2px 7px rgba(100, 69, 42, .16) !important;
+}
+
+.thread-line::before {
+  left: 18px;
+}
+
+.thread-line::after {
+  right: 18px;
+}
+
+.stone-slot {
+  position: absolute !important;
+  inset: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  transform: none !important;
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+}
+
+.empty-thread-hint {
+  position: absolute;
+  left: 50%;
+  top: 69%;
+  transform: translate(-50%, -50%);
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .68);
+  color: rgba(28, 20, 32, .55);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.thread-stone,
+.thread-stone.natural-stone {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  display: block;
+  padding: 0;
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  cursor: grab;
+  background: var(--stone-texture), var(--stone-color, #b48a78) !important;
+  box-shadow:
+    0 8px 17px rgba(34, 23, 38, .22),
+    inset 0 8px 13px rgba(255, 255, 255, .25),
+    inset 0 -10px 16px rgba(18, 12, 22, .25) !important;
+  animation: stonePlaced .26s cubic-bezier(.2, .9, .25, 1.25) both;
+  transition: filter .18s ease, box-shadow .18s ease;
+}
+
+.thread-stone:hover {
+  cursor: pointer;
+  filter: saturate(1.12) contrast(1.08) brightness(1.04);
+  box-shadow:
+    0 13px 24px rgba(34, 23, 38, .25),
+    inset 0 8px 13px rgba(255, 255, 255, .28),
+    inset 0 -11px 18px rgba(18, 12, 22, .28) !important;
+}
+
+/* Маленькое отверстие в бусине, чтобы было ощущение, что она реально надета на нить */
+.thread-stone::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 14%;
+  height: 14%;
+  min-width: 4px;
+  min-height: 4px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: rgba(25, 18, 29, .22);
+  box-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, .23),
+    0 1px 1px rgba(255, 255, 255, .18);
+  z-index: 3;
+  pointer-events: none;
+}
+
+.thread-stone::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background:
+    radial-gradient(circle at 28% 20%, rgba(255, 255, 255, .32), transparent 24%),
+    radial-gradient(circle at 68% 78%, rgba(0, 0, 0, .13), transparent 35%);
+  box-shadow: none !important;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.thread-stone img,
+.natural-stone-preview img,
+.stone-card__circle img,
+.stone-admin-card img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  border: 0 !important;
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+}
+
+.thread-stone img {
+  position: relative;
+  z-index: 1;
+  transform: scale(1.38);
+  filter: saturate(1.12) contrast(1.08);
+}
+
+.stone-card__circle,
+.natural-stone-preview {
+  border: 0 !important;
+  outline: 0 !important;
+  border-radius: 999px;
+  clip-path: circle(50% at 50% 50%);
+  overflow: hidden;
+  background: var(--stone-texture), var(--stone-color, #b48a78) !important;
+  box-shadow:
+    0 7px 14px rgba(43, 30, 48, .14),
+    inset 0 5px 10px rgba(255, 255, 255, .24),
+    inset 0 -8px 13px rgba(24, 16, 29, .17) !important;
+}
+
+.natural-stone-preview img {
+  transform: scale(1.22);
+}
+
+.stone-card__content b {
+  color: #8c4d79;
+}
+
+.stone-card--disabled .stone-card__content b {
+  color: rgba(28, 20, 32, .48);
+}
+
+@keyframes stonePlaced {
+  from {
+    opacity: 0;
+    filter: blur(2px) saturate(.8);
+  }
+
+  to {
+    opacity: 1;
+    filter: blur(0) saturate(1);
+  }
+}
+
+@media (max-width: 720px) {
+  .jewelry-frame {
+    width: min(92vw, 390px);
+    height: 335px;
+  }
+
+  .thread-line {
+    inset: 16px 22px 0;
+  }
+}
+
+/* Natural necklace final polish */
+.jewelry-frame {
+  width: min(540px, 92vw) !important;
+  height: 430px !important;
+  border: 0 !important;
+  background: transparent !important;
+}
+
+.thread-line {
+  position: absolute !important;
+  inset: 14px 28px 0 !important;
+  border: 2px solid rgba(232, 226, 216, .98) !important;
+  border-top-color: rgba(232, 226, 216, .20) !important;
+  border-left-color: rgba(216, 206, 191, .94) !important;
+  border-right-color: rgba(216, 206, 191, .94) !important;
+  border-radius: 48% 48% 58% 58% !important;
+  background: transparent !important;
+  box-shadow:
+    0 2px 7px rgba(78, 58, 38, .10),
+    inset 0 1px 0 rgba(255, 255, 255, .92),
+    inset 0 -1px 0 rgba(150, 126, 96, .20) !important;
+}
+
+.thread-line::before,
+.thread-line::after {
+  top: 4px !important;
+  width: 16px !important;
+  height: 16px !important;
+  border: 2px solid rgba(221, 211, 194, .98) !important;
+  background:
+    radial-gradient(circle at 35% 25%, rgba(255, 255, 255, .95), transparent 42%),
+    linear-gradient(145deg, #f6efe6, #d8c5a8) !important;
+}
+
+.thread-line::before {
+  left: 22px !important;
+}
+
+.thread-line::after {
+  right: 22px !important;
+}
+
+.thread-stone,
+.thread-stone.natural-stone {
+  border: 0 !important;
+  outline: 0 !important;
+  background: var(--stone-texture), var(--stone-color, #b48a78) !important;
+  box-shadow:
+    0 10px 20px rgba(31, 22, 36, .23),
+    inset 0 9px 14px rgba(255, 255, 255, .22),
+    inset 0 -12px 18px rgba(17, 10, 20, .26) !important;
+}
+
+.thread-stone img {
+  border: 0 !important;
+  border-radius: 50% !important;
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  transform: scale(1.45) !important;
+}
+
+.thread-stone::before {
+  width: 13% !important;
+  height: 13% !important;
+  background: rgba(25, 18, 29, .20) !important;
+}
+
+.stone-card__circle,
+.natural-stone-preview {
+  border: 0 !important;
+  outline: 0 !important;
+  background: var(--stone-texture), var(--stone-color, #b48a78) !important;
+}
+
+.product-card__image img,
+.admin-product-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.product-card__image,
+.admin-product-image {
+  overflow: hidden;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .62);
+}
+
+.buy-button,
+.product-card__button {
+  border: 0 !important;
+  border-radius: 999px !important;
+  background: linear-gradient(135deg, #ee9ac5, #c77dff) !important;
+  color: #241627 !important;
+  font-weight: 700 !important;
+  box-shadow: 0 12px 26px rgba(199, 125, 255, .24) !important;
+}
+
+.buy-button:hover,
+.product-card__button:hover {
+  transform: translateY(-2px) scale(1.02);
+}
+
+.file-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  color: rgba(28, 20, 32, .68);
+}
+
+.admin-product-card {
+  min-height: auto;
+}
+
+.admin-product-image {
+  width: 100%;
+  height: 180px;
+  display: grid;
+  place-items: center;
+  color: rgba(28, 20, 32, .45);
+}
+
+@media (max-width: 720px) {
+  .jewelry-frame {
+    width: min(94vw, 410px) !important;
+    height: 350px !important;
+  }
+}
+.livetta-builder {
+  max-width: 1520px;
+  grid-template-columns: minmax(760px, 1fr) 340px;
+}
+
+.livetta-builder .constructor-preview {
+  overflow: hidden;
+}
+
+.livetta-thread-scene {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 18px 0 12px;
+}
+
+.livetta-thread-frame {
+  position: relative;
+  width: min(var(--livetta-frame-width, 855px), 100%);
+  height: var(--livetta-frame-height, 522px);
+  margin: 0 auto 22px;
+  border: 0;
+  border-radius: 42% 42% 58% 58%;
+  transition: width .25s ease, height .25s ease;
+}
+
+.livetta-thread-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.livetta-thread-path,
+.livetta-thread-highlight {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.livetta-thread-path {
+  stroke: rgba(204, 164, 91, .96);
+  stroke-width: 9;
+  filter:
+    drop-shadow(0 7px 7px rgba(71, 45, 22, .22))
+    drop-shadow(0 18px 24px rgba(174, 155, 243, .13));
+}
+
+.livetta-thread-highlight {
+  stroke: rgba(255, 235, 185, .58);
+  stroke-width: 3;
+  transform: translateY(-2px);
+  opacity: .8;
+}
+
+.livetta-bead-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+  border: 0;
+  pointer-events: none;
+}
+
+.livetta-clasp {
+  position: absolute;
+  top: 54px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 5px solid rgba(207, 166, 92, .96);
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.92), transparent 35%),
+    linear-gradient(135deg, #f8d997, #be7f32 58%, #725027);
+  box-shadow:
+    inset -4px -5px 8px rgba(55, 33, 12, .28),
+    0 10px 18px rgba(75, 48, 25, .22);
+  z-index: 20;
+}
+
+.livetta-clasp-left {
+  left: 88px;
+}
+
+.livetta-clasp-right {
+  right: 88px;
+}
+
+.livetta-thread-bead {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  width: var(--bead-size);
+  height: var(--bead-size);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  filter: drop-shadow(0 9px 10px rgba(26, 18, 32, .22));
+  transition: transform .18s ease, filter .18s ease;
+}
+
+.livetta-thread-bead:hover {
+  transform: translate(-50%, -50%) scale(1.12);
+  filter: drop-shadow(0 15px 22px rgba(238, 154, 197, .38));
+}
+
+.livetta-thread-bead--new {
+  animation: livettaBeadIn .34s cubic-bezier(.22, .98, .34, 1.16);
+}
+
+@keyframes livettaBeadIn {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -190%) scale(.35);
+  }
+
+  75% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1.12);
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+.livetta-bead-body,
+.livetta-catalog-bead {
+  position: relative;
+  display: block;
+  width: var(--bead-size);
+  height: var(--bead-size);
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    var(--stone-image),
+    var(--stone-texture);
+  background-size: cover, cover;
+  background-position: center, center;
+  box-shadow:
+    inset 7px 7px 12px rgba(255,255,255,.26),
+    inset -10px -12px 16px rgba(0,0,0,.34),
+    inset 0 0 0 1px rgba(255,255,255,.42),
+    0 0 0 1px rgba(74, 44, 67, .14);
+}
+
+.livetta-bead-body::before,
+.livetta-catalog-bead::before {
+  content: '';
+  position: absolute;
+  inset: -8%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 26% 20%, rgba(255,255,255,.9) 0 8%, transparent 22%),
+    radial-gradient(circle at 74% 82%, rgba(0,0,0,.44), transparent 38%),
+    linear-gradient(135deg, rgba(255,255,255,.36), transparent 42%, rgba(0,0,0,.3));
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+  z-index: 4;
+}
+
+.livetta-bead-thread {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 92%;
+  height: max(2px, 12%);
+  border-radius: 999px;
+  transform: translate(-50%, -50%) rotate(var(--thread-angle));
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.48), transparent 44%),
+    linear-gradient(90deg, #8d6132, #f5d693 28%, #c8934e 56%, #7a532d);
+  box-shadow:
+    inset 0 1px 2px rgba(255,255,255,.5),
+    inset 0 -1px 3px rgba(70, 42, 18, .38);
+  z-index: 5;
+}
+
+.livetta-bead-hole {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34%;
+  height: 20%;
+  border-radius: 999px;
+  transform: translate(-50%, -50%) rotate(var(--thread-angle));
+  background:
+    radial-gradient(ellipse at center, rgba(14, 8, 10, .92) 0 35%, rgba(255,255,255,.14) 54%, rgba(0,0,0,.36) 78%);
+  box-shadow:
+    inset 0 2px 4px rgba(0,0,0,.72),
+    0 1px 3px rgba(255,255,255,.25);
+  z-index: 6;
+}
+
+.livetta-bead-shine {
+  position: absolute;
+  left: 20%;
+  top: 15%;
+  width: 30%;
+  height: 22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.92), rgba(255,255,255,.28) 48%, transparent 72%);
+  filter: blur(.4px);
+  transform: rotate(-28deg);
+  z-index: 7;
+  pointer-events: none;
+}
+
+.livetta-bead-depth {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  box-shadow:
+    inset 0 -8px 13px rgba(0,0,0,.24),
+    inset 0 0 0 1px rgba(255,255,255,.18);
+  z-index: 8;
+  pointer-events: none;
+}
+
+.livetta-catalog-bead {
+  flex: 0 0 auto;
+  width: var(--bead-size);
+  height: var(--bead-size);
+  box-shadow:
+    inset 7px 7px 12px rgba(255,255,255,.28),
+    inset -9px -11px 15px rgba(0,0,0,.3),
+    0 9px 14px rgba(28,20,32,.14);
+}
+
+.livetta-catalog-hole {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 34%;
+  height: 18%;
+  border-radius: 999px;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(ellipse at center, rgba(14, 8, 10, .9) 0 38%, rgba(255,255,255,.16) 54%, rgba(0,0,0,.34) 78%);
+  z-index: 6;
+}
+
+.livetta-stone-card {
+  align-items: center;
+}
+
+.livetta-stone-card:not(:disabled):hover .livetta-catalog-bead {
+  animation: livettaCatalogBeadPulse .55s ease;
+}
+
+@keyframes livettaCatalogBeadPulse {
+  0% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.08);
+  }
+
+  100% {
+    transform: scale(1);
+  }
+}
+
+.stone-card--disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.constructor-actions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 1180px) {
+  .livetta-builder {
+    grid-template-columns: 1fr;
+  }
+
+  .stones-panel {
+    order: 2;
+  }
+}
+
+@media (max-width: 760px) {
+  .livetta-thread-frame {
+    height: calc(var(--livetta-frame-height, 520px) * .78);
+  }
+
+  .livetta-clasp {
+    top: 46px;
+    width: 25px;
+    height: 25px;
+  }
+
+  .livetta-clasp-left {
+    left: 48px;
+  }
+
+  .livetta-clasp-right {
+    right: 48px;
+  }
+}
+.garnet-builder {
+  max-width: 1500px;
+  grid-template-columns: minmax(760px, 1fr) 360px;
+}
+
+.garnet-builder .constructor-preview {
+  overflow: hidden;
+}
+
+.garnet-scene-wrap {
+  position: relative;
+  width: 100%;
+  height: 620px;
+  margin: 24px auto 26px;
+  border-radius: 34px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 58%, rgba(255, 255, 255, .95), rgba(255, 248, 252, .84) 42%, rgba(249, 228, 246, .64) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(174, 155, 243, .24),
+    inset 0 -30px 60px rgba(238, 154, 197, .12),
+    0 25px 70px rgba(174, 155, 243, .14);
+}
+
+.garnet-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+  cursor: grab;
+}
+
+.garnet-canvas:active {
+  cursor: grabbing;
+}
+
+.scene-message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  padding: 12px 18px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .82);
+  box-shadow: 0 15px 34px rgba(174, 155, 243, .18);
+  color: rgba(28, 20, 32, .58);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.garnet-card {
+  align-items: center;
+}
+
+.garnet-card-preview {
+  position: relative;
+  flex: 0 0 auto;
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 22%, rgba(255, 160, 170, .95), transparent 18%),
+    radial-gradient(circle at 72% 78%, rgba(30, 0, 5, .86), transparent 42%),
+    linear-gradient(135deg, #ff4056, #8b0614 46%, #290006 100%);
+  box-shadow:
+    inset 11px 10px 16px rgba(255, 255, 255, .24),
+    inset -16px -18px 24px rgba(0, 0, 0, .38),
+    0 14px 28px rgba(74, 0, 16, .28);
+}
+
+.garnet-card-preview::before {
+  content: '';
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center, #110005 0 35%, rgba(255, 255, 255, .18) 58%, rgba(0, 0, 0, .3) 100%);
+  transform: rotate(-12deg);
+}
+
+.garnet-facet {
+  position: absolute;
+  background: rgba(255, 255, 255, .22);
+  clip-path: polygon(50% 0, 100% 100%, 0 100%);
+}
+
+.facet-1 {
+  left: 15px;
+  top: 8px;
+  width: 24px;
+  height: 22px;
+  transform: rotate(22deg);
+}
+
+.facet-2 {
+  right: 9px;
+  top: 24px;
+  width: 23px;
+  height: 24px;
+  transform: rotate(84deg);
+  opacity: .35;
+}
+
+.facet-3 {
+  left: 23px;
+  bottom: 7px;
+  width: 25px;
+  height: 22px;
+  transform: rotate(174deg);
+  opacity: .24;
+}
+
+.garnet-card:not(:disabled):hover .garnet-card-preview {
+  animation: garnetPreviewPulse .65s ease;
+}
+
+@keyframes garnetPreviewPulse {
+  0% {
+    transform: scale(1) rotate(0);
+  }
+
+  50% {
+    transform: scale(1.12) rotate(8deg);
+  }
+
+  100% {
+    transform: scale(1) rotate(0);
+  }
+}
+
+.stone-card--disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.constructor-actions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.garnet-scene-wrap {
+  height: 520px;
+}
+
+@media (max-width: 1180px) {
+  .garnet-scene-wrap {
+    height: 460px;
+  }
+}
+
+@media (max-width: 640px) {
+  .garnet-scene-wrap {
+    height: 360px;
+  }
+}
+/* Optimized 3D constructor override */
+.garnet-builder {
+  align-items: start;
+}
+
+.garnet-builder .constructor-preview {
+  overflow: hidden;
+}
+
+.garnet-builder .constructor-lead {
+  max-width: 760px;
+}
+
+.garnet-scene-wrap {
+  position: relative;
+  width: min(100%, 920px);
+  height: clamp(430px, 56vw, 660px);
+  margin: 24px auto 0;
+  border-radius: 30px;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(255,255,255,.96), rgba(255,245,250,.72) 58%, rgba(224,176,255,.14)),
+    linear-gradient(135deg, rgba(255,255,255,.76), rgba(255,246,251,.62));
+  border: 1px solid rgba(238,154,197,.24);
+  box-shadow: inset 0 0 70px rgba(255,255,255,.78), 0 22px 70px rgba(174,155,243,.16);
+}
+
+.garnet-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.garnet-canvas:active {
+  cursor: grabbing;
+}
+
+.scene-message {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  padding: 13px 18px;
+  border-radius: 999px;
+  color: rgba(28, 20, 32, .72);
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(174,155,243,.26);
+  box-shadow: 0 14px 40px rgba(174,155,243,.16);
+  pointer-events: none;
+}
+
+.constructor-stone-card {
+  align-items: center;
+  border: 1px solid rgba(174,155,243,.2);
+  border-radius: 22px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 12px 34px rgba(174,155,243,.12);
+  transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+}
+
+.constructor-stone-card:not(:disabled):hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 42px rgba(238,154,197,.22);
+}
+
+.constructor-stone-card:disabled {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+.stone-card__thumb {
+  position: relative;
+  width: 58px;
+  height: 58px;
+  flex: 0 0 58px;
+  border-radius: 50%;
+  overflow: hidden;
+  display: grid;
+  place-items: center;
+  background:
+    radial-gradient(circle at 32% 24%, rgba(255,255,255,.92), transparent 19%),
+    radial-gradient(circle at 68% 78%, rgba(0,0,0,.2), transparent 35%),
+    var(--stone-color, #8b0614);
+  box-shadow: inset -10px -12px 18px rgba(0,0,0,.16), 0 10px 24px rgba(28,20,32,.13);
+}
+
+.stone-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transform: scale(1.08);
+}
+
+.stone-card__gem {
+  width: 62%;
+  height: 62%;
+  clip-path: polygon(50% 0, 90% 20%, 100% 62%, 50% 100%, 0 62%, 10% 20%);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,.45), transparent 32%),
+    linear-gradient(45deg, rgba(0,0,0,.12), transparent 60%),
+    var(--stone-color, #8b0614);
+  filter: saturate(1.16);
+}
+
+.stone-card__content {
+  min-width: 0;
+  display: grid;
+  gap: 4px;
+}
+
+.stone-card__content small {
+  color: rgba(28,20,32,.6);
+  line-height: 1.35;
+}
+
+.stone-card__content b {
+  color: #9c4f82;
+  font-size: 13px;
+}
+
+.constructor-actions button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+@media (max-width: 980px) {
+  .garnet-scene-wrap {
+    height: clamp(380px, 70vw, 560px);
+  }
+}
+
+@media (max-width: 560px) {
+  .garnet-scene-wrap {
+    height: 360px;
+    border-radius: 22px;
+  }
+
+  .stone-card__thumb {
+    width: 50px;
+    height: 50px;
+    flex-basis: 50px;
+  }
+}
+
+
+/* Photo neck constructor update */
+.garnet-builder .garnet-scene-wrap {
+  min-height: 620px;
+  background: #fff;
+}
+
+.garnet-builder .garnet-canvas {
+  min-height: 620px;
+}
+
+@media (max-width: 760px) {
+  .garnet-builder .garnet-scene-wrap,
+  .garnet-builder .garnet-canvas {
+    min-height: 460px;
+  }
+}
+
+
+/* 2D neck constructor */
+.neck-constructor-stage {
+  position: relative;
+  width: min(100%, 760px);
+  aspect-ratio: 1 / 1;
+  margin: 28px auto 0;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #fff;
+  border: 1px solid rgba(238, 154, 197, .25);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.55), 0 22px 60px rgba(174,155,243,.12);
+}
+
+.neck-photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+  pointer-events: none;
+}
+
+.necklace-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.necklace-thread {
+  fill: none;
+  stroke: rgba(196, 190, 185, .96);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 2px rgba(72, 58, 52, .18));
+}
+
+.necklace-beads {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+}
+
+.necklace-bead {
+  position: absolute;
+  transform: translate(-50%, -50%) rotate(var(--bead-rotate, 0deg));
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 32% 28%, rgba(255,255,255,.95), rgba(255,255,255,.12) 22%, transparent 33%),
+    radial-gradient(circle at 58% 62%, var(--stone-color), rgba(0,0,0,.26));
+  box-shadow:
+    0 1px 3px rgba(45, 31, 35, .22),
+    inset 0 -2px 3px rgba(0,0,0,.12),
+    inset 0 1px 2px rgba(255,255,255,.5);
+  cursor: pointer;
+  transition: transform .16s ease, box-shadow .16s ease;
+}
+
+.necklace-bead:hover {
+  transform: translate(-50%, -50%) rotate(var(--bead-rotate, 0deg)) scale(1.18);
+  z-index: 10;
+  box-shadow:
+    0 6px 16px rgba(45, 31, 35, .28),
+    inset 0 -2px 3px rgba(0,0,0,.12),
+    inset 0 1px 2px rgba(255,255,255,.5);
+}
+
+.necklace-bead img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 50%;
+}
+
+.necklace-bead span {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.necklace-bead--new {
+  animation: beadPop .22s ease-out;
+}
+
+@keyframes beadPop {
+  from {
+    transform: translate(-50%, -50%) rotate(var(--bead-rotate, 0deg)) scale(.35);
+    opacity: .2;
+  }
+
+  to {
+    transform: translate(-50%, -50%) rotate(var(--bead-rotate, 0deg)) scale(1);
+    opacity: 1;
+  }
+}
+
+.neck-constructor-stage .scene-message {
+  z-index: 4;
+}
+
+@media (max-width: 760px) {
+  .neck-constructor-stage {
+    width: 100%;
+    border-radius: 22px;
+  }
+
+  .necklace-thread {
+    stroke-width: 3;
+  }
+}
+
+
+/* Real necklace shape over neck photo */
+.neck-constructor-stage {
+  background: #fff;
+}
+
+.neck-photo {
+  object-fit: cover;
+}
+
+.necklace-svg {
+  z-index: 2;
+}
+
+.necklace-layout-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+.necklace-chain {
+  fill: none;
+  stroke: rgba(178, 174, 168, .96);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 5 4;
+  filter: url(#necklaceSoftShadow);
+}
+
+.necklace-chain--back {
+  opacity: .96;
+}
+
+.necklace-thread--front {
+  fill: none;
+  stroke: rgba(205, 201, 196, .84);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  filter: drop-shadow(0 1px 2px rgba(72, 58, 52, .14));
+}
+
+.necklace-beads {
+  z-index: 4;
+}
+
+.necklace-bead {
+  border: 1px solid rgba(225, 222, 216, .86);
+  background:
+    radial-gradient(circle at 30% 26%, rgba(255,255,255,.95), rgba(255,255,255,.18) 26%, transparent 38%),
+    radial-gradient(circle at 55% 60%, var(--stone-color), rgba(0,0,0,.22));
+}
+
+.necklace-bead img {
+  transform: scale(1.14);
+}
+
+@media (max-width: 760px) {
+  .necklace-chain {
+    stroke-width: 2.7;
+  }
+
+  .necklace-thread--front {
+    stroke-width: 1.8;
+  }
+}
+
+
+/* Dynamic necklace size */
+.neck-constructor-stage[data-necklace-size] .necklace-chain,
+.neck-constructor-stage[data-necklace-size] .necklace-thread--front {
+  transition: stroke-width .18s ease, opacity .18s ease;
+}
+
+.neck-constructor-stage[data-necklace-size] .necklace-chain {
+  stroke-width: calc(2.6px + var(--necklace-size-progress, .3) * 1.1px);
+}
+
+.neck-constructor-stage[data-necklace-size] .necklace-thread--front {
+  stroke-width: calc(1.8px + var(--necklace-size-progress, .3) * .75px);
+}
+
+
+/* Bigger necklace that visually goes behind the neck */
+.neck-constructor-stage {
+  width: min(100%, 820px);
+}
+
+.necklace-svg {
+  z-index: 2;
+}
+
+.necklace-layout-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+.necklace-thread--front {
+  fill: none;
+  stroke: rgba(187, 184, 179, .96);
+  stroke-width: calc(2.8px + var(--necklace-size-progress, .3) * 1.2px);
+  stroke-linecap: round;
+  stroke-dasharray: 5 4;
+  filter: url(#necklaceSoftShadow);
+}
+
+/*
+  Это дубль того же фото поверх верхней части цепочки.
+  Он скрывает нить в зоне шеи, поэтому создаётся эффект,
+  что ожерелье реально уходит за шею модели.
+*/
+.neck-photo-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url("../img/neck-model.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  clip-path: polygon(
+    36% 16%,
+    64% 16%,
+    68% 33%,
+    66% 49%,
+    61% 57%,
+    56% 61%,
+    50% 63%,
+    44% 61%,
+    39% 57%,
+    34% 49%,
+    32% 33%
+  );
+}
+
+.necklace-beads {
+  z-index: 4;
+}
+
+.necklace-bead {
+  border: 1px solid rgba(224, 221, 216, .9);
+}
+
+.necklace-bead:hover {
+  z-index: 20;
+}
+
+@media (max-width: 760px) {
+  .necklace-thread--front {
+    stroke-width: calc(2.2px + var(--necklace-size-progress, .3) * .8px);
+  }
+}
+
+
+/* Symmetry + behind neck + capacity fix */
+.necklace-thread--front {
+  stroke: rgba(184, 181, 176, .96);
+  stroke-width: calc(2.4px + var(--necklace-size-progress, .3) * .95px);
+  stroke-dasharray: 4 3;
+}
+
+.neck-photo-mask {
+  z-index: 8;
+  clip-path: polygon(
+    37.5% 14%,
+    62.5% 14%,
+    66% 32%,
+    65% 45%,
+    61.5% 54%,
+    56% 59%,
+    50% 61%,
+    44% 59%,
+    38.5% 54%,
+    35% 45%,
+    34% 32%
+  );
+}
+
+.necklace-beads {
+  z-index: 5;
+}
+
+.necklace-bead {
+  box-shadow:
+    0 1px 3px rgba(45, 31, 35, .2),
+    inset 0 -2px 3px rgba(0,0,0,.12),
+    inset 0 1px 2px rgba(255,255,255,.54);
+}
+
+
+/* Stones until the necklace goes behind the neck */
+.necklace-thread--full {
+  fill: none;
+  stroke: rgba(181, 178, 173, .96);
+  stroke-width: calc(2.5px + var(--necklace-size-progress, .3) * .9px);
+  stroke-linecap: round;
+  stroke-dasharray: 4 3;
+  filter: url(#necklaceSoftShadow);
+}
+
+.necklace-thread--front {
+  display: none;
+}
+
+.necklace-layout-path {
+  fill: none;
+  stroke: transparent;
+  stroke-width: 1;
+}
+
+.necklace-beads {
+  z-index: 5;
+}
+
+.neck-photo-mask {
+  z-index: 6;
+  /*
+    Закрывает только саму шею, чтобы верхняя цепочка уходила за модель.
+    Камни заканчиваются ниже этой зоны, поэтому не должны пропадать.
+  */
+  clip-path: polygon(
+    36% 13%,
+    64% 13%,
+    67.5% 32%,
+    66% 46%,
+    62% 55%,
+    56% 60.5%,
+    50% 62.5%,
+    44% 60.5%,
+    38% 55%,
+    34% 46%,
+    32.5% 32%
+  );
+}
+
+.necklace-bead {
+  border: 1px solid rgba(224, 221, 216, .9);
+  box-shadow:
+    0 1px 3px rgba(45, 31, 35, .2),
+    inset 0 -2px 3px rgba(0,0,0,.12),
+    inset 0 1px 2px rgba(255,255,255,.54);
+}
+
+
+/* Restore necklace middle only */
+/* Посадку, координаты и JS не трогаем. Исправляем только маску, которая скрывала середину. */
+.neck-photo-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background-image: url("../img/neck-model.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  clip-path: none !important;
+}
+
+/* Левая боковая маска: скрывает только место захода цепочки за шею */
+.neck-photo-mask--left {
+  clip-path: polygon(
+    31% 13%,
+    45% 13%,
+    45% 38%,
+    42% 49%,
+    37% 55%,
+    32% 48%,
+    29% 34%
+  ) !important;
+}
+
+/* Правая боковая маска: скрывает только место захода цепочки за шею */
+.neck-photo-mask--right {
+  clip-path: polygon(
+    55% 13%,
+    69% 13%,
+    72% 34%,
+    68% 48%,
+    63% 55%,
+    58% 49%,
+    55% 38%
+  ) !important;
+}
+
+/* Камни остаются видимыми поверх боковых масок */
+.necklace-beads {
+  z-index: 7 !important;
+}
+
+
+/* Restore all visible parts */
+/*
+  JS, центр, ширина, верх, низ и посадка не менялись.
+  Этот блок только уменьшает зоны маски, чтобы она больше не съедала видимую часть ожерелья.
+*/
+
+.neck-photo-mask {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  background-image: url("../img/neck-model.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  clip-path: none !important;
+}
+
+/* Мини-маска слева: закрывает только самый верхний заход цепочки за шею */
+.neck-photo-mask--left {
+  clip-path: polygon(
+    35.5% 14%,
+    43.5% 14%,
+    43.2% 29%,
+    41.2% 35%,
+    37.2% 35%,
+    35.2% 28%
+  ) !important;
+}
+
+/* Мини-маска справа: закрывает только самый верхний заход цепочки за шею */
+.neck-photo-mask--right {
+  clip-path: polygon(
+    56.5% 14%,
+    64.5% 14%,
+    64.8% 28%,
+    62.8% 35%,
+    58.8% 35%,
+    56.8% 29%
+  ) !important;
+}
+
+/* Бусины точно поверх масок */
+.necklace-beads {
+  z-index: 8 !important;
+}
+
+/* SVG с цепочкой остаётся под мини-масками, но сама линия виднее */
+.necklace-svg {
+  z-index: 2 !important;
+}
+
+.necklace-thread--full {
+  stroke: rgba(150, 146, 140, .98) !important;
+  stroke-width: calc(3px + var(--necklace-size-progress, .3) * .9px) !important;
+  filter:
+    drop-shadow(0 1px 1px rgba(255,255,255,.55))
+    drop-shadow(0 2px 3px rgba(40,30,25,.24)) !important;
+}
+
+.necklace-thread--front {
+  stroke: rgba(150, 146, 140, .98) !important;
+  stroke-width: calc(3px + var(--necklace-size-progress, .3) * .9px) !important;
+  filter:
+    drop-shadow(0 1px 1px rgba(255,255,255,.55))
+    drop-shadow(0 2px 3px rgba(40,30,25,.24)) !important;
+}
+
+
+/* Bigger stones, exact necklace trajectory */
+/*
+  Параметры посадки ожерелья не менялись.
+  Камни увеличены через JS-константы и остаются строго на SVG-пути ожерелья.
+*/
+.necklace-bead {
+  box-shadow:
+    0 2px 5px rgba(45, 31, 35, .26),
+    inset 0 -3px 4px rgba(0,0,0,.16),
+    inset 0 2px 3px rgba(255,255,255,.62) !important;
+}
+
+.necklace-bead img {
+  transform: scale(1.18);
+}
+
+
+/* Draggable stones */
+/* Посадка ожерелья, траектория, маски и размер не менялись. */
+.necklace-bead {
+  touch-action: none;
+  cursor: grab;
+  user-select: none;
+}
+
+.necklace-bead--dragging {
+  cursor: grabbing;
+  z-index: 50 !important;
+  opacity: .92;
+  transform: translate(-50%, -50%) rotate(var(--bead-rotate, 0deg)) scale(1.18) !important;
+  box-shadow:
+    0 10px 26px rgba(45, 31, 35, .32),
+    inset 0 -3px 4px rgba(0,0,0,.16),
+    inset 0 2px 3px rgba(255,255,255,.62) !important;
+}
+
+.neck-constructor-stage--dragging {
+  cursor: grabbing;
+}
+
+
+/* Correct drag drop indexing */
+/* Посадка, траектория, размер камней и лимит не менялись. */
+.necklace-bead--dragging {
+  pointer-events: none;
+}
+
+
+/* Exact drag position */
+/*
+  Посадка ожерелья, траектория, маски, размер камней и лимит не менялись.
+  Камень теперь сохраняет точную позицию на SVG-пути после отпускания.
+*/
+.necklace-bead--dragging {
+  pointer-events: none;
+  z-index: 70 !important;
+}
+
+
+/* Collision placement for dragged stones */
+/* Посадка, траектория, размер, маски и лимит не менялись. */
+.necklace-bead--dragging {
+  pointer-events: none;
+  z-index: 80 !important;
+}
+
+
+/* Home carousel */
+.home-page {
+  max-width: 1420px;
+  margin: 32px auto 70px;
+  padding: 0 24px;
+}
+
+.home-carousel {
+  width: 100%;
+}
+
+.home-carousel__viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: 34px;
+  background: rgba(255, 255, 255, .68);
+  border: 1px solid rgba(174, 155, 243, .28);
+  box-shadow: 0 24px 70px rgba(174, 155, 243, .18);
+}
+
+.home-carousel__track {
+  display: flex;
+  transition: transform .65s ease;
+  will-change: transform;
+}
+
+.home-carousel__slide {
+  min-width: 100%;
+  position: relative;
+}
+
+.home-carousel__slide img {
+  display: block;
+  width: 100%;
+  height: 620px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.home-carousel__button {
+  position: absolute;
+  top: 50%;
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  border: 0;
+  border-radius: 999px;
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, .72);
+  color: rgba(28, 20, 32, .82);
+  font-size: 36px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: 0 10px 26px rgba(28, 20, 32, .14);
+  backdrop-filter: blur(10px);
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.home-carousel__button:hover {
+  transform: translateY(-50%) scale(1.08);
+  background: rgba(255, 255, 255, .92);
+  box-shadow: 0 14px 34px rgba(238, 154, 197, .24);
+}
+
+.home-carousel__button--prev {
+  left: 18px;
+  padding-bottom: 7px;
+}
+
+.home-carousel__button--next {
+  right: 18px;
+  padding-bottom: 7px;
+}
+
+.home-carousel__dots {
+  position: absolute;
+  left: 50%;
+  bottom: 18px;
+  z-index: 4;
+  display: flex;
+  gap: 9px;
+  transform: translateX(-50%);
+  padding: 8px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .54);
+  backdrop-filter: blur(10px);
+}
+
+.home-carousel__dots button {
+  width: 10px;
+  height: 10px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(174, 155, 243, .42);
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, width .18s ease;
+}
+
+.home-carousel__dots button.is-active {
+  width: 26px;
+  border-radius: 999px;
+  background: #ee9ac5;
+}
+
+@media (max-width: 720px) {
+  .home-page {
+    margin-top: 22px;
+    padding: 0 14px 50px;
+  }
+
+  .home-carousel__viewport {
+    border-radius: 22px;
+  }
+
+  .home-carousel__slide img {
+    height: 260px;
+  }
+
+  .home-carousel__button {
+    width: 38px;
+    height: 38px;
+    font-size: 30px;
+  }
+
+  .home-carousel__button--prev {
+    left: 10px;
+  }
+
+  .home-carousel__button--next {
+    right: 10px;
+  }
+}
+
+
+/* Admin carousel upload */
+.carousel-admin-preview {
+  margin-top: 16px;
+}
+
+.carousel-admin-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.carousel-admin-card {
+  padding: 14px;
+  border: 1px solid rgba(174, 155, 243, .28);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .78);
+}
+
+.carousel-admin-card strong,
+.carousel-admin-card span {
+  display: block;
+}
+
+.carousel-admin-card span {
+  margin: 5px 0 10px;
+  color: rgba(28, 20, 32, .58);
+  font-size: 13px;
+}
+
+.carousel-admin-card img {
+  width: 100%;
+  aspect-ratio: 1420 / 620;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(28, 20, 32, .12);
+}
+
+@media (max-width: 720px) {
+  .carousel-admin-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Admin carousel unlimited upload */
+.carousel-admin-preview {
+  margin-top: 16px;
+}
+
+.carousel-admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 14px;
+}
+
+.carousel-admin-card {
+  padding: 14px;
+  border: 1px solid rgba(174, 155, 243, .28);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .78);
+}
+
+.carousel-admin-card strong,
+.carousel-admin-card span {
+  display: block;
+}
+
+.carousel-admin-card span {
+  margin: 5px 0 10px;
+  color: rgba(28, 20, 32, .58);
+  font-size: 13px;
+}
+
+.carousel-admin-card img {
+  width: 100%;
+  aspect-ratio: 1420 / 620;
+  object-fit: cover;
+  display: block;
+  border-radius: 14px;
+  box-shadow: 0 10px 24px rgba(28, 20, 32, .12);
+}
+
+.carousel-delete-button {
+  width: 100%;
+  margin-top: 12px;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(238, 154, 197, .22);
+  color: #8c4d79;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+
+/* Admin carousel order */
+.carousel-order-toolbar {
+  margin: 14px 0 16px;
+  padding: 14px;
+  border: 1px solid rgba(174, 155, 243, .28);
+  border-radius: 18px;
+  background: rgba(255, 255, 255, .72);
+}
+
+.carousel-order-toolbar strong,
+.carousel-order-toolbar span {
+  display: block;
+}
+
+.carousel-order-toolbar span {
+  margin: 6px 0 12px;
+  color: rgba(28, 20, 32, .58);
+  font-size: 13px;
+}
+
+.carousel-order-toolbar button {
+  width: 100%;
+  padding: 11px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #ee9ac5, #9a84e8);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.carousel-index-field {
+  display: block;
+  margin: 10px 0 12px;
+  color: rgba(28, 20, 32, .72);
+  font-size: 13px;
+}
+
+.carousel-index-field input {
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px 11px;
+  border: 1px solid rgba(174, 155, 243, .45);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .9);
+  color: rgba(28, 20, 32, .86);
+  outline: none;
+}

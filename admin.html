@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка Livetta</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div class="lava-background">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+
+    <div>
+        <img src="img/Logo.png" alt="Логотип Livetta" class="logo">
+    </div>
+
+    <main class="admin">
+        <section id="loginSection" class="admin-card">
+            <h1>Вход в админку</h1>
+
+            <form id="loginForm" class="admin-form">
+                <input id="login" name="login" type="text" placeholder="Логин" required>
+                <input id="password" name="password" type="password" placeholder="Пароль" required>
+                <button type="submit">Войти</button>
+            </form>
+        </section>
+
+        <section id="adminPanel" hidden>
+            <div class="admin-grid">
+                <section class="admin-card">
+                    <h1>Добавить товар</h1>
+
+                    <form id="productForm" class="admin-form" enctype="multipart/form-data">
+                        <input id="title" name="title" type="text" placeholder="Название украшения" required>
+
+                        <select id="category" name="category" required>
+                            <option value="">Категория</option>
+                            <option value="Ожерелье">Ожерелье</option>
+                            <option value="Кольцо">Кольцо</option>
+                            <option value="Браслет">Браслет</option>
+                            <option value="Серьги">Серьги</option>
+                        </select>
+
+                        <input id="price" name="price" type="text" inputmode="decimal" placeholder="Цена, например 2500"
+                            required>
+
+                        <textarea id="description" name="description" placeholder="Описание" required></textarea>
+
+                        <label class="file-field">
+                            Фото товара
+                            <input id="productImage" name="image" type="file" accept="image/*">
+                        </label>
+
+                        <button type="submit">Добавить товар</button>
+                    </form>
+                </section>
+
+                <section class="admin-card admin-card--accent">
+                    <h1>Добавить камень</h1>
+
+                    <p class="muted-text">
+                        Размер указывай в миллиметрах. Можно писать 8, 8.5 или 8,5.
+                    </p>
+
+                    <form id="stoneForm" class="admin-form" enctype="multipart/form-data">
+                        <input id="stoneName" name="name" type="text" placeholder="Название камня" required>
+
+                        <textarea id="stoneDescription" name="description" placeholder="Описание камня"
+                            required></textarea>
+
+                        <input id="stonePrice" name="price" type="text" inputmode="decimal"
+                            placeholder="Цена за 1 камень" required>
+
+                        <input id="stoneSize" name="size_mm" type="text" inputmode="decimal"
+                            placeholder="Размер камня, мм, например 8" required>
+
+                        <label>
+                            Цвет камня
+                            <input id="stoneColor" name="color" type="color" value="#b48a78">
+                        </label>
+
+                        <label class="file-field">
+                            Фото камня
+                            <input id="stoneImage" name="image" type="file" accept="image/*">
+                        </label>
+
+                        <button type="submit">Добавить камень</button>
+                    </form>
+                </section>
+                <section class="admin-card admin-card--accent">
+                    <h1>Карусель главной страницы</h1>
+
+                    <p class="muted-text">
+                        Загружай фото строго в размере <strong>1420×620 px</strong>, чтобы баннеры не обрезались и выглядели ровно.
+                        Можно загрузить любое количество фото.
+                    </p>
+
+                    <form id="carouselForm" class="admin-form" enctype="multipart/form-data">
+                        <label class="file-field">
+                            Фото для карусели, размер 1420×620 px
+                            <input id="carouselImages" name="slides" type="file" accept="image/*" multiple>
+                        </label>
+
+                        <button type="submit">Добавить фото в карусель</button>
+                    </form>
+
+                    <div id="carouselAdminPreview" class="carousel-admin-preview"></div>
+                </section>
+
+</div>
+
+            <section class="admin-card">
+                <h2>Товары</h2>
+                <div id="adminProducts" class="admin-list"></div>
+            </section>
+
+            <section class="admin-card">
+                <h2>Камни для конструктора</h2>
+                <div id="adminStones" class="admin-list"></div>
+            </section>
+        </section>
+    </main>
+
+    <script src="js/admin.js"></script>
+</body>
+
+</html>
