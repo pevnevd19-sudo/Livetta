@@ -154,14 +154,16 @@ function renderProductStones(product) {
     <div class="premium-product-stones">
       <h2>Камни в украшении</h2>
       <div class="premium-product-stones__list">
-        ${stones.map((stone) => `
+        ${stones.map((stone) => {
+          const property = String(stone.stone_property || stone.description || '').trim();
+          return `
           <article class="premium-product-stone">
             <h3>${escapeHtml(stone.name)}</h3>
-            ${stone.description ? `<p>${formatTextBlock(stone.description)}</p>` : ''}
-            ${stone.stone_property ? `<p><b>Свойство:</b> ${formatTextBlock(stone.stone_property)}</p>` : ''}
-            ${stone.zodiac ? `<p><b>Зодиак:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
+            ${property ? `<p><b>${escapeHtml(stone.name)}</b> — ${formatTextBlock(property)}</p>` : ''}
+            ${stone.zodiac ? `<p><b>Знаки зодиака:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
           </article>
-        `).join('')}
+        `;
+        }).join('')}
       </div>
     </div>
   `;

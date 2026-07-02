@@ -5,7 +5,7 @@
   const DEFAULT_CLASP_RESERVE_MM = 20;
   const CART_KEY = 'livetta_cart';
 
-  const THREAD_FIT_STORAGE_KEY = 'livetta_constructor_thread_fit_v2';
+  const THREAD_FIT_STORAGE_KEY = 'livetta_constructor_thread_fit_v4';
   const MAX_VISUAL_STONES = 36;
 
   /*
@@ -23,7 +23,15 @@
     bottomY30: 665,
     bottomY50: 790,
     bottomHalf30: 96,
-    bottomHalf50: 156
+    bottomHalf50: 156,
+    stoneOffsetX: 0,
+    stoneOffsetY: 0,
+    stoneTopGap: 0,
+    stoneTopHalfAdd: 0,
+    stoneSideYOffset: 0,
+    stoneSideHalfAdd: 0,
+    stoneBottomYOffset: 0,
+    stoneBottomHalfAdd: 0
   };
 
   let NECKLACE_FIT = loadNecklaceFit();
@@ -312,20 +320,19 @@
       'C ' + (fit.centerX + bottomHalf) + ' ' + bottomY + ', ' + (fit.centerX + sideHalf) + ' ' + sideY + ', ' + rightTop + ' ' + fit.topY
     ].join(' ');
 
-    /*
-      Stones use a slightly lower visible path. The full thread still goes up
-      behind the neck, but beads start where the necklace is visible on the model.
-    */
-    const beadTopGap = 42;
-    const beadTopHalf = fit.topHalf + 24;
-    const beadSideY = sideY + 8;
-    const beadSideHalf = sideHalf + 10;
-    const beadLeftTop = fit.centerX - beadTopHalf;
-    const beadRightTop = fit.centerX + beadTopHalf;
+    const stoneCenterX = fit.centerX + fit.stoneOffsetX;
+    const beadTopY = fit.topY + fit.stoneTopGap + fit.stoneOffsetY;
+    const beadTopHalf = Math.max(20, fit.topHalf + fit.stoneTopHalfAdd);
+    const beadSideY = sideY + fit.stoneSideYOffset + fit.stoneOffsetY;
+    const beadSideHalf = Math.max(20, sideHalf + fit.stoneSideHalfAdd);
+    const beadBottomY = bottomY + fit.stoneBottomYOffset + fit.stoneOffsetY;
+    const beadBottomHalf = Math.max(20, bottomHalf + fit.stoneBottomHalfAdd);
+    const beadLeftTop = stoneCenterX - beadTopHalf;
+    const beadRightTop = stoneCenterX + beadTopHalf;
     const beadD = [
-      'M ' + beadLeftTop + ' ' + (fit.topY + beadTopGap),
-      'C ' + (fit.centerX - beadSideHalf) + ' ' + beadSideY + ', ' + (fit.centerX - bottomHalf) + ' ' + bottomY + ', ' + fit.centerX + ' ' + bottomY,
-      'C ' + (fit.centerX + bottomHalf) + ' ' + bottomY + ', ' + (fit.centerX + beadSideHalf) + ' ' + beadSideY + ', ' + beadRightTop + ' ' + (fit.topY + beadTopGap)
+      'M ' + beadLeftTop + ' ' + beadTopY,
+      'C ' + (stoneCenterX - beadSideHalf) + ' ' + beadSideY + ', ' + (stoneCenterX - beadBottomHalf) + ' ' + beadBottomY + ', ' + stoneCenterX + ' ' + beadBottomY,
+      'C ' + (stoneCenterX + beadBottomHalf) + ' ' + beadBottomY + ', ' + (stoneCenterX + beadSideHalf) + ' ' + beadSideY + ', ' + beadRightTop + ' ' + beadTopY
     ].join(' ');
 
     path.setAttribute('d', beadD);

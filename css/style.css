@@ -10521,3 +10521,185 @@ body.is-stone-catalog-open {
 .stone-catalog-modal {
   z-index: 10050 !important;
 }
+
+/* Codex fit controls, product cards, and admin stone editor */
+.catalog-product-card__body {
+  min-height: 0 !important;
+  padding: 16px !important;
+}
+
+.catalog-product-card__bottom {
+  margin-top: 8px !important;
+  padding-top: 0 !important;
+}
+
+.catalog-product-card .product-card__title {
+  margin-bottom: 0 !important;
+}
+
+.catalog-product-card .product-card__price {
+  margin: 5px 0 12px !important;
+  font-size: 18px !important;
+  line-height: 1.15 !important;
+}
+
+.catalog-product-card .product-card__image img {
+  animation: none !important;
+  transition: none !important;
+  transform: scale(1) !important;
+}
+
+.catalog-product-card:hover .product-card__image img {
+  transform: scale(1.035) !important;
+}
+
+.stone-catalog-modal__dialog {
+  width: min(96vw, 1320px) !important;
+  height: min(92vh, 900px) !important;
+  max-height: min(92vh, 900px) !important;
+}
+
+.stone-catalog-list {
+  grid-template-columns: repeat(auto-fill, minmax(255px, 1fr)) !important;
+  gap: 18px !important;
+  padding: 2px 6px 16px !important;
+}
+
+.constructor-catalog-stone {
+  display: grid !important;
+  grid-template-rows: auto minmax(0, 1fr) auto !important;
+  gap: 12px !important;
+  min-height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden !important;
+  border-radius: 8px !important;
+  background: rgba(255, 255, 255, .82) !important;
+  box-shadow: 0 18px 44px rgba(143, 86, 127, .12) !important;
+}
+
+.constructor-catalog-stone__image {
+  aspect-ratio: 1 / 1 !important;
+  max-height: none !important;
+  border-radius: 0 !important;
+}
+
+.constructor-catalog-stone__image img {
+  transform: none !important;
+}
+
+.constructor-catalog-stone__body {
+  gap: 8px !important;
+  padding: 0 16px !important;
+}
+
+.constructor-catalog-stone__body h3 {
+  font-size: 18px !important;
+  line-height: 1.18 !important;
+}
+
+.constructor-catalog-stone__meta {
+  order: 2;
+  margin-top: 2px !important;
+}
+
+.constructor-catalog-stone__body > p,
+.constructor-catalog-stone__detail p {
+  font-size: 13px !important;
+  line-height: 1.42 !important;
+}
+
+.constructor-catalog-stone > button {
+  width: auto !important;
+  min-height: 44px !important;
+  margin: 0 16px 16px !important;
+  border-radius: 999px !important;
+}
+
+.thread-setting--stones {
+  background: linear-gradient(135deg, rgba(246, 251, 255, .78), rgba(255, 246, 250, .68)) !important;
+}
+
+.admin-product-stone-editor {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(184, 138, 223, .18);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .62);
+}
+
+.admin-product-stone-editor__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.admin-product-stone-editor__head span {
+  display: block;
+  color: rgba(38, 27, 41, .82);
+  font-weight: 900;
+}
+
+.admin-product-stone-editor__head small {
+  display: block;
+  margin-top: 3px;
+  color: rgba(38, 27, 41, .56);
+  font-size: 12px;
+}
+
+.admin-product-stone-editor__head button,
+.admin-product-stone-row button {
+  min-height: 36px !important;
+  border-radius: 10px !important;
+}
+
+.admin-product-stone-editor__list {
+  display: grid;
+  gap: 12px;
+}
+
+.admin-product-stone-row {
+  display: grid;
+  grid-template-columns: minmax(150px, .9fr) minmax(220px, 1.5fr) minmax(180px, 1fr) auto;
+  gap: 10px;
+  align-items: end;
+  padding: 12px;
+  border-radius: 12px;
+  background: rgba(255, 247, 251, .72);
+  box-shadow: inset 0 0 0 1px rgba(184, 138, 223, .12);
+}
+
+.admin-product-stone-row label {
+  display: grid;
+  gap: 6px;
+}
+
+.admin-product-stone-row span {
+  color: rgba(38, 27, 41, .68);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.admin-product-stone-row input,
+.admin-product-stone-row textarea {
+  width: 100%;
+  min-height: 40px !important;
+}
+
+.admin-product-stone-row textarea {
+  min-height: 72px !important;
+  resize: vertical;
+}
+
+@media (max-width: 860px) {
+  .admin-product-stone-editor__head,
+  .admin-product-stone-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .admin-product-stone-editor__head {
+    align-items: stretch;
+  }
+}

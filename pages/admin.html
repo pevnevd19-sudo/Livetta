@@ -6,7 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админка LiVetta</title>
-    <link rel="stylesheet" href="css/style.css?v=20260703-product-constructor">
+    <link rel="stylesheet" href="css/style.css?v=20260703-fit-admin-cards">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.ico" sizes="any">
     <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
@@ -100,7 +100,24 @@
                         </select>
                         <input id="price" name="price" type="text" inputmode="decimal" placeholder="Цена, например 2500" required>
                         <textarea id="description" name="description" placeholder="Описание" required></textarea>
-                        <textarea id="productStones" name="product_stones" placeholder="Камни в украшении: один камень на строку. Формат: Название | описание | знаки зодиака | свойство"></textarea>
+                        <input id="productStones" name="product_stones" type="hidden" value="[]">
+                        <section class="admin-product-stone-editor admin-field--wide" data-product-stones-editor>
+                            <header class="admin-product-stone-editor__head">
+                                <div>
+                                    <span>Камни в украшении</span>
+                                    <small>Название камня, его свойства и подходящие знаки зодиака</small>
+                                </div>
+                                <button type="button" data-add-product-stone>Добавить камень</button>
+                            </header>
+                            <div class="admin-product-stone-editor__list" data-product-stones-list>
+                                <article class="admin-product-stone-row" data-product-stone-row>
+                                    <label><span>Камень</span><input data-product-stone-name placeholder="Например: аметист"></label>
+                                    <label><span>Свойства</span><textarea data-product-stone-property placeholder="Например: обладает мягкой успокаивающей энергией"></textarea></label>
+                                    <label><span>Знаки зодиака</span><input data-product-stone-zodiac placeholder="Например: Рыбы, Водолей, Дева"></label>
+                                    <button type="button" data-remove-product-stone>Удалить</button>
+                                </article>
+                            </div>
+                        </section>
                         <input id="productStock" name="stock_qty" type="number" min="0" value="1" placeholder="Остаток готовых изделий" required>
                         <label class="admin-check"><input name="is_child" type="checkbox" value="1"> Детское украшение</label>
                         <input type="hidden" name="active" value="true">
@@ -220,7 +237,7 @@
     <div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script src="js/common.js"></script>
-    <script src="js/admin.js?v=20260703-product-constructor"></script>
+    <script src="js/admin.js?v=20260703-fit-admin-cards"></script>
 </body>
 
 </html>

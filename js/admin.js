@@ -48,6 +48,7 @@ function getApiUrl() {
 function init() {
   loginForm?.addEventListener('submit', handleLogin);
   productForm?.addEventListener('submit', handleProductCreate);
+  productForm?.addEventListener('click', handleProductStoneEditorClick);
   stoneForm?.addEventListener('submit', handleStoneCreate);
   categoryForm?.addEventListener('submit', handleCategoryCreate);
   adminCategories?.addEventListener('click', handleCategoryClick);
@@ -56,6 +57,7 @@ function init() {
   popularProductsAdmin?.addEventListener('click', handlePopularProductsClick);
   adminProducts?.addEventListener('submit', handleProductEditSubmit);
   adminProducts?.addEventListener('click', handleProductClick);
+  adminProducts?.addEventListener('click', handleProductStoneEditorClick);
   adminStones?.addEventListener('submit', handleStoneEditSubmit);
   adminStones?.addEventListener('click', handleStoneClick);
   adminOrders?.addEventListener('click', handleOrderClick);
@@ -598,12 +600,14 @@ async function handleProductCreate(event) {
   event.preventDefault();
   const button = event.submitter;
   const formData = new FormData(productForm);
+  syncProductStonesField(productForm, formData);
   normalizeProductImagesField(formData, productForm.querySelector('#productImage'));
 
   setButtonBusy(button, true);
   try {
     await apiFetch('/products', { method: 'POST', body: formData });
     productForm.reset();
+    resetProductStonesEditor(productForm);
     renderCategorySelect();
     await Promise.all([loadProducts(), loadPopularProducts()]);
     showAdminToast('Украшение добавлено');
@@ -729,10 +733,7 @@ function renderProduct(product) {
               <span>Описание</span>
               <textarea name="description" required>${escapeHtml(product.description)}</textarea>
             </label>
-            <label class="admin-field admin-field--wide">
-              <span>Камни в украшении</span>
-              <textarea name="product_stones" placeholder="Название | описание | знаки зодиака | свойство">${escapeHtml(formatProductStonesForTextarea(productStones))}</textarea>
-            </label>
+            ${renderProductStonesEditor(productStones)}
             <label class="file-field admin-file-field admin-field--wide">
               <span>Добавить фотографии</span>
               <input name="images" type="file" accept="image/*" multiple>
@@ -798,26 +799,130 @@ function normalizeProductStone(stone) {
 }
 
 function renderAdminProductStone(stone) {
+  const property = getProductStoneProperty(stone);
+
   return `
     <article>
       <strong>${escapeHtml(stone.name)}</strong>
-      ${stone.description ? `<p>${formatAdminDescription(stone.description)}</p>` : ''}
-      ${stone.zodiac ? `<small><b>Зодиак:</b> ${escapeHtml(stone.zodiac)}</small>` : ''}
-      ${stone.stone_property ? `<small><b>Свойство:</b> ${formatAdminDescription(stone.stone_property)}</small>` : ''}
+      ${property ? `<p>${escapeHtml(stone.name)} — ${formatAdminDescription(property)}</p>` : ''}
+      ${stone.zodiac ? `<small><b>Знаки зодиака:</b> ${escapeHtml(stone.zodiac)}</small>` : ''}
     </article>
   `;
 }
 
-function formatProductStonesForTextarea(stones) {
-  return (Array.isArray(stones) ? stones : [])
-    .map((stone) => [
-      stone.name || '',
-      stone.description || '',
-      stone.zodiac || '',
-      stone.stone_property || ''
-    ].join(' | ').replace(/\s+\|\s+$/g, '').trim())
-    .filter(Boolean)
-    .join('\n');
+function getProductStoneProperty(stone) {
+  return String(stone?.stone_property || stone?.property || stone?.description || '').trim();
+}
+
+function renderProductStonesEditor(stones = []) {
+  const normalized = (Array.isArray(stones) ? stones : []).map(normalizeProductStone).filter(Boolean);
+  const rows = normalized.length ? normalized : [{}];
+
+  return `
+    <section class="admin-product-stone-editor admin-field--wide" data-product-stones-editor>
+      <input name="product_stones" type="hidden" value="${escapeHtml(JSON.stringify(normalized))}">
+      <header class="admin-product-stone-editor__head">
+        <div>
+          <span>Камни в украшении</span>
+          <small>Название камня, его свойства и подходящие знаки зодиака</small>
+        </div>
+        <button type="button" data-add-product-stone>Добавить камень</button>
+      </header>
+      <div class="admin-product-stone-editor__list" data-product-stones-list>
+        ${rows.map(renderProductStoneEditorRow).join('')}
+      </div>
+    </section>
+  `;
+}
+
+function renderProductStoneEditorRow(stone = {}) {
+  const property = getProductStoneProperty(stone);
+
+  return `
+    <article class="admin-product-stone-row" data-product-stone-row>
+      <label>
+        <span>Камень</span>
+        <input data-product-stone-name value="${escapeHtml(stone.name || '')}" placeholder="Например: аметист">
+      </label>
+      <label>
+        <span>Свойства</span>
+        <textarea data-product-stone-property placeholder="Например: обладает мягкой успокаивающей энергией">${escapeHtml(property)}</textarea>
+      </label>
+      <label>
+        <span>Знаки зодиака</span>
+        <input data-product-stone-zodiac value="${escapeHtml(stone.zodiac || '')}" placeholder="Например: Рыбы, Водолей, Дева">
+      </label>
+      <button type="button" data-remove-product-stone>Удалить</button>
+    </article>
+  `;
+}
+
+function handleProductStoneEditorClick(event) {
+  const addButton = event.target.closest('[data-add-product-stone]');
+  const removeButton = event.target.closest('[data-remove-product-stone]');
+
+  if (addButton) {
+    event.preventDefault();
+    addProductStoneRow(addButton.closest('[data-product-stones-editor]'));
+    return;
+  }
+
+  if (removeButton) {
+    event.preventDefault();
+    const editor = removeButton.closest('[data-product-stones-editor]');
+    const row = removeButton.closest('[data-product-stone-row]');
+    const rows = editor ? Array.from(editor.querySelectorAll('[data-product-stone-row]')) : [];
+
+    if (row && rows.length > 1) {
+      row.remove();
+    } else if (row) {
+      row.querySelectorAll('input, textarea').forEach((field) => {
+        field.value = '';
+      });
+    }
+
+    syncProductStonesField(removeButton.closest('form'));
+  }
+}
+
+function addProductStoneRow(editor, stone = {}) {
+  const list = editor?.querySelector('[data-product-stones-list]');
+  if (!list) return;
+  list.insertAdjacentHTML('beforeend', renderProductStoneEditorRow(stone));
+}
+
+function resetProductStonesEditor(form) {
+  const editor = form?.querySelector('[data-product-stones-editor]');
+  const list = editor?.querySelector('[data-product-stones-list]');
+  if (!list) return;
+  list.innerHTML = renderProductStoneEditorRow({});
+  syncProductStonesField(form);
+}
+
+function syncProductStonesField(form, formData = null) {
+  const stones = readProductStonesEditor(form);
+  const value = JSON.stringify(stones);
+  const hidden = form?.querySelector('[name="product_stones"]');
+
+  if (hidden) {
+    hidden.value = value;
+  }
+
+  if (formData) {
+    formData.set('product_stones', value);
+  }
+
+  return stones;
+}
+
+function readProductStonesEditor(form) {
+  return Array.from(form?.querySelectorAll('[data-product-stone-row]') || [])
+    .map((row) => normalizeProductStone({
+      name: row.querySelector('[data-product-stone-name]')?.value,
+      stone_property: row.querySelector('[data-product-stone-property]')?.value,
+      zodiac: row.querySelector('[data-product-stone-zodiac]')?.value
+    }))
+    .filter(Boolean);
 }
 
 async function handleProductEditSubmit(event) {
@@ -843,6 +948,7 @@ async function handleProductEditSubmit(event) {
   event.preventDefault();
   const button = event.submitter;
   const formData = new FormData(form);
+  syncProductStonesField(form, formData);
   normalizeProductImagesField(formData, form.querySelector('input[type="file"]'));
   if (form.querySelector('[name="active"]') && !form.querySelector('[name="active"]').checked) {
     formData.set('active', 'false');
