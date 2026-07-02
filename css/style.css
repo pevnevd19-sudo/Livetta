@@ -10703,3 +10703,469 @@ body.is-stone-catalog-open {
     align-items: stretch;
   }
 }
+
+/* Clean LiVetta constructor rebuild */
+.lv-constructor {
+  width: min(100% - 28px, 1440px);
+  margin: 24px auto 80px;
+}
+
+.lv-builder {
+  display: grid;
+  gap: 22px;
+}
+
+.lv-builder__head {
+  display: grid;
+  gap: 6px;
+  text-align: center;
+}
+
+.lv-builder__head h1 {
+  margin: 0;
+  color: rgba(38, 27, 41, .92);
+  font-size: clamp(34px, 5vw, 58px);
+  line-height: 1;
+}
+
+.lv-builder__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(340px, 430px);
+  gap: 22px;
+  align-items: start;
+}
+
+.lv-builder__preview,
+.lv-builder__catalog {
+  border: 1px solid rgba(184, 138, 223, .18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .76);
+  box-shadow: 0 18px 48px rgba(143, 86, 127, .10);
+}
+
+.lv-builder__preview {
+  padding: 18px;
+}
+
+.lv-builder__catalog {
+  position: sticky;
+  top: 16px;
+  display: grid;
+  gap: 16px;
+  max-height: calc(100vh - 32px);
+  padding: 16px;
+  overflow: hidden;
+}
+
+.lv-builder__controls {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.lv-builder__controls label,
+.lv-fit-grid label {
+  display: grid;
+  gap: 6px;
+}
+
+.lv-builder__controls span,
+.lv-fit-grid span {
+  color: rgba(38, 27, 41, .66);
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.lv-builder__controls select,
+.lv-builder__catalog input {
+  width: 100%;
+  min-height: 42px;
+  border: 1px solid rgba(184, 138, 223, .28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .9);
+  color: rgba(38, 27, 41, .9);
+  font: inherit;
+  font-size: 14px;
+  outline: none;
+  padding: 0 12px;
+}
+
+.lv-neck-stage {
+  position: relative;
+  width: min(100%, 800px);
+  margin: 0 auto;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.lv-neck-stage__photo,
+.lv-neck-stage__svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.lv-neck-stage__photo {
+  object-fit: cover;
+  pointer-events: none;
+  user-select: none;
+}
+
+.lv-neck-stage__svg {
+  z-index: 2;
+  overflow: visible;
+}
+
+.lv-thread-path {
+  fill: none;
+  stroke: rgba(142, 137, 131, .96);
+  stroke-width: 4.2;
+  stroke-linecap: round;
+  stroke-dasharray: 4 3;
+  filter: drop-shadow(0 1px 2px rgba(35, 26, 24, .25));
+}
+
+.lv-stone-layer {
+  cursor: pointer;
+}
+
+.lv-svg-stone {
+  cursor: pointer;
+  outline: none;
+}
+
+.lv-svg-stone__base {
+  filter: drop-shadow(0 2px 5px rgba(45, 31, 35, .24));
+}
+
+.lv-svg-stone__ring {
+  fill: none;
+  stroke: rgba(255, 255, 255, .72);
+  stroke-width: 1.6;
+}
+
+.lv-svg-stone__shine {
+  fill: rgba(255, 255, 255, .68);
+}
+
+.lv-svg-stone:hover .lv-svg-stone__base {
+  filter: drop-shadow(0 8px 16px rgba(45, 31, 35, .30));
+}
+
+.lv-builder__summary {
+  width: min(100%, 800px);
+  margin: 14px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lv-builder__summary div {
+  display: grid;
+  gap: 3px;
+  padding: 12px;
+  border: 1px solid rgba(184, 138, 223, .14);
+  border-radius: 8px;
+  background: rgba(255, 247, 251, .72);
+}
+
+.lv-builder__summary span {
+  color: rgba(38, 27, 41, .55);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.lv-builder__summary strong {
+  color: rgba(38, 27, 41, .92);
+  font-size: 18px;
+}
+
+.lv-builder__actions {
+  width: min(100%, 800px);
+  margin: 14px auto 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.lv-builder__actions button,
+.lv-stone-card > button,
+.lv-fit-panel > button,
+.lv-selected-stone button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: #ee9ac5;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.lv-builder__actions button:disabled,
+.lv-stone-card > button:disabled {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+.lv-builder__actions button:nth-child(1),
+.lv-builder__actions button:nth-child(2),
+.lv-selected-stone button {
+  background: rgba(255, 255, 255, .86);
+  color: rgba(140, 77, 121, .88);
+  box-shadow: inset 0 0 0 1px rgba(184, 138, 223, .26);
+}
+
+.lv-builder__message {
+  width: min(100%, 800px);
+  min-height: 22px;
+  margin: 10px auto 0;
+  color: rgba(38, 27, 41, .62);
+  font-size: 14px;
+  text-align: center;
+}
+
+.lv-fit-panel {
+  width: min(100%, 800px);
+  margin: 12px auto 0;
+  padding: 12px;
+  border: 1px solid rgba(184, 138, 223, .16);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .62);
+}
+
+.lv-fit-panel summary {
+  cursor: pointer;
+  color: rgba(140, 77, 121, .88);
+  font-weight: 900;
+}
+
+.lv-fit-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.lv-fit-grid label {
+  padding: 10px;
+  border-radius: 8px;
+  background: rgba(255, 247, 251, .72);
+}
+
+.lv-fit-grid span {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.lv-fit-grid input[type="range"] {
+  width: 100%;
+  accent-color: #ee9ac5;
+}
+
+.lv-builder__catalog-head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 150px;
+  gap: 12px;
+  align-items: end;
+}
+
+.lv-builder__catalog-head h2,
+.lv-selected-stones h2 {
+  margin: 2px 0 0;
+  color: rgba(38, 27, 41, .9);
+  font-size: 22px;
+}
+
+.lv-stone-catalog {
+  min-height: 220px;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 12px;
+  padding-right: 4px;
+}
+
+.lv-stone-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(184, 138, 223, .18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .88);
+  box-shadow: 0 12px 28px rgba(143, 86, 127, .10);
+}
+
+.lv-stone-card__image {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.86), transparent 22%),
+    var(--stone-color, #b48a78);
+}
+
+.lv-stone-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lv-stone-card__image span {
+  width: 42%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--stone-color, #b48a78);
+  box-shadow: inset 0 10px 22px rgba(255,255,255,.36), inset 0 -12px 20px rgba(0,0,0,.18);
+}
+
+.lv-stone-card__body {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+}
+
+.lv-stone-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.lv-stone-card__meta span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(238, 154, 197, .16);
+  color: rgba(140, 77, 121, .82);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.lv-stone-card h3 {
+  margin: 0;
+  color: rgba(38, 27, 41, .92);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.lv-stone-card p,
+.lv-stone-card small {
+  margin: 0;
+  color: rgba(38, 27, 41, .62);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.lv-stone-card > button {
+  margin: 0 12px 12px;
+}
+
+.lv-selected-stones {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+}
+
+#builderSelectedList {
+  display: grid;
+  gap: 8px;
+  max-height: 220px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.lv-selected-stone {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 32px 32px 32px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px;
+  border-radius: 8px;
+  background: rgba(255, 247, 251, .76);
+}
+
+.lv-selected-stone > span {
+  width: 42px;
+  height: 42px;
+  overflow: hidden;
+  border-radius: 50%;
+  background: var(--stone-color, #b48a78);
+}
+
+.lv-selected-stone img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lv-selected-stone strong,
+.lv-selected-stone small {
+  display: block;
+}
+
+.lv-selected-stone strong {
+  color: rgba(38, 27, 41, .9);
+  font-size: 14px;
+}
+
+.lv-selected-stone small {
+  color: rgba(38, 27, 41, .58);
+  font-size: 12px;
+}
+
+.lv-selected-stone button {
+  min-height: 32px;
+  width: 32px;
+  padding: 0;
+}
+
+.lv-empty {
+  margin: 0;
+  padding: 16px;
+  color: rgba(38, 27, 41, .58);
+  border-radius: 8px;
+  background: rgba(255, 247, 251, .72);
+}
+
+@media (max-width: 1040px) {
+  .lv-builder__layout {
+    grid-template-columns: 1fr;
+  }
+
+  .lv-builder__catalog {
+    position: static;
+    max-height: none;
+  }
+}
+
+@media (max-width: 720px) {
+  .lv-constructor {
+    width: min(100% - 20px, 1440px);
+    margin-top: 16px;
+  }
+
+  .lv-builder__preview,
+  .lv-builder__catalog {
+    padding: 12px;
+  }
+
+  .lv-builder__controls,
+  .lv-builder__summary,
+  .lv-builder__actions,
+  .lv-fit-grid,
+  .lv-builder__catalog-head {
+    grid-template-columns: 1fr;
+  }
+
+  .lv-stone-catalog {
+    grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+  }
+
+  .lv-selected-stone {
+    grid-template-columns: 38px minmax(0, 1fr) 30px 30px 30px;
+  }
+}
