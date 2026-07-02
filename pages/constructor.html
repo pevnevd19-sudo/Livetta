@@ -4,17 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор колье LiVetta</title>
-    <meta name="description" content="Соберите индивидуальное колье LiVetta из натуральных камней.">
-    <meta name="robots" content="index, follow">
-    <link rel="canonical" href="https://livettajew.ru/constructor.html">
-    <link rel="stylesheet" href="/css/style.css?v=20260703-clean-constructor">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#f09ab5">
+    <title>Конструктор украшений Livetta</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -27,11 +18,11 @@
     </div>
 
     <div>
-        <img src="img/Logo.png" alt="Логотип LiVetta" class="logo">
+        <img src="img/Logo.png" alt="Логотип Livetta" class="logo">
     </div>
 
     <nav class="nav">
-        <a href="/">ГЛАВНАЯ</a>
+        <a href="index.html">ГЛАВНАЯ</a>
         <a href="catalog.html">КАТАЛОГ</a>
         <a href="delivery.html">ДОСТАВКА</a>
         <a href="faq.html">ВОПРОСЫ</a>
@@ -40,105 +31,115 @@
         <a href="about.html">О НАС</a>
     </nav>
 
-    <main class="lv-constructor" data-constructor>
-        <section class="lv-builder">
-            <header class="lv-builder__head">
-                <span class="page-eyebrow">LiVetta custom</span>
-                <h1>Конструктор колье</h1>
-            </header>
+    <main class="constructor garnet-builder">
+        <section class="constructor-preview glass-card">
+            <p class="eyebrow">Livetta custom</p>
+            <h1>Конструктор ожерелья</h1>
+            <p class="constructor-lead">
+                Выбирай камни справа, и они будут надеваться на нить в 3D. Размер берётся из админки в миллиметрах,
+                бусины ставятся с зазором и не залезают друг на друга.
+            </p>
 
-            <div class="lv-builder__layout">
-                <section class="lv-builder__preview" aria-label="Примерка колье">
-                    <div class="lv-builder__controls">
-                        <label>
-                            <span>Размер</span>
-                            <select id="builderSize"></select>
-                        </label>
-                        <label>
-                            <span>Замок</span>
-                            <select id="builderClasp">
-                                <option value="">Выберите</option>
-                                <option value="lobster-steel">Карабин</option>
-                                <option value="toggle-steel">Тоггл</option>
-                                <option value="magnetic-steel">Магнитный</option>
-                                <option value="screw-steel">Винтовой</option>
-                                <option value="hook-steel">Крючок</option>
-                            </select>
-                        </label>
-                        <label>
-                            <span>Материал</span>
-                            <select id="builderMaterial">
-                                <option value="">Выберите</option>
-                                <option value="brass">Латунь</option>
-                                <option value="rhodium">Родий</option>
-                            </select>
-                        </label>
-                    </div>
+            <div class="constructor-options">
+                <label>
+                    Тип украшения
+                    <select id="jewelryType">
+                        <option value="Колье">Колье</option>
+                        <option value="Браслет">Браслет</option>
+                    </select>
+                </label>
 
-                    <div class="lv-neck-stage" id="builderStage">
-                        <img class="lv-neck-stage__photo" src="/img/neck.jpg" alt="Примерка колье на шее">
-                        <svg class="lv-neck-stage__svg" id="builderSvg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Колье">
-                            <path id="builderThreadPath" class="lv-thread-path" d="M 330 430 C 250 560, 380 735, 500 760 C 620 735, 750 560, 670 430"></path>
-                            <g id="builderStoneLayer" class="lv-stone-layer"></g>
-                        </svg>
-                    </div>
+                <label>
+                    Размер, см
+                    <select id="jewelrySize"></select>
+                </label>
 
-                    <div class="lv-builder__summary">
-                        <div><span>Цена</span><strong id="builderTotal">0 ₽</strong></div>
-                        <div><span>Камни</span><strong id="builderCount">0</strong></div>
-                        <div><span>Длина</span><strong><span id="builderUsed">0</span> / <span id="builderMax">0</span> мм</strong></div>
-                    </div>
+                <label class="constructor-clasp-field">
+                    Тип замка <span class="required-mark">*</span>
+                    <select id="claspType" required>
+                        <option value="">Выберите замок</option>
+                        <option value="lobster-steel">Карабин — нержавеющая сталь</option>
+                        <option value="toggle-steel">Тоггл — нержавеющая сталь</option>
+                        <option value="magnetic-steel">Магнитный — нержавеющая сталь</option>
+                        <option value="screw-steel">Винтовой — нержавеющая сталь</option>
+                        <option value="hook-steel">Крючок — нержавеющая сталь</option>
+                    </select>
+                    <small>Замок обязателен для оформления сборки.</small>
+                </label>
+            </div>
 
-                    <div class="lv-builder__actions">
-                        <button id="builderUndo" type="button">Убрать последний</button>
-                        <button id="builderClear" type="button">Очистить</button>
-                        <button id="addCustomToCart" type="button">В корзину</button>
-                    </div>
+            <div class="neck-constructor-stage" id="neckStage">
+                <img class="neck-photo" src="img/neck-model.jpg" alt="Шея для примерки ожерелья">
 
-                    <p id="builderMessage" class="lv-builder__message" aria-live="polite"></p>
+                <svg class="necklace-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                        <filter id="necklaceSoftShadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="2" stdDeviation="1.4" flood-color="rgba(50,35,30,.22)" />
+                        </filter>
+                    </defs>
 
-                    <details class="lv-fit-panel">
-                        <summary>Настройки нити</summary>
-                        <div class="lv-fit-grid">
-                            <label><span>Центр <b data-fit-value="centerX">500</b></span><input type="range" min="430" max="570" step="1" data-fit="centerX"></label>
-                            <label><span>Верх <b data-fit-value="topY">430</b></span><input type="range" min="330" max="560" step="1" data-fit="topY"></label>
-                            <label><span>Ширина верха <b data-fit-value="topHalf">170</b></span><input type="range" min="90" max="280" step="1" data-fit="topHalf"></label>
-                            <label><span>Бок <b data-fit-value="sideY">585</b></span><input type="range" min="430" max="740" step="1" data-fit="sideY"></label>
-                            <label><span>Ширина бока <b data-fit-value="sideHalf">285</b></span><input type="range" min="170" max="420" step="1" data-fit="sideHalf"></label>
-                            <label><span>Низ <b data-fit-value="bottomY">760</b></span><input type="range" min="580" max="920" step="1" data-fit="bottomY"></label>
-                            <label><span>Ширина низа <b data-fit-value="bottomHalf">115</b></span><input type="range" min="40" max="250" step="1" data-fit="bottomHalf"></label>
-                            <label><span>Глубина размера <b data-fit-value="sizeDepth">6</b></span><input type="range" min="0" max="12" step=".5" data-fit="sizeDepth"></label>
-                            <label><span>Размер камней <b data-fit-value="stoneScale">2.45</b></span><input type="range" min="1.4" max="4.4" step=".05" data-fit="stoneScale"></label>
-                            <label><span>Разлёт камней <b data-fit-value="stoneSpread">86</b></span><input type="range" min="35" max="96" step="1" data-fit="stoneSpread"></label>
-                        </div>
-                        <button id="builderResetFit" type="button">Сбросить посадку</button>
-                    </details>
-                </section>
+                    <!-- Полная цепочка. Верхние участки визуально уходят за шею модели. -->
+                    <path id="necklaceFullPath" class="necklace-thread necklace-thread--full" d="M 330 345 C 250 505, 360 700, 500 720 C 640 700, 750 505, 670 345" />
 
-                <aside class="lv-builder__catalog" aria-label="Камни для конструктора">
-                    <div class="lv-builder__catalog-head">
-                        <div>
-                            <span class="page-eyebrow">Камни</span>
-                            <h2>Каталог камней</h2>
-                        </div>
-                        <input id="builderStoneSearch" type="search" placeholder="Поиск">
-                    </div>
+                    <!-- Невидимый путь для бусин. Камни идут по всей видимой части до захода за шею. -->
+                    <path id="necklacePath" class="necklace-layout-path" d="M 340 430 C 245 570, 360 735, 500 750 C 640 735, 755 570, 660 430" />
+                </svg>
 
-                    <div id="builderStoneCatalog" class="lv-stone-catalog"></div>
+                <div class="neck-photo-mask neck-photo-mask--left" aria-hidden="true"></div>
+                <div class="neck-photo-mask neck-photo-mask--right" aria-hidden="true"></div>
 
-                    <section class="lv-selected-stones" aria-label="Выбранные камни">
-                        <h2>Состав</h2>
-                        <div id="builderSelectedList"></div>
-                    </section>
-                </aside>
+                <div id="necklaceBeads" class="necklace-beads"></div>
+                <div id="sceneMessage" class="scene-message">Загрузка конструктора...</div>
+            </div>
+
+            <div class="constructor-info">
+                <div>
+                    <span>Итоговая цена</span>
+                    <strong id="totalPrice">0 ₽</strong>
+                </div>
+                <div>
+                    <span>Тип</span>
+                    <strong id="selectedType">Колье</strong>
+                </div>
+                <div>
+                    <span>Размер</span>
+                    <strong><span id="selectedSize">45</span> см</strong>
+                </div>
+                <div>
+                    <span>Замок</span>
+                    <strong id="selectedClasp">Не выбран</strong>
+                </div>
+                <div>
+                    <span>Камни</span>
+                    <strong><span id="usedLength">0</span> / <span id="maxLength">0</span> мм</strong>
+                </div>
+            </div>
+
+            <div class="constructor-actions">
+                <button id="undoStone" type="button">Убрать последний</button>
+                <button id="clearConstructor" type="button">Очистить</button>
+                <button id="addCustomToCart" type="button">Добавить сборку в корзину</button>
+            </div>
+
+            <div id="capacityHint" class="capacity-hint">
+                Нажми на гранат справа, чтобы надеть его на нить.
             </div>
         </section>
+
+        <aside class="stones-panel glass-card">
+            <h2>Камни из админки</h2>
+            <p class="muted-text">
+                Камни подтягиваются из базы. Если сервер не запущен, конструктор покажет тестовый гранат.
+            </p>
+
+            <div id="stonesList"></div>
+        </aside>
     </main>
 
-    <script src="/js/common.js"></script>
-    <footer class="site-footer"><div class="site-footer__brand"><strong>LiVetta</strong><p>Украшения ручной работы из натуральных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="user-agreement.html">Пользовательское соглашение</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: 781165194751 · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
-    <script src="js/legal.js"></script>
-    <script src="/js/constructor-fallback.js?v=20260703-clean-constructor"></script>
+    <script src="js/common.js"></script>
+    <script type="module" src="js/constructor.js"></script>
+<footer class="site-footer"><div class="site-footer__brand"><strong>Livetta</strong><p>Украшения ручной работы из натуральных поделочных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: ВСТАВИТЬ ИНН · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
+<script src="js/legal.js"></script>
 </body>
 
 </html>
