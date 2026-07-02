@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Корзина — LiVetta</title>
+    <link rel="stylesheet" href="css/catalogstyle.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#f09ab5">
+
+</head>
+
+<body>
+    <div class="lava-background" aria-hidden="true">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+    <div><a href="/"><img src="img/Logo.png" alt="LiVetta" class="logo"></a></div>
+    <nav class="nav"><a href="/">ГЛАВНАЯ</a><a href="catalog.html">КАТАЛОГ</a><a
+            href="delivery.html">ДОСТАВКА</a><a href="faq.html">ВОПРОСЫ</a><a href="constructor.html">КОНСТРУКТОР</a><a
+            href="cart.html" class="is-active">КОРЗИНА</a><a href="about.html">О НАС</a></nav>
+    <main class="cart-page">
+        <section class="cart-head"><a class="cart-back-link" href="catalog.html">← Продолжить покупки</a>
+            <h1>Корзина и оформление</h1>
+            <p>Проверьте состав заказа, выберите доставку и способ оплаты.</p>
+        </section>
+        <section class="cart-layout">
+            <div class="cart-list" id="cartList">
+                <p class="muted-text">Загрузка корзины...</p>
+            </div>
+            <aside class="cart-summary"><span>Ваш заказ</span>
+                <h2>Оформление</h2>
+                <div class="cart-summary-row">
+                    <p>Товары</p><strong id="cartItemsCount">0</strong>
+                </div>
+                <div class="cart-summary-row">
+                    <p>Стоимость товаров</p><strong id="cartSubtotal">0 ₽</strong>
+                </div>
+                <div class="cart-summary-row cart-summary-row--discount" id="cartDiscountRow" hidden>
+                    <p id="cartDiscountLabel">Скидка</p><strong id="cartDiscount">−0 ₽</strong>
+                </div>
+                <div class="cart-summary-row">
+                    <p>Доставка</p><strong id="cartShipping">—</strong>
+                </div>
+                <div class="cart-summary-row cart-summary-row--total">
+                    <p>Итого</p><strong id="cartTotal">0 ₽</strong>
+                </div>
+                <div class="cart-promo-panel" id="cartPromoPanel" hidden></div>
+                <form class="cart-order-form" id="cartOrderForm" novalidate>
+                    <h3>Получатель</h3><input id="cartCustomerName" type="text" autocomplete="name"
+                        placeholder="Имя и фамилия *" required><input id="cartCustomerPhone" type="tel"
+                        autocomplete="tel" placeholder="Телефон *" required><input id="cartCustomerTelegram" type="text"
+                        placeholder="Telegram, например @username"><input id="cartCustomerEmail" type="email"
+                        autocomplete="email" placeholder="Email для заказа и чека *" required>
+                    <h3>Доставка</h3><select id="cartCountry" required>
+                        <option value="Россия">Россия</option>
+                        <option value="Казахстан">Казахстан</option>
+                        <option value="Беларусь">Беларусь</option>
+                        <option value="Другая страна">Другая страна</option>
+                    </select><input id="cartCity" type="text" autocomplete="address-level2" placeholder="Город *"
+                        required><input id="cartPostalCode" type="text" autocomplete="postal-code"
+                        placeholder="Почтовый индекс"><input id="cartAddress" type="text" autocomplete="street-address"
+                        placeholder="Адрес доставки *" required>
+                    <select id="cartDeliveryMethod" required>
+                        <option value="spb_courier">Курьер LiVetta по Санкт-Петербургу</option>
+                        <option value="cdek">СДЭК</option>
+                        <option value="russian_post">Почта России</option>
+                        <option value="other">Другая служба — согласовать</option>
+                    </select>
+                    <label class="cart-check cart-check--kad" id="withinKadLabel"><input id="cartWithinKad"
+                            type="checkbox" checked><span>Адрес находится в пределах КАД</span></label><textarea
+                        id="cartDeliveryComment"
+                        placeholder="Комментарий к доставке: интервал, подъезд, страна и т. п."></textarea>
+                    <p class="cart-shipping-message" id="cartShippingMessage"></p>
+                    <h3>Оплата</h3><select id="cartPaymentMethod">
+                        <option value="online">Онлайн: карта, СБП и другие способы Robokassa</option>
+                        <option value="cash_on_delivery">Наличными при получении в пределах КАД</option>
+                        <option value="sbp_on_delivery">СБП при получении в пределах КАД</option>
+                    </select>
+                    <textarea id="cartCustomerComment" placeholder="Комментарий к заказу"></textarea>
+                    <label class="cart-check"><input id="cartLegalConsent" type="checkbox" required><span>Я принимаю <a
+                                href="offer.html" target="_blank">публичную оферту</a>, правила <a href="returns.html"
+                                target="_blank">возврата</a> и даю <a href="personal-data-consent.html"
+                                target="_blank">согласие на обработку персональных данных</a> *</span></label>
+                    <label class="cart-check"><input id="cartMarketingConsent" type="checkbox"><span>Хочу получать
+                            новости и акции LiVetta. <a href="marketing-consent.html" target="_blank">Условия
+                                рассылки</a></span></label>
+                    <button type="submit" id="cartSubmitButton">Оформить заказ</button>
+                    <p id="cartOrderMessage" class="cart-order-message" aria-live="polite"></p>
+                </form>
+                <button class="cart-clear-button" id="cartClearButton" type="button">Очистить корзину</button>
+            </aside>
+        </section>
+    </main>
+    <footer class="site-footer">
+        <div class="site-footer__brand"><strong>LiVetta</strong>
+            <p>Украшения ручной работы из натуральных камней и культивированного жемчуга.</p>
+        </div>
+        <div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a
+                href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div>
+        <div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="privacy.html">Политика данных</a><a
+                href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на
+                рассылку</a></div>
+        <div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a
+                href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore"
+                target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая
+            Горгопко Елизавета Андреевна · ИНН: 781165194751 · 193091, Санкт-Петербург, Ультрамариновая ул., д.
+            10</small>
+    </footer>
+    <script src="js/common.js"></script>
+    <script src="js/cart.js"></script>
+    <script src="js/legal.js"></script>
+</body>
+
+</html>

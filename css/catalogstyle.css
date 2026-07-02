@@ -1,0 +1,206 @@
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+.product-card {
+  border: 2px solid #222;
+  padding: 14px;
+  aspect-ratio: 1 / 1;
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.product-card__category {
+  font-size: 12px;
+  color: #777;
+  margin: 0;
+}
+
+.product-card__image {
+  width: 100%;
+  height: 300px;
+  background: #eee;
+  border: 1px solid #ccc;
+}
+
+.product-card__title {
+  font-size: 16px;
+  margin: 0;
+}
+
+.product-card__description {
+  font-size: 13px;
+  margin: 0;
+}
+
+.product-card__price {
+  font-weight: bold;
+  margin: auto 0 0;
+}
+
+.product-card__button {
+  padding: 10px;
+  border: 1px solid #222;
+  background: white;
+  cursor: pointer;
+}
+.catalog-grid {
+  max-width: 1180px;
+  margin: 46px auto;
+  padding: 0 24px 60px;
+}
+
+.catalog-product-card {
+  min-height: 520px;
+  aspect-ratio: auto;
+  border: 0;
+  border-radius: 28px;
+  background: rgba(255, 255, 255, .72);
+  box-shadow: 0 20px 50px rgba(174, 155, 243, .18);
+  backdrop-filter: blur(16px);
+}
+
+.catalog-product-card .product-card__image {
+  height: 280px;
+  border: 0;
+}
+
+.catalog-product-card .product-card__image span {
+  height: 100%;
+  display: grid;
+  place-items: center;
+  color: rgba(28, 20, 32, .42);
+}
+
+.catalog-product-card .product-card__button {
+  margin-top: auto;
+  padding: 13px 18px;
+  cursor: pointer;
+}
+
+@media (max-width: 980px) {
+  .catalog-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .catalog-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+
+/* Premium catalog overrides */
+.catalog-page .catalog-grid {
+  max-width: none;
+}
+
+.catalog-page .product-card {
+  aspect-ratio: auto;
+}
+
+
+/* Catalog select and equal buttons final fix */
+.catalog-category-select-wrap {
+  max-width: 360px;
+  margin: 34px auto;
+}
+
+.product-card__actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.product-card__actions a,
+.product-card__actions button {
+  width: 100% !important;
+  height: 44px !important;
+  min-height: 44px !important;
+  padding: 0 10px !important;
+  box-sizing: border-box !important;
+}
+
+
+/* Final category select polish */
+.catalog-category-select-wrap {
+  max-width: 340px;
+  margin: 30px auto 34px;
+}
+
+.catalog-category-select select {
+  min-height: 52px;
+  border-radius: 999px;
+}
+
+
+
+
+
+/* LiVetta unified catalog buttons */
+.product-card__actions {
+  display: grid !important;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 10px !important;
+}
+
+.product-card__actions a,
+.product-card__actions button,
+.product-card__button,
+.buy-button {
+  width: 100% !important;
+  height: 38px !important;
+  min-height: 38px !important;
+  border-radius: 999px !important;
+  border: 2px solid rgba(184, 138, 223, .88) !important;
+  background: #ee9ac5 !important;
+  color: rgba(255, 255, 255, .96) !important;
+  box-shadow: none !important;
+  font-size: 14px !important;
+  font-weight: 700 !important;
+  padding: 0 12px !important;
+  box-sizing: border-box !important;
+  transform: none !important;
+}
+
+.catalog-product-card .product-card__image {
+  aspect-ratio: 1 / 1 !important;
+  height: auto !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+.catalog-product-card .product-card__image img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+}
+
+
+/* Catalog buy animation small fix */
+.buy-button.is-added-to-cart,
+.product-card__button.is-added-to-cart {
+  background: #9a84e8 !important;
+  border-color: rgba(154, 132, 232, .95) !important;
+  color: rgba(255, 255, 255, .98) !important;
+}
+
+
+/* Product buy button color fix fallback */
+.product-detail__buy,
+.premium-buy-button,
+.buy-button,
+.product-buy-button,
+.product-page-buy,
+#productBuyButton,
+#buyButton {
+  border: 2px solid rgba(184, 138, 223, .88) !important;
+  background: #ee9ac5 !important;
+  background-color: #ee9ac5 !important;
+  color: rgba(255, 255, 255, .96) !important;
+  box-shadow: none !important;
+}

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Конструктор украшений LiVetta</title>
+    <meta name="description" content="Конструктор украшений LiVetta: соберите колье из доступных камней, выберите размер и замок, добавьте индивидуальную сборку в корзину.">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://livettajew.ru/constructor.html">
+    <link rel="stylesheet" href="/css/style.css?v=20260703-product-constructor">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#f09ab5">
+
+</head>
+
+<body>
+    <div class="lava-background">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+
+    <div>
+        <img src="img/Logo.png" alt="Логотип LiVetta" class="logo">
+    </div>
+
+    <nav class="nav">
+        <a href="/">ГЛАВНАЯ</a>
+        <a href="catalog.html">КАТАЛОГ</a>
+        <a href="delivery.html">ДОСТАВКА</a>
+        <a href="faq.html">ВОПРОСЫ</a>
+        <a href="constructor.html">КОНСТРУКТОР</a>
+        <a href="cart.html">КОРЗИНА</a>
+        <a href="about.html">О НАС</a>
+    </nav>
+
+    <main class="constructor garnet-builder">
+        <section class="constructor-preview glass-card">
+            <p class="eyebrow">LiVetta custom</p>
+            <h1>Конструктор ожерелья</h1>
+            <p class="constructor-lead">
+                Соберите ожерелье в своем ритме: выбирайте оттенки, размер и замок, а мы покажем композицию на силуэте.
+            </p>
+
+            <div class="constructor-options">
+                <label>
+                    <span class="constructor-field-label">Тип украшения</span>
+                    <select id="jewelryType">
+    <option value="Колье">Колье</option>
+</select>
+                </label>
+
+                <label>
+                    <span class="constructor-field-label">Размер, см</span>
+                    <select id="jewelrySize"></select>
+                </label>
+
+                <label class="constructor-clasp-field">
+                    <span class="constructor-field-label">Тип замка <span class="required-mark">*</span></span>
+                    <select id="claspType" required>
+                        <option value="">Выберите замок</option>
+                        <option value="lobster-steel">Карабин</option>
+                        <option value="toggle-steel">Тоггл</option>
+                        <option value="magnetic-steel">Магнитный</option>
+                    </select>
+                    <small>Замок обязателен для оформления сборки.</small>
+                </label>
+
+                <label class="constructor-clasp-material-field">
+                    <span class="constructor-field-label">Материал замка <span class="required-mark">*</span></span>
+                    <select id="claspMaterial" required>
+                        <option value="">Выберите материал</option>
+                        <option value="brass">Латунь</option>
+                        <option value="rhodium">Родий</option>
+                    </select>
+                    <small>Материал обязателен для оформления сборки.</small>
+                </label>
+            </div>
+
+            <div class="neck-constructor-stage" id="neckStage">
+                <img class="neck-photo" src="/img/neck.jpg" alt="Шея для примерки ожерелья">
+
+                <svg class="necklace-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true">
+                    <defs>
+                        <filter id="necklaceSoftShadow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feDropShadow dx="0" dy="2" stdDeviation="1.4" flood-color="rgba(50,35,30,.22)" />
+                        </filter>
+                    </defs>
+
+                    <!-- Полная цепочка. Верхние участки визуально уходят за шею модели. -->
+                    <path id="necklaceFullPath" class="necklace-thread necklace-thread--full" d="M 330 345 C 250 505, 360 700, 500 720 C 640 700, 750 505, 670 345" />
+
+                    <!-- Невидимый путь для бусин. Камни идут по всей видимой части до захода за шею. -->
+                    <path id="necklacePath" class="necklace-layout-path" d="M 340 430 C 245 570, 360 735, 500 750 C 640 735, 755 570, 660 430" />
+                </svg>
+
+                <div class="neck-photo-mask neck-photo-mask--left" aria-hidden="true"></div>
+                <div class="neck-photo-mask neck-photo-mask--right" aria-hidden="true"></div>
+
+                <svg class="necklace-beads-svg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-label="Камни на нити">
+                    <g id="necklaceBeads" class="necklace-beads"></g>
+                </svg>
+                <div id="sceneMessage" class="scene-message" hidden>Загрузка конструктора...</div>
+            </div>
+
+            <div class="constructor-info">
+                <div>
+                    <span>Итоговая цена</span>
+                    <strong id="totalPrice">0 ₽</strong>
+                </div>
+                <div>
+                    <span>Тип</span>
+                    <strong id="selectedType">Колье</strong>
+                </div>
+                <div>
+                    <span>Размер</span>
+                    <strong><span id="selectedSize">45</span> см</strong>
+                </div>
+                <div>
+                    <span>Замок</span>
+                    <strong id="selectedClasp">Не выбран</strong>
+                </div>
+                <div>
+                    <span>Материал</span>
+                    <strong id="selectedClaspMaterial">Не выбран</strong>
+                </div>
+                <div>
+                    <span>Камни</span>
+                    <strong><span id="usedLength">0</span> / <span id="maxLength">0</span> мм</strong>
+                </div>
+            </div>
+
+            <div class="constructor-actions">
+                <button id="undoStone" type="button">Убрать последний</button>
+                <button id="clearConstructor" type="button">Очистить</button>
+                <button id="addCustomToCart" type="button">Добавить сборку в корзину</button>
+            </div>
+
+            <div id="capacityHint" class="capacity-hint">
+                Выберите замок, материал и камни — украшение появится на модели сразу.
+            </div>
+
+            <section id="threadSettingsPanel" class="thread-settings-panel glass-card" aria-label="Настройки нити">
+                <header class="thread-settings-panel__head">
+                    <div>
+                        <span class="page-eyebrow">Посадка нити</span>
+                        <h3>Настройки нити</h3>
+                    </div>
+                    <button id="resetThreadSettings" type="button">Сбросить</button>
+                </header>
+                <div class="thread-settings-grid">
+                    <label class="thread-setting"><span>Центр <b data-thread-setting-value="centerX">500</b></span><input type="range" min="440" max="560" step="1" value="500" data-thread-setting="centerX"></label>
+                    <label class="thread-setting"><span>Верх <b data-thread-setting-value="topY">430</b></span><input type="range" min="360" max="520" step="1" value="430" data-thread-setting="topY"></label>
+                    <label class="thread-setting"><span>Ширина верха <b data-thread-setting-value="topHalf">168</b></span><input type="range" min="120" max="230" step="1" value="168" data-thread-setting="topHalf"></label>
+                    <label class="thread-setting"><span>Бок 30 см <b data-thread-setting-value="sideY30">530</b></span><input type="range" min="430" max="650" step="1" value="530" data-thread-setting="sideY30"></label>
+                    <label class="thread-setting"><span>Бок 50 см <b data-thread-setting-value="sideY50">620</b></span><input type="range" min="500" max="720" step="1" value="620" data-thread-setting="sideY50"></label>
+                    <label class="thread-setting"><span>Ширина бока 30 <b data-thread-setting-value="sideHalf30">252</b></span><input type="range" min="190" max="330" step="1" value="252" data-thread-setting="sideHalf30"></label>
+                    <label class="thread-setting"><span>Ширина бока 50 <b data-thread-setting-value="sideHalf50">318</b></span><input type="range" min="240" max="390" step="1" value="318" data-thread-setting="sideHalf50"></label>
+                    <label class="thread-setting"><span>Низ 30 см <b data-thread-setting-value="bottomY30">665</b></span><input type="range" min="560" max="770" step="1" value="665" data-thread-setting="bottomY30"></label>
+                    <label class="thread-setting"><span>Низ 50 см <b data-thread-setting-value="bottomY50">790</b></span><input type="range" min="660" max="900" step="1" value="790" data-thread-setting="bottomY50"></label>
+                    <label class="thread-setting"><span>Ширина низа 30 <b data-thread-setting-value="bottomHalf30">96</b></span><input type="range" min="45" max="170" step="1" value="96" data-thread-setting="bottomHalf30"></label>
+                    <label class="thread-setting"><span>Ширина низа 50 <b data-thread-setting-value="bottomHalf50">156</b></span><input type="range" min="80" max="230" step="1" value="156" data-thread-setting="bottomHalf50"></label>
+                </div>
+            </section>
+        </section>
+
+        <aside class="stones-panel glass-card">
+            <h2>Избранные камни</h2>
+            <button id="openStonesCatalog" class="stones-panel__catalog-button" type="button">Добавить камни</button>
+            <p class="muted-text">Добавьте камни из каталога в избранное, а затем надевайте их на нить.</p>
+
+            <div id="stonesList"></div>
+        </aside>
+
+        <div id="stoneCatalogModal" class="stone-catalog-modal" hidden>
+            <div class="stone-catalog-modal__backdrop" data-close-stones-catalog></div>
+            <section class="stone-catalog-modal__dialog glass-card" role="dialog" aria-modal="true" aria-labelledby="stoneCatalogTitle">
+                <header class="stone-catalog-modal__head">
+                    <div>
+                        <span class="page-eyebrow">Каталог камней</span>
+                        <h2 id="stoneCatalogTitle">Каталог камней</h2>
+                        <p>Выберите камни в избранное. Они появятся под кнопкой и будут доступны для сборки.</p>
+                    </div>
+                    <button id="closeStoneCatalog" class="stone-catalog-modal__close" type="button" aria-label="Закрыть каталог">×</button>
+                </header>
+                <div id="stoneCatalogList" class="stone-catalog-list"></div>
+            </section>
+        </div>
+    </main>
+
+    <script src="/js/common.js"></script>
+    <footer class="site-footer"><div class="site-footer__brand"><strong>LiVetta</strong><p>Украшения ручной работы из натуральных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="user-agreement.html">Пользовательское соглашение</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: 781165194751 · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
+<script src="js/legal.js"></script>
+        <script src="/js/constructor-fallback.js?v=20260703-product-constructor"></script>
+</body>
+
+</html>

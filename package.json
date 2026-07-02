@@ -1,0 +1,28 @@
+{
+  "name": "livetta-store",
+  "version": "2.0.0",
+  "private": true,
+  "description": "LiVetta handmade jewelry store",
+  "main": "server.js",
+  "type": "commonjs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "backup": "node scripts/backup.js",
+    "set-inn": "node scripts/set-inn.js",
+    "reset-owner": "node scripts/reset-owner.js"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "nodemailer": "^9.0.1"
+  }
+}

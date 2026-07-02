@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админка LiVetta</title>
+    <link rel="stylesheet" href="css/style.css?v=20260703-product-constructor">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="icon" href="/favicon.ico" sizes="any">
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="theme-color" content="#f09ab5">
+
+</head>
+
+<body>
+    <div class="lava-background">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+
+    <div>
+        <a href="/" aria-label="Перейти на главную LiVetta">
+            <img src="img/Logo.png" alt="Логотип LiVetta" class="logo">
+        </a>
+    </div>
+
+    <main class="admin">
+        <section id="loginSection" class="admin-card admin-login-card">
+            <span class="admin-eyebrow">Управление магазином</span>
+            <h1>Вход в LiVetta</h1>
+            <p class="muted-text">Введите данные владельца, администратора или мастера.</p>
+
+            <form id="loginForm" class="admin-form">
+                <input id="login" name="login" type="text" placeholder="Логин" autocomplete="username" required>
+                <input id="password" name="password" type="password" placeholder="Пароль" autocomplete="current-password" required>
+                <button id="loginSubmitButton" type="submit">Войти</button>
+            </form>
+            <p id="loginMessage" class="admin-message" aria-live="polite"></p>
+        </section>
+
+        <section id="adminPanel" hidden>
+            <header class="admin-session-bar">
+                <div class="admin-session-bar__title">
+                    <span class="admin-eyebrow">Панель управления</span>
+                    <h1>Управление LiVetta</h1>
+                    <span id="adminUserBadge">Загрузка профиля…</span>
+                </div>
+                <div class="admin-session-actions">
+                    <a id="ordersExportLink" href="/api/orders-export.xlsx" hidden>Скачать Excel</a>
+                    <button id="backupButton" type="button" hidden>Резервная копия</button>
+                    <button id="logoutButton" class="admin-logout-button" type="button">Выйти</button>
+                </div>
+            </header>
+
+            <nav id="adminTabs" class="admin-tabs" aria-label="Разделы админки">
+                <button type="button" data-admin-tab="orders" data-roles="owner,admin">Заказы</button>
+                <button type="button" data-admin-tab="products" data-roles="owner,admin">Украшения</button>
+                <button type="button" data-admin-tab="stones" data-roles="owner,admin,master">Склад камней</button>
+                <button type="button" data-admin-tab="home" data-roles="owner,admin">Главная</button>
+                <button type="button" data-admin-tab="users" data-roles="owner">Пользователи</button>
+            </nav>
+
+            <section class="admin-page" data-admin-page="orders" data-roles="owner,admin">
+                <section class="admin-card admin-card--accent admin-orders-section">
+                    <h1>Заказы</h1>
+                    <p class="muted-text">Заказы автоматически сохраняются в базе и в Excel-файле. В Excel можно изменить статус, доставку, трек-номер и комментарий, затем импортировать файл обратно.</p>
+                    <div class="admin-excel-toolbar">
+                        <button id="ordersExcelSyncButton" type="button">Обновить Excel-файл</button>
+                        <label class="file-field admin-excel-file">Импортировать изменения
+                            <input id="ordersExcelImportInput" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet">
+                        </label>
+                        <button id="ordersExcelImportButton" type="button">Загрузить изменения из Excel</button>
+                        <small id="ordersExcelPathHint">Путь к локальному файлу задаётся через ORDERS_EXCEL_PATH в .env.</small>
+                    </div>
+                    <div id="adminOrders" class="admin-orders-list">
+                        <p class="muted-text">Заявок пока нет</p>
+                    </div>
+                </section>
+            </section>
+
+            <section class="admin-page" data-admin-page="products" data-roles="owner,admin">
+                <section class="admin-card admin-card--accent">
+                    <h1>Украшения</h1>
+                    <div id="productsStockSummary" class="admin-metric-grid" aria-live="polite"></div>
+                </section>
+
+                <section class="admin-card">
+                    <h2>Добавить украшение</h2>
+                    <form id="productForm" class="admin-form" enctype="multipart/form-data">
+                        <input id="title" name="title" type="text" placeholder="Название украшения" required>
+                        <select id="category" name="category" required>
+                            <option value="">Категория</option>
+                        </select>
+                        <input id="price" name="price" type="text" inputmode="decimal" placeholder="Цена, например 2500" required>
+                        <textarea id="description" name="description" placeholder="Описание" required></textarea>
+                        <textarea id="productStones" name="product_stones" placeholder="Камни в украшении: один камень на строку. Формат: Название | описание | знаки зодиака | свойство"></textarea>
+                        <input id="productStock" name="stock_qty" type="number" min="0" value="1" placeholder="Остаток готовых изделий" required>
+                        <label class="admin-check"><input name="is_child" type="checkbox" value="1"> Детское украшение</label>
+                        <input type="hidden" name="active" value="true">
+                        <label class="file-field">
+                            Фото товара, можно несколько
+                            <input id="productImage" name="images" type="file" accept="image/*" multiple>
+                        </label>
+                        <button type="submit">Добавить украшение</button>
+                    </form>
+                </section>
+
+                <section class="admin-card">
+                    <h2>Украшения в каталоге</h2>
+                    <div id="adminProducts" class="admin-list"></div>
+                </section>
+
+                <section class="admin-card">
+                    <h2>Категории украшений</h2>
+                    <form id="categoryForm" class="admin-form">
+                        <input id="categoryName" name="name" type="text" placeholder="Новая категория, например Колье" required>
+                        <button type="submit">Добавить категорию</button>
+                    </form>
+                    <div id="adminCategories" class="admin-category-list"></div>
+                </section>
+            </section>
+
+            <section class="admin-page" data-admin-page="stones" data-roles="owner,admin,master">
+                <section class="admin-card admin-card--accent">
+                    <h1>Склад камней конструктора</h1>
+                    <p class="muted-text">Отдельный склад бусин: доступное количество уменьшается сразу после оформления заказа, а статистика «Продано» растёт после подтверждения оплаты.</p>
+                    <div id="stonesStockSummary" class="admin-metric-grid" aria-live="polite"></div>
+                </section>
+
+                <section class="admin-card admin-card--accent" data-roles="owner,admin">
+                    <h2>Добавить новые камни</h2>
+                    <form id="stoneForm" class="admin-form" enctype="multipart/form-data">
+                        <input id="stoneName" name="name" type="text" placeholder="Название камня" required>
+                        <textarea id="stoneDescription" name="description" placeholder="Описание камня" required></textarea>
+                        <input id="stoneZodiac" name="zodiac" type="text" placeholder="Знак зодиака, например: Лев, Весы">
+                        <textarea id="stoneProperty" name="stone_property" placeholder="Свойство камня"></textarea>
+                        <input id="stonePrice" name="price" type="text" inputmode="decimal" placeholder="Цена за 1 камень" required>
+                        <input id="stoneSize" name="size_mm" type="text" inputmode="decimal" placeholder="Размер камня, мм, например 8" required>
+                        <label>
+                            Форма камня
+                            <select name="stone_shape" id="stoneShape" required>
+                            <option value="round" selected>Круг</option>
+                            <option value="square">Квадрат</option>
+                            <option value="diamond">Ромб</option>
+                            <option value="rectangle">Прямоугольник</option>
+                            <option value="triangle">Треугольник</option>
+                            <option value="faceted">Многогранный</option>
+                        </select>
+                        </label>
+                        <input id="stoneStock" name="stock_qty" type="number" min="0" value="0" placeholder="Количество бусин на складе" required>
+                        <input type="hidden" name="active" value="true">
+                        <label>
+                            Цвет камня
+                            <input id="stoneColor" name="color" type="color" value="#b48a78">
+                        </label>
+                        <label class="file-field">
+                            Фото камня
+                            <input id="stoneImage" name="image" type="file" accept="image/*">
+                        </label>
+                        <button type="submit">Добавить камень</button>
+                    </form>
+                </section>
+
+                <section class="admin-card">
+                    <h2>Камни для сборки украшений</h2>
+                    <div id="adminStones" class="admin-list"></div>
+                </section>
+            </section>
+
+            <section class="admin-page" data-admin-page="home" data-roles="owner,admin">
+                <div class="admin-grid">
+                    <section class="admin-card admin-card--accent">
+                        <h1>Карусель главной страницы</h1>
+                        <p class="muted-text">Текущие фото имеют размер <strong>1420×620 px</strong>. Загружай новые в этой же пропорции, чтобы баннер не обрезался.</p>
+                        <form id="carouselForm" class="admin-form" enctype="multipart/form-data">
+                            <label class="file-field">
+                                Фото для карусели, размер 1420×620 px
+                                <input id="carouselImages" name="slides" type="file" accept="image/*" multiple>
+                            </label>
+                            <button type="submit">Добавить фото в карусель</button>
+                        </form>
+                        <div id="carouselAdminPreview" class="carousel-admin-preview"></div>
+                    </section>
+
+                    <section class="admin-card admin-card--accent">
+                        <h1>Популярные товары на главной</h1>
+                        <p class="muted-text">Выбери товары из уже добавленных товаров. Индекс 1 — первый товар, 2 — второй и так далее.</p>
+                        <div id="popularProductsAdmin" class="popular-admin"></div>
+                    </section>
+                </div>
+            </section>
+
+            <section class="admin-page" data-admin-page="users" data-roles="owner">
+                <section class="admin-card admin-card--accent">
+                    <h2>Пользователи админки</h2>
+                    <p class="muted-text">Владелец видит всё; администратор — заказы, товары и остатки; мастер — только склад бусин.</p>
+                    <form id="userForm" class="admin-form">
+                        <input name="login" placeholder="Логин" required>
+                        <input name="password" type="password" minlength="8" placeholder="Временный пароль, минимум 8 символов" required>
+                        <select name="role">
+                            <option value="admin">Администратор</option>
+                            <option value="master">Мастер</option>
+                            <option value="owner">Владелец</option>
+                        </select>
+                        <button type="submit">Добавить пользователя</button>
+                    </form>
+                    <div id="adminUsers" class="admin-list"></div>
+                </section>
+            </section>
+        </section>
+    </main>
+
+    <div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+    <script src="js/common.js"></script>
+    <script src="js/admin.js?v=20260703-product-constructor"></script>
+</body>
+
+</html>

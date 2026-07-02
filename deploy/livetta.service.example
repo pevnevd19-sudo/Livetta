@@ -1,0 +1,15 @@
+[Unit]
+Description=Livetta Node.js Store
+After=network.target
+
+[Service]
+Type=simple
+User=livetta
+WorkingDirectory=/var/www/livetta
+EnvironmentFile=/var/www/livetta/.env
+ExecStart=/usr/bin/node /var/www/livetta/server.js
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

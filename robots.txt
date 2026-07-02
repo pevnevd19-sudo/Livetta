@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /img/apple-touch-icon.png
+Allow: /img/favicon-32x32.png
+Allow: /favicon.svg
+Allow: /
+Disallow: /admin.html
+Disallow: /api/
+Sitemap: https://livettajew.ru/sitemap.xml
