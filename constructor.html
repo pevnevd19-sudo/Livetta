@@ -115,7 +115,20 @@
                 Камни подтягиваются из базы. Если сервер не запущен, конструктор покажет тестовый гранат.
             </p>
 
-            <div id="stonesList"></div>
+            <div class="constructor-catalog-toolbar">
+                <label class="constructor-search-field">
+                    <span>Поиск камней</span>
+                    <input id="stoneSearch" type="search" placeholder="Название, свойства, знак зодиака">
+                </label>
+                <button id="clearStoneSearch" type="button">Сброс</button>
+            </div>
+
+            <div id="stonesList" class="constructor-stone-grid"></div>
+
+            <section class="selected-stones-panel" aria-label="Состав украшения">
+                <h3>Состав украшения</h3>
+                <div id="selectedStonesList"></div>
+            </section>
         </aside>
     </main>
 

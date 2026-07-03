@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Конструктор украшений Livetta</title>
     <link rel="stylesheet" href="css/style.css">
-    <link rel="stylesheet" href="css/constructor-restore.css?v=20260703-svg-stones">
+    <link rel="stylesheet" href="css/constructor-restore.css?v=20260703-constructor-catalog-materials">
 </head>
 
 <body>
@@ -66,6 +66,17 @@
                     </select>
                     <small>Замок обязателен для оформления сборки.</small>
                 </label>
+
+                <label class="constructor-clasp-material-field">
+                    Материал застежки <span class="required-mark">*</span>
+                    <select id="claspMaterial" required>
+                        <option value="">Выберите материал</option>
+                        <option value="steel">Нержавеющая сталь</option>
+                        <option value="brass">Латунь</option>
+                        <option value="rhodium">Родий</option>
+                    </select>
+                    <small>Материал сохраняется в составе индивидуальной сборки.</small>
+                </label>
             </div>
 
             <div class="neck-constructor-stage" id="neckStage">
@@ -111,6 +122,10 @@
                     <strong id="selectedClasp">Не выбран</strong>
                 </div>
                 <div>
+                    <span>Материал</span>
+                    <strong id="selectedClaspMaterial">Не выбран</strong>
+                </div>
+                <div>
                     <span>Камни</span>
                     <strong><span id="usedLength">0</span> / <span id="maxLength">0</span> мм</strong>
                 </div>
@@ -133,12 +148,25 @@
                 Камни подтягиваются из базы. Если сервер не запущен, конструктор покажет тестовый гранат.
             </p>
 
-            <div id="stonesList"></div>
+            <div class="constructor-catalog-toolbar">
+                <label class="constructor-search-field">
+                    <span>Поиск камней</span>
+                    <input id="stoneSearch" type="search" placeholder="Название, свойства, знак зодиака">
+                </label>
+                <button id="clearStoneSearch" type="button">Сброс</button>
+            </div>
+
+            <div id="stonesList" class="constructor-stone-grid"></div>
+
+            <section class="selected-stones-panel" aria-label="Состав украшения">
+                <h3>Состав украшения</h3>
+                <div id="selectedStonesList"></div>
+            </section>
         </aside>
     </main>
 
     <script src="js/common.js"></script>
-    <script type="module" src="js/constructor.js?v=20260703-svg-stones"></script>
+    <script type="module" src="js/constructor.js?v=20260703-constructor-catalog-materials"></script>
 <footer class="site-footer"><div class="site-footer__brand"><strong>Livetta</strong><p>Украшения ручной работы из натуральных поделочных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: ВСТАВИТЬ ИНН · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
 <script src="js/legal.js"></script>
 </body>
