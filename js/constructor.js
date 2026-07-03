@@ -1,4 +1,14 @@
 const App = window.Livetta;
+
+if (!App) {
+  const startupMessage = document.querySelector('#sceneMessage');
+  if (startupMessage) {
+    startupMessage.hidden = false;
+    startupMessage.textContent = 'Не удалось запустить конструктор: не загрузился common.js.';
+  }
+  throw new Error('Livetta common.js is not loaded');
+}
+
 const API_URL = App.getApiUrl();
 
 const sceneMessage = document.querySelector('#sceneMessage');
@@ -31,15 +41,6 @@ const TYPE_CONFIG = {
     minClasp: 14,
     maxClasp: 30,
     title: 'Колье'
-  },
-  'Браслет': {
-    min: 14,
-    max: 24,
-    defaultSize: 18,
-    claspRatio: 0.08,
-    minClasp: 8,
-    maxClasp: 18,
-    title: 'Браслет'
   }
 };
 
@@ -90,23 +91,31 @@ async function init() {
     createSizeOptions();
     bindEvents();
 
-    stonesCatalog = await loadStonesCatalog();
-
+    // Сначала запускаем сам конструктор. Загрузка каталога не может
+    // заблокировать нить, кнопки и перемещение уже добавленных камней.
+    stonesCatalog = [];
     rebuildNecklace();
     renderStonesCatalog();
     updateSummary();
-
     sceneMessage.hidden = true;
+    window.__livettaConstructorReady = true;
+
+    // Камни подгружаются отдельно с тайм-аутом. Даже если API недоступен,
+    // вечной надписи «Загрузка конструктора...» больше не будет.
+    stonesCatalog = await loadStonesCatalog();
+    renderStonesCatalog();
+    updateSummary();
   } catch (error) {
     console.error(error);
+    window.__livettaConstructorReady = false;
     sceneMessage.hidden = false;
-    sceneMessage.textContent = 'Не удалось запустить конструктор. Проверь консоль браузера.';
+    sceneMessage.textContent = 'Не удалось запустить конструктор. Обновите страницу через Ctrl + F5.';
   }
 }
 
 async function loadStonesCatalog() {
   try {
-    const response = await fetch(`${API_URL}/stones?cache=${Date.now()}`);
+    const response = await fetchWithTimeout(`${API_URL}/stones?cache=${Date.now()}`, 6000);
 
     if (!response.ok) {
       throw new Error('Камни не загрузились');
@@ -125,6 +134,23 @@ async function loadStonesCatalog() {
     capacityHint.textContent = 'Камни не загрузились. Проверьте сервер или добавьте их в админке.';
     return [];
   }
+}
+
+
+function fetchWithTimeout(url, timeoutMs = 6000) {
+  if (typeof AbortController === 'undefined') {
+    return fetch(url, { cache: 'no-store' });
+  }
+
+  const controller = new AbortController();
+  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
+
+  return fetch(url, {
+    cache: 'no-store',
+    signal: controller.signal
+  }).finally(() => {
+    window.clearTimeout(timer);
+  });
 }
 
 function normalizeStone(stone) {
@@ -317,9 +343,7 @@ function updateNecklaceShape() {
 
   const sizeCm = Number(jewelrySize.value) || getTypeConfig().defaultSize;
 
-  const sizeProgress = jewelryType.value === 'Браслет'
-    ? clamp((sizeCm - 14) / (24 - 14), 0, 1)
-    : clamp((sizeCm - 30) / (50 - 30), 0, 1);
+  const sizeProgress = clamp((sizeCm - 30) / (50 - 30), 0, 1);
 
   /*
     Натуральное изменение размера:
