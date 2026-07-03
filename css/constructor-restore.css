@@ -8065,3 +8065,31 @@ body.is-stone-catalog-open {
     grid-template-columns: 38px minmax(0, 1fr) 34px;
   }
 }
+
+
+/* Required field stars near constructor labels. */
+.constructor-options .constructor-clasp-field,
+.constructor-options .constructor-clasp-material-field {
+  gap: 6px;
+}
+
+.constructor-label-text {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 4px;
+  width: fit-content;
+  color: rgba(38, 27, 41, .72);
+  font-size: 13px;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.constructor-label-text .required-mark {
+  position: relative;
+  top: -0.28em;
+  color: #c85d91;
+  font-size: 15px;
+  font-weight: 950;
+  line-height: 1;
+  margin-left: 1px;
+}
