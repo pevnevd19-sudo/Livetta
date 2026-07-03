@@ -8160,10 +8160,19 @@ body.is-stone-catalog-open {
 
 .favorite-stone-card__size,
 .stone-catalog-card__size {
+  display: block !important;
+  width: auto !important;
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
   border: 0 !important;
+  border-radius: 0 !important;
   box-shadow: none !important;
-  background: rgba(255, 247, 251, .78) !important;
-  color: rgba(38, 27, 41, .72) !important;
+  background: transparent !important;
+  color: rgba(38, 27, 41, .66) !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
 }
 
 .favorite-stone-card__actions {
