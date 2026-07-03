@@ -141,13 +141,13 @@ async function loadStonesCatalog() {
     const stones = Array.isArray(data) ? data.map(normalizeStone).filter(Boolean) : [];
 
     if (!stones.length) {
-      capacityHint.textContent = 'Камни пока не добавлены. Добавьте их в админке, чтобы конструктор стал доступен.';
+      capacityHint.textContent = 'Камни пока не добавлены. Конструктор станет доступен после добавления камней.';
     }
 
     return stones;
   } catch (error) {
     console.warn('Камни не загрузились:', error.message);
-    capacityHint.textContent = 'Камни не загрузились. Проверьте сервер или добавьте их в админке.';
+    capacityHint.textContent = 'Камни не загрузились. Проверьте подключение или список камней.';
     return [];
   }
 }
@@ -288,18 +288,29 @@ function bindEvents() {
   });
 
   stonesList.addEventListener('click', (event) => {
-    const wear = event.target.closest('[data-wear-favorite]');
     const remove = event.target.closest('[data-remove-favorite]');
-
-    if (wear) {
-      const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
-      addStone(stone);
+    if (remove) {
+      event.stopPropagation();
+      removeFavoriteStone(remove.dataset.removeFavorite);
       return;
     }
 
-    if (remove) {
-      removeFavoriteStone(remove.dataset.removeFavorite);
-    }
+    const wear = event.target.closest('[data-wear-favorite]');
+    if (!wear || wear.getAttribute('aria-disabled') === 'true') return;
+
+    const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
+    addStone(stone);
+  });
+
+  stonesList.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    const wear = event.target.closest('[data-wear-favorite]');
+    if (!wear || wear.getAttribute('aria-disabled') === 'true') return;
+
+    event.preventDefault();
+    const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
+    addStone(stone);
   });
 
   document.addEventListener('keydown', (event) => {
@@ -406,7 +417,7 @@ function renderStonesCatalog() {
     const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '<span class="stone-card__gem"></span>';
 
     return `
-      <article class="favorite-stone-card">
+      <article class="favorite-stone-card${disabled ? ' is-disabled' : ''}" data-wear-favorite="${escapeHtml(stone.id)}" tabindex="${disabled ? '-1' : '0'}" role="button" aria-disabled="${disabled ? 'true' : 'false'}">
         <span class="favorite-stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
         <span class="favorite-stone-card__body">
           <strong>${escapeHtml(stone.name)}</strong>
@@ -416,7 +427,6 @@ function renderStonesCatalog() {
           <span class="favorite-stone-card__size">Размер: ${formatNumber(stone.sizeMm)} мм</span>
         </span>
         <span class="favorite-stone-card__actions">
-          <button type="button" data-wear-favorite="${escapeHtml(stone.id)}" ${disabled ? 'disabled' : ''}>Надеть</button>
           <button type="button" data-remove-favorite="${escapeHtml(stone.id)}" aria-label="Убрать из избранного">×</button>
         </span>
         <strong class="favorite-stone-card__price">${formatPrice(stone.price)} ₽</strong>
@@ -431,7 +441,7 @@ function renderStoneCatalogModal() {
   if (!stoneCatalogList) return;
 
   if (!stonesCatalog.length) {
-    stoneCatalogList.innerHTML = '<p class="muted-text">Камней пока нет. Добавь их в админке.</p>';
+    stoneCatalogList.innerHTML = '<p class="muted-text">Камней пока нет.</p>';
     return;
   }
 

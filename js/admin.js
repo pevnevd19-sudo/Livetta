@@ -203,7 +203,7 @@ function logoutAdmin(showMessage = true) {
   loginSection.hidden = false;
   loginForm?.reset();
   if (showMessage) {
-    setLoginMessage('Вы вышли из админки.');
+    setLoginMessage('Вы вышли из панели.');
   }
 }
 
@@ -1492,7 +1492,7 @@ async function apiFetch(path, options = {}) {
 
   if (options.auth !== false) {
     const token = getToken();
-    if (!token) throw new Error('Сначала войдите в админку');
+    if (!token) throw new Error('Сначала войдите в панель');
     headers.Authorization = `Bearer ${token}`;
   }
 

@@ -8093,3 +8093,91 @@ body.is-stone-catalog-open {
   line-height: 1;
   margin-left: 1px;
 }
+
+/* Codex final favorite stone typography and neutral size field. */
+.favorite-stone-card,
+.favorite-stone-card * {
+  font-family: inherit !important;
+}
+
+.favorite-stone-card {
+  grid-template-columns: 58px minmax(0, 1fr) !important;
+  gap: 12px !important;
+  align-items: start !important;
+  padding: 12px !important;
+  cursor: pointer !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+}
+
+.favorite-stone-card:hover {
+  transform: translateY(-2px) !important;
+}
+
+.favorite-stone-card:focus-visible {
+  outline: 2px solid rgba(238, 154, 197, .72) !important;
+  outline-offset: 3px !important;
+}
+
+.favorite-stone-card.is-disabled {
+  cursor: not-allowed !important;
+  opacity: .58 !important;
+}
+
+.favorite-stone-card__body {
+  gap: 6px !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+}
+
+.favorite-stone-card__body strong {
+  font-size: 15px !important;
+  font-weight: 950 !important;
+  line-height: 1.2 !important;
+}
+
+.favorite-stone-card__body small,
+.favorite-stone-card__size {
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1.35 !important;
+}
+
+.favorite-stone-card__body small {
+  color: rgba(38, 27, 41, .66) !important;
+}
+
+.favorite-stone-card__size,
+.stone-catalog-card__size {
+  border: 0 !important;
+  box-shadow: none !important;
+  background: rgba(255, 247, 251, .78) !important;
+  color: rgba(38, 27, 41, .72) !important;
+}
+
+.favorite-stone-card__actions {
+  grid-column: 1 / -1 !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  gap: 0 !important;
+  margin-top: 0 !important;
+}
+
+.favorite-stone-card__actions button {
+  min-height: 28px !important;
+  width: 28px !important;
+  min-width: 28px !important;
+  padding: 0 !important;
+  border-radius: 8px !important;
+  font-size: 18px !important;
+  font-weight: 950 !important;
+}
+
+.favorite-stone-card__actions button[data-remove-favorite] {
+  width: 28px !important;
+  min-width: 28px !important;
+  min-height: 28px !important;
+  font-size: 18px !important;
+}

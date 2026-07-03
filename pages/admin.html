@@ -5,7 +5,7 @@
 
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Админка LiVetta</title>
+    <title>Панель LiVetta</title>
     <link rel="stylesheet" href="css/style.css?v=20260703-fit-admin-cards">
     <link rel="icon" href="/favicon.svg" type="image/svg+xml">
     <link rel="icon" href="/favicon.ico" sizes="any">
@@ -35,7 +35,7 @@
         <section id="loginSection" class="admin-card admin-login-card">
             <span class="admin-eyebrow">Управление магазином</span>
             <h1>Вход в LiVetta</h1>
-            <p class="muted-text">Введите данные владельца, администратора или мастера.</p>
+            <p class="muted-text">Введите данные владельца, менеджера или мастера.</p>
 
             <form id="loginForm" class="admin-form">
                 <input id="login" name="login" type="text" placeholder="Логин" autocomplete="username" required>
@@ -59,7 +59,7 @@
                 </div>
             </header>
 
-            <nav id="adminTabs" class="admin-tabs" aria-label="Разделы админки">
+            <nav id="adminTabs" class="admin-tabs" aria-label="Разделы панели">
                 <button type="button" data-admin-tab="orders" data-roles="owner,admin">Заказы</button>
                 <button type="button" data-admin-tab="products" data-roles="owner,admin">Украшения</button>
                 <button type="button" data-admin-tab="stones" data-roles="owner,admin,master">Склад камней</button>
@@ -216,13 +216,13 @@
 
             <section class="admin-page" data-admin-page="users" data-roles="owner">
                 <section class="admin-card admin-card--accent">
-                    <h2>Пользователи админки</h2>
-                    <p class="muted-text">Владелец видит всё; администратор — заказы, товары и остатки; мастер — только склад бусин.</p>
+                    <h2>Пользователи панели</h2>
+                    <p class="muted-text">Владелец видит всё; менеджер — заказы, товары и остатки; мастер — только склад бусин.</p>
                     <form id="userForm" class="admin-form">
                         <input name="login" placeholder="Логин" required>
                         <input name="password" type="password" minlength="8" placeholder="Временный пароль, минимум 8 символов" required>
                         <select name="role">
-                            <option value="admin">Администратор</option>
+                            <option value="admin">Менеджер</option>
                             <option value="master">Мастер</option>
                             <option value="owner">Владелец</option>
                         </select>
