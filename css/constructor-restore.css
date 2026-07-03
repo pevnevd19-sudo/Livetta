@@ -7903,3 +7903,119 @@ body.is-stone-catalog-open {
     grid-template-columns: 1fr 44px;
   }
 }
+
+
+/* Stone card polish: stronger typography, bottom price, separate size field. */
+.stone-catalog-card,
+.favorite-stone-card,
+.selected-stone-row {
+  font-weight: 600;
+}
+
+.favorite-stone-card {
+  grid-template-columns: 58px minmax(0, 1fr);
+  align-items: start;
+}
+
+.favorite-stone-card__body strong,
+.stone-catalog-card h3,
+.selected-stone-row__body strong {
+  font-weight: 950;
+}
+
+.favorite-stone-card__body small,
+.stone-catalog-card p,
+.selected-stone-row__body small {
+  font-weight: 650;
+}
+
+.favorite-stone-card__actions {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  gap: 8px;
+  align-items: center;
+}
+
+.favorite-stone-card__actions button {
+  width: 100%;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.favorite-stone-card__actions button[data-remove-favorite] {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.favorite-stone-card__size,
+.stone-catalog-card__size {
+  display: inline-flex;
+  width: fit-content;
+  max-width: 100%;
+  margin-top: 4px;
+  padding: 6px 9px;
+  border-radius: 6px;
+  background: rgba(255, 247, 251, .92);
+  color: rgba(140, 77, 121, .9);
+  font-size: 12px;
+  font-weight: 900;
+  box-shadow: inset 0 0 0 1px rgba(184, 138, 223, .22);
+}
+
+.favorite-stone-card__price,
+.stone-catalog-card__price {
+  color: rgba(38, 27, 41, .94);
+  font-size: 18px;
+  font-weight: 950;
+  line-height: 1.1;
+}
+
+.favorite-stone-card__price {
+  grid-column: 1 / -1;
+  align-self: end;
+  padding-top: 8px;
+  border-top: 1px solid rgba(184, 138, 223, .14);
+}
+
+.stone-catalog-card {
+  grid-template-rows: auto minmax(0, 1fr) auto;
+}
+
+.stone-catalog-card__meta {
+  display: none !important;
+}
+
+.stone-catalog-card__bottom {
+  display: grid;
+  gap: 10px;
+  margin-top: auto;
+  padding: 0 12px 12px;
+}
+
+.stone-catalog-card__bottom button {
+  min-height: 40px;
+  border: 0;
+  border-radius: 8px;
+  background: #ee9ac5;
+  color: #fff;
+  cursor: pointer;
+  font-weight: 950;
+}
+
+.stone-catalog-card__bottom button:disabled {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+.stone-catalog-card > button {
+  display: none !important;
+}
+
+@media (max-width: 720px) {
+  .favorite-stone-card__actions {
+    grid-template-columns: minmax(0, 1fr) 44px;
+  }
+}

@@ -410,14 +410,16 @@ function renderStonesCatalog() {
         <span class="favorite-stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
         <span class="favorite-stone-card__body">
           <strong>${escapeHtml(stone.name)}</strong>
-          <small>${formatNumber(stone.sizeMm)} мм · ${formatPrice(stone.price)} ₽</small>
+          ${stone.description ? `<small>${escapeHtml(stone.description)}</small>` : ''}
           ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
           ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
+          <span class="favorite-stone-card__size">Размер: ${formatNumber(stone.sizeMm)} мм</span>
         </span>
         <span class="favorite-stone-card__actions">
           <button type="button" data-wear-favorite="${escapeHtml(stone.id)}" ${disabled ? 'disabled' : ''}>Надеть</button>
           <button type="button" data-remove-favorite="${escapeHtml(stone.id)}" aria-label="Убрать из избранного">×</button>
         </span>
+        <strong class="favorite-stone-card__price">${formatPrice(stone.price)} ₽</strong>
       </article>
     `;
   }).join('');
@@ -448,16 +450,16 @@ function renderStoneCatalogModal() {
       <article class="stone-catalog-card">
         <div class="stone-catalog-card__image" style="--stone-color:${escapeHtml(stone.color)}">${image}</div>
         <div class="stone-catalog-card__body">
-          <div class="stone-catalog-card__meta">
-            <span>${formatPrice(stone.price)} ₽</span>
-            <span>${formatNumber(stone.sizeMm)} мм</span>
-          </div>
           <h3>${escapeHtml(stone.name)}</h3>
           ${stone.description ? `<p>${escapeHtml(stone.description)}</p>` : ''}
           ${stone.property ? `<p><b>Свойства:</b> ${escapeHtml(stone.property)}</p>` : ''}
           ${stone.zodiac ? `<p><b>Зодиак:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
+          <span class="stone-catalog-card__size">Размер: ${formatNumber(stone.sizeMm)} мм</span>
         </div>
-        <button type="button" data-favorite-stone="${escapeHtml(stone.id)}" ${added ? 'disabled' : ''}>${added ? 'В избранном' : 'В избранное'}</button>
+        <div class="stone-catalog-card__bottom">
+          <strong class="stone-catalog-card__price">${formatPrice(stone.price)} ₽</strong>
+          <button type="button" data-favorite-stone="${escapeHtml(stone.id)}" ${added ? 'disabled' : ''}>${added ? 'В избранном' : 'В избранное'}</button>
+        </div>
       </article>
     `;
   }).join('');
