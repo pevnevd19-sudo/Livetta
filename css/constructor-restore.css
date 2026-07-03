@@ -7457,3 +7457,55 @@ button:disabled { cursor: not-allowed !important; opacity: .55; }
   right: 18px;
   padding-bottom: 7px;
 }
+
+
+/* SVG stones sit on the exact same coordinate system as the necklace thread. */
+.necklace-svg {
+  pointer-events: none;
+}
+
+.necklace-svg-beads {
+  pointer-events: auto;
+}
+
+.necklace-beads--fallback {
+  display: none !important;
+}
+
+.necklace-svg-bead {
+  cursor: grab;
+  pointer-events: auto;
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+.necklace-svg-bead__visual {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: filter .16s ease, transform .16s ease;
+}
+
+.necklace-svg-bead__base {
+  filter: drop-shadow(0 2px 5px rgba(45, 31, 35, .26));
+}
+
+.necklace-svg-bead__stroke {
+  fill: none;
+  stroke: rgba(255, 255, 255, .72);
+  stroke-width: 1.6;
+}
+
+.necklace-svg-bead__shine {
+  fill: rgba(255, 255, 255, .68);
+}
+
+.necklace-svg-bead:hover .necklace-svg-bead__visual,
+.necklace-svg-bead--dragging .necklace-svg-bead__visual {
+  filter: drop-shadow(0 8px 16px rgba(45, 31, 35, .30));
+  transform: scale(1.12);
+}
+
+.necklace-svg-bead--dragging {
+  cursor: grabbing;
+  opacity: .94;
+}

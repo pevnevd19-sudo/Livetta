@@ -166,6 +166,8 @@ function normalizeStone(stone) {
     id: String(stone.id ?? name),
     name,
     description: String(stone.description || 'Камень для сборки').trim(),
+    property: String(stone.stone_property || stone.property || '').trim(),
+    zodiac: String(stone.zodiac || '').trim(),
     price: Number.isFinite(price) && price >= 0 ? price : 0,
     sizeMm,
     color: normalizeColor(stone.color),
@@ -297,6 +299,8 @@ function renderStonesCatalog() {
         <span class="stone-card__content">
           <strong>${escapeHtml(stone.name)}</strong>
           <small>${escapeHtml(stone.description)}</small>
+          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
+          ${stone.zodiac ? `<small>${escapeHtml(stone.zodiac)}</small>` : ''}
           <span class="stone-meta">${formatPrice(stone.price)} ₽ / ${formatNumber(stone.sizeMm)} мм</span>
           <b>${stone.available === false ? 'Нет в наличии' : (disabled ? 'Не помещается' : `Можно добавить: ${canAdd} шт.`)}</b>
         </span>
@@ -513,6 +517,9 @@ function buildBeadLayout(stones) {
     return {
       stone: item.stone,
       originalIndex: item.originalIndex,
+      svgX: point.x,
+      svgY: point.y,
+      diameterSvg: item.radius * 2,
       x: point.x / 1000 * stageRect.width,
       y: point.y / 1000 * stageRect.height,
       diameter: item.radiusPx * 2,
@@ -575,31 +582,41 @@ function applyPathCollisions(items, pathLength, customGap = VISUAL_GAP_PX) {
   }
 }
 function renderBead(item, index, animate) {
-  const style = [
-    `left:${item.x}px`,
-    `top:${item.y}px`,
-    `width:${item.diameter}px`,
-    `height:${item.diameter}px`,
-    `--stone-color:${escapeHtml(item.stone.color)}`,
-    `--bead-rotate:${item.angle}deg`
-  ].join(';');
-
+  const radius = item.diameterSvg / 2;
+  const safeIndex = String(index).replace(/[^\w-]/g, '');
+  const clipId = `necklaceStoneClip-${safeIndex}`;
+  const gradientId = `necklaceStoneGradient-${safeIndex}`;
+  const style = `--stone-color:${escapeHtml(item.stone.color)}`;
   const image = item.stone.image
-    ? `<img src="${escapeHtml(item.stone.image)}" alt="${escapeHtml(item.stone.name)}" loading="lazy">`
-    : '<span></span>';
+    ? `<image class="necklace-svg-bead__image" href="${escapeHtml(item.stone.image)}" x="${-radius}" y="${-radius}" width="${item.diameterSvg}" height="${item.diameterSvg}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})"></image>`
+    : '';
 
   return `
-    <button
-      class="necklace-bead ${animate ? 'necklace-bead--new' : ''}"
-      type="button"
+    <g
+      class="necklace-svg-bead ${animate ? 'necklace-svg-bead--new' : ''}"
       data-bead-index="${index}"
-      title="Удалить ${escapeHtml(item.stone.name)}"
+      transform="translate(${item.svgX} ${item.svgY}) rotate(${item.angle})"
       style="${style}">
-      ${image}
-    </button>
+      <title>Удалить ${escapeHtml(item.stone.name)}</title>
+      <defs>
+        <radialGradient id="${gradientId}" cx="32%" cy="25%" r="76%">
+          <stop offset="0%" stop-color="#fff" stop-opacity=".96"></stop>
+          <stop offset="42%" stop-color="${escapeHtml(item.stone.color)}"></stop>
+          <stop offset="100%" stop-color="${escapeHtml(item.stone.color)}" stop-opacity=".72"></stop>
+        </radialGradient>
+        <clipPath id="${clipId}">
+          <circle cx="0" cy="0" r="${radius}"></circle>
+        </clipPath>
+      </defs>
+      <g class="necklace-svg-bead__visual">
+        <circle class="necklace-svg-bead__base" cx="0" cy="0" r="${radius}" fill="url(#${gradientId})"></circle>
+        ${image}
+        <circle class="necklace-svg-bead__stroke" cx="0" cy="0" r="${radius}"></circle>
+        <ellipse class="necklace-svg-bead__shine" cx="${-radius * 0.28}" cy="${-radius * 0.34}" rx="${radius * 0.22}" ry="${radius * 0.14}"></ellipse>
+      </g>
+    </g>
   `;
 }
-
 function getBeadDiameter(sizeMm) {
   const realSizeMm = Number(sizeMm || 8);
   const necklaceLengthMm = getMaxLength();
@@ -713,6 +730,9 @@ async function addDesignToCart() {
         stones: selectedStones.map((stone) => ({
           id: stone.id,
           name: stone.name,
+          description: stone.description,
+          property: stone.property,
+          zodiac: stone.zodiac,
           price: stone.price,
           size_mm: stone.sizeMm,
           color: stone.color,
@@ -754,7 +774,7 @@ function handleBeadPointerDown(event) {
   };
 
   bead.setPointerCapture?.(event.pointerId);
-  bead.classList.add('necklace-bead--dragging');
+  bead.classList.add('necklace-svg-bead--dragging');
   neckStage.classList.add('neck-constructor-stage--dragging');
 
   moveDraggedBeadToPointer(event);
@@ -819,9 +839,10 @@ function handleBeadPointerCancel(event) {
 
 function finishBeadDrag() {
   if (draggedBead?.bead) {
-    draggedBead.bead.classList.remove('necklace-bead--dragging');
+    draggedBead.bead.classList.remove('necklace-svg-bead--dragging');
     draggedBead.bead.style.left = '';
     draggedBead.bead.style.top = '';
+    draggedBead.bead.removeAttribute('data-dragging');
   }
 
   neckStage?.classList.remove('neck-constructor-stage--dragging');
@@ -835,8 +856,8 @@ function moveDraggedBeadToPointer(event) {
 
   const position = getClosestPathPositionFromPointer(event);
 
-  draggedBead.bead.style.left = `${position.x}px`;
-  draggedBead.bead.style.top = `${position.y}px`;
+  draggedBead.bead.setAttribute('transform', `translate(${position.svgX} ${position.svgY})`);
+  draggedBead.bead.setAttribute('data-dragging', 'true');
 }
 
 function getDropIndexFromPointer(event) {
@@ -903,6 +924,8 @@ function getClosestPathPositionFromPointer(event) {
   }
 
   return {
+    svgX: bestPoint.x,
+    svgY: bestPoint.y,
     x: bestPoint.x / 1000 * stageRect.width,
     y: bestPoint.y / 1000 * stageRect.height,
     length: bestLength
@@ -1192,6 +1215,9 @@ function getDesignComposition(stones) {
       count: 0,
       size_mm: stone.sizeMm,
       price: stone.price || 0,
+      description: stone.description || '',
+      property: stone.property || '',
+      zodiac: stone.zodiac || '',
       color: stone.color || '#ee9ac5',
       image: stone.image || ''
     };
