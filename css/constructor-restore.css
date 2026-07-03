@@ -8098,6 +8098,30 @@ body.is-stone-catalog-open {
 .favorite-stone-card,
 .favorite-stone-card * {
   font-family: inherit !important;
+  user-select: none !important;
+  -webkit-user-select: none !important;
+}
+
+.favorite-stone-card img {
+  -webkit-user-drag: none !important;
+  user-drag: none !important;
+}
+
+.constructor-disclaimer {
+  width: min(100%, 760px) !important;
+  margin: 14px auto 18px !important;
+  padding: 12px 14px !important;
+  border-radius: 8px !important;
+  background: rgba(255, 247, 251, .84) !important;
+  color: rgba(65, 45, 67, .66) !important;
+  font-size: 13px !important;
+  font-weight: 750 !important;
+  line-height: 1.4 !important;
+}
+
+.constructor-disclaimer strong {
+  color: rgba(140, 77, 121, .92) !important;
+  font-weight: 950 !important;
 }
 .constructor-clasp-field small,
 .constructor-clasp-material-field small {
@@ -8115,6 +8139,8 @@ body.is-stone-catalog-open {
   align-items: start !important;
   padding: 12px !important;
   cursor: pointer !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
   font-size: 13px !important;
   font-weight: 750 !important;
   line-height: 1.35 !important;
