@@ -8099,6 +8099,15 @@ body.is-stone-catalog-open {
 .favorite-stone-card * {
   font-family: inherit !important;
 }
+.constructor-clasp-field small,
+.constructor-clasp-material-field small {
+  display: block !important;
+  margin-top: 6px !important;
+  color: rgba(65, 45, 67, .55) !important;
+  font-size: 12px !important;
+  font-weight: 400 !important;
+  line-height: 1.35 !important;
+}
 
 .favorite-stone-card {
   grid-template-columns: 58px minmax(0, 1fr) !important;
