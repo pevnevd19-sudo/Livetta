@@ -8019,3 +8019,49 @@ body.is-stone-catalog-open {
     grid-template-columns: minmax(0, 1fr) 44px;
   }
 }
+
+
+/* Stacked selected stone composition. */
+.selected-stone-row--stacked {
+  position: relative;
+  grid-template-columns: 42px minmax(0, 1fr) 34px;
+  padding-right: 46px;
+}
+
+.selected-stone-row__count {
+  position: absolute;
+  top: 7px;
+  right: 7px;
+  min-width: 40px;
+  max-width: calc(100% - 14px);
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(238, 154, 197, .2);
+  color: rgba(140, 77, 121, .94);
+  font-size: 11px;
+  font-weight: 950;
+  line-height: 1;
+  text-align: center;
+  box-shadow: inset 0 0 0 1px rgba(184, 138, 223, .22);
+}
+
+.selected-stone-row--stacked .selected-stone-row__body {
+  padding-right: 8px;
+}
+
+.selected-stone-row--stacked .selected-stone-row__body strong,
+.selected-stone-row--stacked .selected-stone-row__body small {
+  white-space: normal;
+}
+
+.selected-stone-row--stacked button[data-remove-selected-stone] {
+  align-self: end;
+  grid-column: 3;
+  grid-row: 1;
+}
+
+@media (max-width: 720px) {
+  .selected-stone-row--stacked {
+    grid-template-columns: 38px minmax(0, 1fr) 34px;
+  }
+}

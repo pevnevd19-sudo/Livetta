@@ -465,6 +465,26 @@ function renderStoneCatalogModal() {
   }).join('');
 }
 
+function getSelectedStoneGroups() {
+  const map = new Map();
+
+  selectedStones.forEach((stone, index) => {
+    const key = `${stone.id || stone.name}-${stone.sizeMm || ''}`;
+    const current = map.get(key) || {
+      stone,
+      firstIndex: index,
+      count: 0,
+      totalPrice: 0
+    };
+
+    current.count += 1;
+    current.totalPrice += Number(stone.price || 0);
+    map.set(key, current);
+  });
+
+  return Array.from(map.values()).sort((a, b) => a.stone.name.localeCompare(b.stone.name, 'ru'));
+}
+
 function renderSelectedStones() {
   if (!selectedStonesList) return;
 
@@ -473,17 +493,21 @@ function renderSelectedStones() {
     return;
   }
 
-  selectedStonesList.innerHTML = selectedStones.map((stone, index) => {
+  selectedStonesList.innerHTML = getSelectedStoneGroups().map((item) => {
+    const stone = item.stone;
     const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="">` : '<span></span>';
 
     return `
-      <article class="selected-stone-row">
+      <article class="selected-stone-row selected-stone-row--stacked">
         <span class="selected-stone-row__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
         <span class="selected-stone-row__body">
           <strong>${escapeHtml(stone.name)}</strong>
-          <small>${formatNumber(stone.sizeMm)} мм · ${formatPrice(stone.price)} ₽</small>
+          <small>${formatNumber(stone.sizeMm)} мм · ${formatPrice(item.totalPrice)} ₽</small>
+          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
+          ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
         </span>
-        <button type="button" data-remove-selected-stone="${index}" aria-label="Удалить камень">×</button>
+        <span class="selected-stone-row__count">${item.count} шт</span>
+        <button type="button" data-remove-selected-stone="${item.firstIndex}" aria-label="Убрать один камень">×</button>
       </article>
     `;
   }).join('');
