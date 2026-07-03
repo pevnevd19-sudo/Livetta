@@ -31,6 +31,10 @@ const selectedClaspMaterial = document.querySelector('#selectedClaspMaterial');
 const stoneSearch = document.querySelector('#stoneSearch');
 const clearStoneSearch = document.querySelector('#clearStoneSearch');
 const selectedStonesList = document.querySelector('#selectedStonesList');
+const openStonesCatalog = document.querySelector('#openStonesCatalog');
+const closeStoneCatalog = document.querySelector('#closeStoneCatalog');
+const stoneCatalogModal = document.querySelector('#stoneCatalogModal');
+const stoneCatalogList = document.querySelector('#stoneCatalogList');
 
 const neckStage = document.querySelector('#neckStage');
 const necklaceBeads = document.querySelector('#necklaceBeads');
@@ -88,6 +92,7 @@ const CLASP_MATERIALS = {
 const DEFAULT_CLASP_RESERVE_MM = 20;
 
 let stonesCatalog = [];
+let favoriteStones = [];
 let selectedStones = [];
 let draggedBead = null;
 let currentBeadLayout = [];
@@ -249,11 +254,24 @@ function bindEvents() {
 
   addCustomToCart.addEventListener('click', addDesignToCart);
 
-  stoneSearch?.addEventListener('input', renderStonesCatalog);
+  stoneSearch?.addEventListener('input', renderStoneCatalogModal);
 
   clearStoneSearch?.addEventListener('click', () => {
     if (stoneSearch) stoneSearch.value = '';
-    renderStonesCatalog();
+    renderStoneCatalogModal();
+  });
+
+  openStonesCatalog?.addEventListener('click', openStoneCatalog);
+  closeStoneCatalog?.addEventListener('click', closeStoneCatalogModal);
+
+  stoneCatalogModal?.addEventListener('click', (event) => {
+    if (event.target.closest('[data-close-stone-catalog]')) closeStoneCatalogModal();
+  });
+
+  stoneCatalogList?.addEventListener('click', (event) => {
+    const favorite = event.target.closest('[data-favorite-stone]');
+    if (!favorite) return;
+    addFavoriteStone(favorite.dataset.favoriteStone);
   });
 
   selectedStonesList?.addEventListener('click', (event) => {
@@ -270,14 +288,22 @@ function bindEvents() {
   });
 
   stonesList.addEventListener('click', (event) => {
-    const card = event.target.closest('[data-stone-id]');
+    const wear = event.target.closest('[data-wear-favorite]');
+    const remove = event.target.closest('[data-remove-favorite]');
 
-    if (!card || card.disabled) {
+    if (wear) {
+      const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
+      addStone(stone);
       return;
     }
 
-    const stone = stonesCatalog.find((item) => item.id === card.dataset.stoneId);
-    addStone(stone);
+    if (remove) {
+      removeFavoriteStone(remove.dataset.removeFavorite);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') closeStoneCatalogModal();
   });
 
   necklaceBeads.addEventListener('pointerdown', handleBeadPointerDown);
@@ -315,6 +341,40 @@ function getTypeConfig() {
   return TYPE_CONFIG[jewelryType.value] || TYPE_CONFIG['Колье'];
 }
 
+function openStoneCatalog() {
+  if (!stoneCatalogModal) return;
+  stoneCatalogModal.hidden = false;
+  document.body.classList.add('is-stone-catalog-open');
+  renderStoneCatalogModal();
+  window.setTimeout(() => stoneSearch?.focus(), 0);
+}
+
+function closeStoneCatalogModal() {
+  if (!stoneCatalogModal || stoneCatalogModal.hidden) return;
+  stoneCatalogModal.hidden = true;
+  document.body.classList.remove('is-stone-catalog-open');
+}
+
+function addFavoriteStone(stoneId) {
+  const stone = stonesCatalog.find((item) => String(item.id) === String(stoneId));
+  if (!stone) return;
+
+  if (!favoriteStones.some((item) => String(item.id) === String(stone.id))) {
+    favoriteStones.push(stone);
+  }
+
+  renderStonesCatalog();
+}
+
+function removeFavoriteStone(stoneId) {
+  favoriteStones = favoriteStones.filter((item) => String(item.id) !== String(stoneId));
+  renderStonesCatalog();
+}
+
+function isFavoriteStone(stone) {
+  return favoriteStones.some((item) => String(item.id) === String(stone.id));
+}
+
 function getStoneSearchQuery() {
   return String(stoneSearch?.value || '').trim().toLowerCase();
 }
@@ -332,38 +392,73 @@ function getFilteredStones() {
 }
 
 function renderStonesCatalog() {
+  if (!stonesList) return;
+
+  if (!favoriteStones.length) {
+    stonesList.innerHTML = '<p class="muted-text">В избранном пока пусто. Открой каталог камней и добавь нужные камни.</p>';
+    renderStoneCatalogModal();
+    return;
+  }
+
+  stonesList.innerHTML = favoriteStones.map((stone) => {
+    const canAdd = getCanAddCount(stone);
+    const disabled = stone.available === false || canAdd <= 0;
+    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '<span class="stone-card__gem"></span>';
+
+    return `
+      <article class="favorite-stone-card">
+        <span class="favorite-stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
+        <span class="favorite-stone-card__body">
+          <strong>${escapeHtml(stone.name)}</strong>
+          <small>${formatNumber(stone.sizeMm)} мм · ${formatPrice(stone.price)} ₽</small>
+          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
+          ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
+        </span>
+        <span class="favorite-stone-card__actions">
+          <button type="button" data-wear-favorite="${escapeHtml(stone.id)}" ${disabled ? 'disabled' : ''}>Надеть</button>
+          <button type="button" data-remove-favorite="${escapeHtml(stone.id)}" aria-label="Убрать из избранного">×</button>
+        </span>
+      </article>
+    `;
+  }).join('');
+
+  renderStoneCatalogModal();
+}
+
+function renderStoneCatalogModal() {
+  if (!stoneCatalogList) return;
+
   if (!stonesCatalog.length) {
-    stonesList.innerHTML = '<p class="muted-text">Камней пока нет. Добавь их в админке.</p>';
+    stoneCatalogList.innerHTML = '<p class="muted-text">Камней пока нет. Добавь их в админке.</p>';
     return;
   }
 
   const visibleStones = getFilteredStones();
 
   if (!visibleStones.length) {
-    stonesList.innerHTML = '<p class="muted-text">По такому запросу камней нет.</p>';
+    stoneCatalogList.innerHTML = '<p class="muted-text">По такому запросу камней нет.</p>';
     return;
   }
 
-  stonesList.innerHTML = visibleStones.map((stone) => {
-    const canAdd = getCanAddCount(stone);
-    const disabled = stone.available === false || canAdd <= 0;
-    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '';
+  stoneCatalogList.innerHTML = visibleStones.map((stone) => {
+    const added = isFavoriteStone(stone);
+    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '<span class="stone-card__gem"></span>';
 
     return `
-      <button class="stone-card constructor-stone-card ${disabled ? 'stone-card--disabled' : ''}" type="button" data-stone-id="${escapeHtml(stone.id)}" ${disabled ? 'disabled' : ''}>
-        <span class="stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">
-          ${image || '<span class="stone-card__gem"></span>'}
-        </span>
-
-        <span class="stone-card__content">
-          <strong>${escapeHtml(stone.name)}</strong>
-          <small>${escapeHtml(stone.description)}</small>
-          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
-          ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
-          <span class="stone-meta">${formatPrice(stone.price)} ₽ / ${formatNumber(stone.sizeMm)} мм</span>
-          <b>${stone.available === false ? 'Нет в наличии' : (disabled ? 'Не помещается' : `Можно добавить: ${canAdd} шт.`)}</b>
-        </span>
-      </button>
+      <article class="stone-catalog-card">
+        <div class="stone-catalog-card__image" style="--stone-color:${escapeHtml(stone.color)}">${image}</div>
+        <div class="stone-catalog-card__body">
+          <div class="stone-catalog-card__meta">
+            <span>${formatPrice(stone.price)} ₽</span>
+            <span>${formatNumber(stone.sizeMm)} мм</span>
+          </div>
+          <h3>${escapeHtml(stone.name)}</h3>
+          ${stone.description ? `<p>${escapeHtml(stone.description)}</p>` : ''}
+          ${stone.property ? `<p><b>Свойства:</b> ${escapeHtml(stone.property)}</p>` : ''}
+          ${stone.zodiac ? `<p><b>Зодиак:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
+        </div>
+        <button type="button" data-favorite-stone="${escapeHtml(stone.id)}" ${added ? 'disabled' : ''}>${added ? 'В избранном' : 'В избранное'}</button>
+      </article>
     `;
   }).join('');
 }

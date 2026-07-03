@@ -7643,3 +7643,263 @@ button:disabled { cursor: not-allowed !important; opacity: .55; }
     grid-template-columns: 1fr;
   }
 }
+
+
+/* Open stone catalog and favorite stones. */
+body.is-stone-catalog-open {
+  overflow: hidden;
+}
+
+.constructor-stones-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.constructor-stones-head h2 {
+  margin: 2px 0 0;
+}
+
+.favorite-stones-list {
+  display: grid;
+  gap: 10px;
+}
+
+.favorite-stone-card {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(184, 138, 223, .18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .86);
+}
+
+.favorite-stone-card__thumb {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  overflow: hidden;
+  border-radius: 8px;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.86), transparent 24%),
+    var(--stone-color, #b48a78);
+}
+
+.favorite-stone-card__thumb img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.favorite-stone-card__body {
+  display: grid;
+  gap: 3px;
+  min-width: 0;
+}
+
+.favorite-stone-card__body strong,
+.favorite-stone-card__body small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.favorite-stone-card__body strong {
+  color: rgba(38, 27, 41, .92);
+  font-size: 15px;
+}
+
+.favorite-stone-card__body small {
+  color: rgba(38, 27, 41, .6);
+  font-size: 12px;
+}
+
+.favorite-stone-card__actions {
+  display: grid;
+  gap: 6px;
+}
+
+.favorite-stone-card__actions button,
+.stone-catalog-card > button,
+.stone-catalog-modal__close,
+.stones-panel__catalog-button {
+  min-height: 38px;
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 900;
+}
+
+.stones-panel__catalog-button,
+.stone-catalog-card > button {
+  background: #ee9ac5;
+  color: #fff;
+  padding: 0 14px;
+}
+
+.favorite-stone-card__actions button,
+.stone-catalog-modal__close {
+  background: rgba(255, 255, 255, .88);
+  color: rgba(140, 77, 121, .88);
+  box-shadow: inset 0 0 0 1px rgba(184, 138, 223, .26);
+}
+
+.favorite-stone-card__actions button:disabled,
+.stone-catalog-card > button:disabled {
+  opacity: .52;
+  cursor: not-allowed;
+}
+
+.stone-catalog-modal[hidden] {
+  display: none !important;
+}
+
+.stone-catalog-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+
+.stone-catalog-modal__backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(38, 27, 41, .34);
+  backdrop-filter: blur(4px);
+}
+
+.stone-catalog-modal__dialog {
+  position: relative;
+  z-index: 1;
+  width: min(1120px, 100%);
+  max-height: min(86vh, 820px);
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  gap: 14px;
+  overflow: hidden;
+  padding: 18px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .96);
+}
+
+.stone-catalog-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.stone-catalog-modal__head h2 {
+  margin: 2px 0 0;
+  color: rgba(38, 27, 41, .92);
+}
+
+.stone-catalog-modal__close {
+  width: 42px;
+  padding: 0;
+  font-size: 22px;
+}
+
+.stone-catalog-list {
+  min-height: 220px;
+  overflow: auto;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 14px;
+  padding-right: 4px;
+}
+
+.stone-catalog-card {
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  overflow: hidden;
+  border: 1px solid rgba(184, 138, 223, .18);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, .9);
+  box-shadow: 0 12px 28px rgba(143, 86, 127, .10);
+}
+
+.stone-catalog-card__image {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 30% 24%, rgba(255,255,255,.86), transparent 22%),
+    var(--stone-color, #b48a78);
+}
+
+.stone-catalog-card__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.stone-catalog-card__body {
+  display: grid;
+  gap: 7px;
+  padding: 12px;
+}
+
+.stone-catalog-card__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.stone-catalog-card__meta span {
+  padding: 4px 7px;
+  border-radius: 999px;
+  background: rgba(238, 154, 197, .16);
+  color: rgba(140, 77, 121, .82);
+  font-size: 11px;
+  font-weight: 900;
+}
+
+.stone-catalog-card h3 {
+  margin: 0;
+  color: rgba(38, 27, 41, .92);
+  font-size: 17px;
+  line-height: 1.2;
+}
+
+.stone-catalog-card p {
+  margin: 0;
+  color: rgba(38, 27, 41, .62);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.stone-catalog-card > button {
+  margin: 0 12px 12px;
+}
+
+@media (max-width: 720px) {
+  .stone-catalog-modal {
+    padding: 12px;
+  }
+
+  .stone-catalog-modal__dialog {
+    max-height: 90vh;
+    padding: 12px;
+  }
+
+  .stone-catalog-list {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  }
+
+  .favorite-stone-card {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+
+  .favorite-stone-card__actions {
+    grid-column: 1 / -1;
+    grid-template-columns: 1fr 44px;
+  }
+}

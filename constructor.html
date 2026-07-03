@@ -110,26 +110,48 @@
         </section>
 
         <aside class="stones-panel glass-card">
-            <h2>Камни из админки</h2>
-            <p class="muted-text">
-                Камни подтягиваются из базы. Если сервер не запущен, конструктор покажет тестовый гранат.
-            </p>
-
-            <div class="constructor-catalog-toolbar">
-                <label class="constructor-search-field">
-                    <span>Поиск камней</span>
-                    <input id="stoneSearch" type="search" placeholder="Название, свойства, знак зодиака">
-                </label>
-                <button id="clearStoneSearch" type="button">Сброс</button>
+            <div class="stones-panel__head constructor-stones-head">
+                <div>
+                    <span class="page-eyebrow">Камни</span>
+                    <h2>Избранные камни</h2>
+                </div>
+                <button id="openStonesCatalog" class="stones-panel__catalog-button" type="button">Каталог камней</button>
             </div>
 
-            <div id="stonesList" class="constructor-stone-grid"></div>
+            <p class="muted-text">
+                Открой каталог, добавь камни в избранное, а потом надевай их на нить из этого списка.
+            </p>
+
+            <div id="stonesList" class="favorite-stones-list"></div>
 
             <section class="selected-stones-panel" aria-label="Состав украшения">
                 <h3>Состав украшения</h3>
                 <div id="selectedStonesList"></div>
             </section>
         </aside>
+
+        <div id="stoneCatalogModal" class="stone-catalog-modal" hidden>
+            <div class="stone-catalog-modal__backdrop" data-close-stone-catalog></div>
+            <section class="stone-catalog-modal__dialog glass-card" role="dialog" aria-modal="true" aria-labelledby="stoneCatalogTitle">
+                <header class="stone-catalog-modal__head">
+                    <div>
+                        <span class="page-eyebrow">Каталог камней</span>
+                        <h2 id="stoneCatalogTitle">Каталог камней</h2>
+                    </div>
+                    <button id="closeStoneCatalog" class="stone-catalog-modal__close" type="button" aria-label="Закрыть каталог">×</button>
+                </header>
+
+                <div class="constructor-catalog-toolbar">
+                    <label class="constructor-search-field">
+                        <span>Поиск камней</span>
+                        <input id="stoneSearch" type="search" placeholder="Название, свойства, знак зодиака">
+                    </label>
+                    <button id="clearStoneSearch" type="button">Сброс</button>
+                </div>
+
+                <div id="stoneCatalogList" class="stone-catalog-list"></div>
+            </section>
+        </div>
     </main>
 
     <script type="module" src="js/constructor.js"></script>
