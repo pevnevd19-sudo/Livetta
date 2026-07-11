@@ -43,7 +43,7 @@ const necklaceFullPath = document.querySelector('#necklaceFullPath');
 
 const TYPE_CONFIG = {
   'Колье': {
-    min: 30,
+    min: 25,
     max: 50,
     defaultSize: 45,
     claspRatio: 0.08,
@@ -77,11 +77,9 @@ const BEAD_CAPACITY_SIZE_FACTOR = 1;
 // Недрагоценные варианты замков. reserveMm — часть общей длины,
 // которую занимает сам замок и соединительные элементы.
 const CLASP_OPTIONS = {
-  'lobster-steel': { id: 'lobster-steel', name: 'Карабин', material: 'Нержавеющая сталь', reserveMm: 18 },
-  'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', material: 'Нержавеющая сталь', reserveMm: 24 },
-  'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', material: 'Нержавеющая сталь', reserveMm: 20 },
-  'screw-steel': { id: 'screw-steel', name: 'Винтовой замок', material: 'Нержавеющая сталь', reserveMm: 16 },
-  'hook-steel': { id: 'hook-steel', name: 'Замок-крючок', material: 'Нержавеющая сталь', reserveMm: 18 }
+  'lobster-steel': { id: 'lobster-steel', name: 'Карабин', reserveMm: 18 },
+  'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', reserveMm: 24 },
+  'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', reserveMm: 20 }
 };
 
 const CLASP_MATERIALS = {
@@ -889,7 +887,7 @@ function updateSummary() {
 
   if (!clasp) {
     capacityHint.textContent = selectedStones.length
-      ? `Выберите тип замка. Сейчас расчёт выполнен с запасом ${DEFAULT_CLASP_RESERVE_MM} мм.`
+      ? `Выберите тип замка. Сейчас доступно ${formatNumber(max)} мм под камни.`
       : `Сначала выберите замок, затем добавляйте камни. Под камни доступно ${formatNumber(max)} мм.`;
   } else if (!material) {
     capacityHint.textContent = 'Выберите материал застежки.';
@@ -930,7 +928,7 @@ async function addDesignToCart() {
     rebuildNecklace(false);
 
     const cart = readCart();
-    const title = `${jewelryType.value} Livetta custom`;
+    const title = `${jewelryType.value} LiVetta custom`;
     const total = selectedStones.reduce((sum, stone) => sum + stone.price, 0);
     const composition = getDesignComposition(selectedStones);
     const previewImage = await createDesignPreviewImage();
@@ -1207,7 +1205,7 @@ function getPhysicalUsedLength(stones) {
 }
 
 function getMaxLength() {
-  return getAvailableBeadLengthMm();
+  return getSelectedNecklaceLengthMm();
 }
 
 function readCart() {

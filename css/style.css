@@ -11169,3 +11169,105 @@ body.is-stone-catalog-open {
     grid-template-columns: 38px minmax(0, 1fr) 30px 30px 30px;
   }
 }
+
+
+/* Codex 20260711 order, product length and constructor mobile fixes */
+.premium-product-length {
+  display: grid;
+  gap: 8px;
+  max-width: 260px;
+  margin-top: 16px;
+  color: rgba(55, 35, 49, .72);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.premium-product-length select {
+  width: 100%;
+  border: 1px solid rgba(189, 145, 207, .46);
+  border-radius: 16px;
+  padding: 13px 42px 13px 16px;
+  background: rgba(255, 255, 255, .82);
+  color: rgba(41, 24, 39, .86);
+  font: inherit;
+  box-shadow: 0 14px 30px rgba(170, 93, 151, .14);
+}
+
+.checkout-page #cartCheckoutLink,
+.checkout-page-body #cartCheckoutLink {
+  display: none !important;
+}
+
+.checkout-page .cart-list .cart-item__info > strong,
+.checkout-page-body .cart-list .cart-item__info > strong {
+  display: none !important;
+}
+
+.constructor-disclaimer {
+  box-sizing: border-box;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  word-break: normal;
+  white-space: normal;
+}
+
+@media (max-width: 760px) {
+  .constructor-preview .constructor-disclaimer {
+    width: 100%;
+    margin: 12px 0 16px;
+    padding: 12px 14px;
+    display: block;
+    line-height: 1.45;
+    font-size: 13px;
+  }
+}
+
+
+
+/* Codex 20260711 checkout price label */
+.cart-item__line-price {
+  margin: 0 !important;
+  color: rgba(28, 20, 32, .90) !important;
+  font-size: 17px !important;
+  font-weight: 900 !important;
+}
+
+.checkout-page .cart-list .cart-item__info .cart-item__line-price,
+.checkout-page-body .cart-list .cart-item__info .cart-item__line-price {
+  display: inline-flex !important;
+  align-items: center !important;
+  width: fit-content !important;
+  max-width: 100% !important;
+  gap: 6px !important;
+  margin-top: 10px !important;
+  padding: 8px 12px !important;
+  border-radius: 999px !important;
+  background: rgba(255, 247, 251, .86) !important;
+  border: 1px solid rgba(238, 154, 197, .28) !important;
+  box-shadow: 0 12px 26px rgba(174, 90, 142, .12) !important;
+  color: rgba(28, 20, 32, .88) !important;
+  line-height: 1.1 !important;
+  white-space: nowrap !important;
+}
+
+.checkout-page .cart-list .cart-item__line-price span,
+.checkout-page-body .cart-list .cart-item__line-price span {
+  display: inline !important;
+  color: rgba(140, 77, 121, .68) !important;
+  font-size: 12px !important;
+  font-weight: 800 !important;
+  letter-spacing: .02em !important;
+  text-transform: uppercase !important;
+}
+
+.checkout-page .cart-list .cart-item__controls,
+.checkout-page-body .cart-list .cart-item__controls {
+  display: none !important;
+}
+
+@media (max-width: 560px) {
+  .checkout-page .cart-list .cart-item__info .cart-item__line-price,
+  .checkout-page-body .cart-list .cart-item__info .cart-item__line-price {
+    white-space: normal !important;
+  }
+}

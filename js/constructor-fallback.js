@@ -1,17 +1,15 @@
 (function () {
   const App = window.Livetta;
-  const SIZE_MIN = 30;
+  const SIZE_MIN = 25;
   const SIZE_MAX = 50;
   const DEFAULT_SIZE = 45;
   const FIT_KEY = 'livetta_clean_constructor_fit_v1';
   const MAX_STONES = 48;
 
   const CLASPS = {
-    'lobster-steel': { id: 'lobster-steel', name: 'Карабин', material: 'Нержавеющая сталь', reserveMm: 18 },
-    'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', material: 'Нержавеющая сталь', reserveMm: 24 },
-    'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', material: 'Нержавеющая сталь', reserveMm: 20 },
-    'screw-steel': { id: 'screw-steel', name: 'Винтовой замок', material: 'Нержавеющая сталь', reserveMm: 16 },
-    'hook-steel': { id: 'hook-steel', name: 'Замок-крючок', material: 'Нержавеющая сталь', reserveMm: 18 }
+    'lobster-steel': { id: 'lobster-steel', name: 'Карабин', reserveMm: 18 },
+    'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', reserveMm: 24 },
+    'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', reserveMm: 20 }
   };
 
   const MATERIALS = {
@@ -327,7 +325,7 @@
     if (!state.selected.length) {
       setMessage('Добавьте камни из каталога.');
     } else if (!getSelectedClasp() || !getSelectedMaterial()) {
-      setMessage('Выберите замок и материал.');
+      setMessage('Выберите замок и материал застежки.');
     } else {
       setMessage('Сборка готова к добавлению в корзину.');
     }
@@ -443,9 +441,7 @@
   }
 
   function getAvailableMm() {
-    const clasp = getSelectedClasp();
-    const reserve = clasp?.reserveMm ?? 20;
-    return Math.max(1, getSizeCm() * 10 - reserve);
+    return Math.max(1, getSizeCm() * 10);
   }
 
   function getUsedMm() {

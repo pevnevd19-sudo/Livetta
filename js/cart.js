@@ -298,6 +298,9 @@ function renderCartItem(item, index) {
   const image = App.resolveImageUrl(item.design?.preview_image || item.image || firstImage(item));
   const title = item.title || 'Украшение LiVetta';
   const category = item.category || (item.custom ? 'Индивидуальная сборка' : 'Украшение');
+  const isCheckoutItemView = typeof isCheckoutPath === 'function' && isCheckoutPath();
+  const linePriceLabel = isCheckoutItemView ? '<span>Цена:</span> ' : '';
+  const linePriceHtml = `<p class="cart-item__line-price">${linePriceLabel}${App.formatPrice(price * quantity)} ₽</p>`;
 
   return `
     <article class="cart-item">
@@ -309,7 +312,8 @@ function renderCartItem(item, index) {
         <h2>${App.escapeHtml(title)}</h2>
         ${item.description ? `<span>${App.escapeHtml(item.description)}</span>` : ''}
         ${renderDesignInfo(item)}
-        <strong>${App.formatPrice(price)} ₽</strong>
+        ${isCheckoutItemView ? linePriceHtml : ''}
+        ${isCheckoutPath() ? '' : `<strong>${App.formatPrice(price)} ₽</strong>`}
       </div>
       <div class="cart-item__controls">
         <div class="cart-qty">
@@ -317,7 +321,7 @@ function renderCartItem(item, index) {
           <span>${quantity}</span>
           <button type="button" data-cart-action="plus" data-index="${index}">+</button>
         </div>
-        <p>${App.formatPrice(price * quantity)} ₽</p>
+        ${isCheckoutItemView ? '' : linePriceHtml}
         <button class="cart-remove-button" type="button" data-cart-action="remove" data-index="${index}">Удалить</button>
       </div>
     </article>
@@ -333,7 +337,8 @@ function renderDesignInfo(item) {
   const designInfo = [
     design?.type ? `<small>Тип: ${App.escapeHtml(design.type)}</small>` : '',
     design?.size_cm ? `<small>Размер: ${App.escapeHtml(design.size_cm)} см</small>` : '',
-    design?.clasp?.name ? `<small>Замок: ${App.escapeHtml(design.clasp.name)}${design.clasp.material ? ` · ${App.escapeHtml(design.clasp.material)}` : ''}</small>` : '',
+    design?.clasp?.name ? `<small>Тип замка: ${App.escapeHtml(design.clasp.name)}</small>` : '',
+    design?.clasp_material_name ? `<small>Материал замка: ${App.escapeHtml(design.clasp_material_name)}</small>` : (design?.clasp?.material ? `<small>Материал замка: ${App.escapeHtml(design.clasp.material)}</small>` : ''),
     design?.stones_count ? `<small>Бусин: ${App.escapeHtml(design.stones_count)}</small>` : ''
   ].join('');
 
@@ -625,7 +630,13 @@ function updateGiftServicesSummary(cart) {
 }
 
 /* Cart page now stays lightweight; full form lives on checkout.html */
-const isCheckoutPage = /checkout\.html$/i.test(window.location.pathname);
+function isCheckoutPath() {
+  return /(?:^|\/)checkout(?:\.html)?\/?$/i.test(window.location.pathname)
+    || document.body.classList.contains('checkout-page-body')
+    || document.body.classList.contains('checkout-page');
+}
+
+const isCheckoutPage = isCheckoutPath();
 const originalSplitRenderCart = renderCart;
 
 renderCart = function renderCartWithSplitCheckout() {
@@ -645,6 +656,9 @@ function syncCheckoutSplit() {
   const form = $('#cartOrderForm');
   const clearButton = $('#cartClearButton');
   const cart = App.readCart();
+  const checkoutLink = $('#cartCheckoutLink');
+
+  if (isCheckoutPage && checkoutLink) checkoutLink.remove();
 
   if (!isCheckoutPage) {
     if (form) form.hidden = true;

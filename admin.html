@@ -50,6 +50,14 @@
 
                         <input id="price" name="price" type="text" inputmode="decimal" placeholder="Цена, например 2500"
                             required>
+                        <label class="admin-check admin-check--promo">
+                            <input id="productIsPromo" name="is_promo" type="checkbox" value="true">
+                            <span>Акция</span>
+                        </label>
+                        <section class="admin-promo-fields admin-field--wide" data-promo-fields hidden>
+                            <label><span>Старая цена, ₽</span><input id="productOldPrice" name="old_price" inputmode="decimal" placeholder="Например 3900"></label>
+                            <label><span>Новая цена, ₽</span><input id="productSalePrice" name="sale_price" inputmode="decimal" placeholder="Например 2900"></label>
+                        </section>
 
                         <textarea id="description" name="description" placeholder="Описание" required></textarea>
 

@@ -1,5 +1,9 @@
 const App = window.Livetta;
 const API_URL = App.getApiUrl();
+const PRODUCT_LENGTH_MIN = 25;
+const PRODUCT_LENGTH_MAX = 50;
+const PRODUCT_LENGTH_DEFAULT = 45;
+
 const EMPTY_LIGHTBOX_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 const productDetail = document.querySelector('#productDetail');
@@ -91,6 +95,7 @@ function renderProductDetail(product) {
         <span class="premium-product-eyebrow">${escapeHtml(product.category)}</span>
         <h1>${escapeHtml(product.title)}</h1>
         <strong class="premium-product-price">${formatPrice(product.price)} ₽</strong>
+        ${renderProductLengthSelector(product)}
       </div>
 
       <div class="premium-product-description">
@@ -103,15 +108,15 @@ function renderProductDetail(product) {
       <div class="premium-product-benefits">
         <div>
           <strong>Подарочная подача</strong>
-          <span>аккуратно и эстетично</span>
+          <span>При желании мы можем упаковать украшение сразу на подарок вашему близкому и не очень человеку, дайте нам только знать об этом.</span>
         </div>
         <div>
           <strong>Фото перед отправкой</strong>
-          <span>покажем украшение до покупки</span>
+          <span>Покажем украшения до отправки, если вам что то не понравится, переделаем бесплатно.</span>
         </div>
         <div>
           <strong>Ручной подбор</strong>
-          <span>камни, форма и настроение</span>
+          <span>Каждое наше украшение, камень, форма и настроение подбирается под конкретного человека, знак зодиака или характер, у нас вы точно сможете найти, то украшение, которое подойдет именно вам.</span>
         </div>
       </div>
 
@@ -167,6 +172,31 @@ function renderProductStones(product) {
       </div>
     </div>
   `;
+}
+
+function renderProductLengthSelector(product) {
+  if (product.purchasable === false) {
+    return '';
+  }
+
+  const options = [];
+  for (let length = PRODUCT_LENGTH_MIN; length <= PRODUCT_LENGTH_MAX; length += 1) {
+    const selected = length === PRODUCT_LENGTH_DEFAULT ? ' selected' : '';
+    options.push(`<option value="${length}"${selected}>${length} см</option>`);
+  }
+
+  return `
+    <label class="premium-product-length" for="productLength">
+      <span>Длина украшения</span>
+      <select id="productLength" name="productLength">${options.join('')}</select>
+    </label>
+  `;
+}
+
+function getSelectedProductLength() {
+  const field = document.querySelector('#productLength');
+  const value = Number(field?.value || PRODUCT_LENGTH_DEFAULT);
+  return Math.min(PRODUCT_LENGTH_MAX, Math.max(PRODUCT_LENGTH_MIN, Number.isFinite(value) ? value : PRODUCT_LENGTH_DEFAULT));
 }
 
 function getProductStones(product) {
@@ -270,7 +300,36 @@ function addToCart(product, button = null) {
     return;
   }
 
-  App.addProductToCart(product);
+  const lengthCm = getSelectedProductLength();
+  const cart = App.readCart();
+  const productId = product.id ?? product.slug ?? product.title;
+  const existing = cart.find((item) => String(item.id) === String(productId) && !item.custom && Number(item.design?.size_cm || 0) === lengthCm);
+  const images = getProductImages(product);
+
+  if (existing) {
+    existing.quantity = Number(existing.quantity || 1) + 1;
+    existing.design = { ...(existing.design || {}), type: product.category || 'Украшение', size_cm: lengthCm };
+  } else {
+    cart.push({
+      id: productId,
+      product_id: product.id,
+      custom: false,
+      title: product.title,
+      category: product.category,
+      description: product.description,
+      product_stones: product.product_stones || [],
+      image: resolveImageUrl(images[0] || product.image),
+      product_images: images,
+      price: Number(product.price || 0),
+      quantity: 1,
+      design: {
+        type: product.category || 'Украшение',
+        size_cm: lengthCm
+      }
+    });
+  }
+
+  App.writeCart(cart);
   animateBuyButton(button);
 }
 

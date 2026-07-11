@@ -573,11 +573,9 @@ function calculateInventory(items) {
 }
 
 const ALLOWED_CLASPS = {
-  'lobster-steel': { id:'lobster-steel', name:'Карабин', material:'Нержавеющая сталь', reserveMm:18 },
-  'toggle-steel': { id:'toggle-steel', name:'Тоггл', material:'Нержавеющая сталь', reserveMm:24 },
-  'magnetic-steel': { id:'magnetic-steel', name:'Магнитный замок', material:'Нержавеющая сталь', reserveMm:20 },
-  'screw-steel': { id:'screw-steel', name:'Винтовой замок', material:'Нержавеющая сталь', reserveMm:16 },
-  'hook-steel': { id:'hook-steel', name:'Замок-крючок', material:'Нержавеющая сталь', reserveMm:18 }
+  'lobster-steel': { id:'lobster-steel', name:'Карабин', reserveMm:18 },
+  'toggle-steel': { id:'toggle-steel', name:'Тоггл', reserveMm:24 },
+  'magnetic-steel': { id:'magnetic-steel', name:'Магнитный замок', reserveMm:20 }
 };
 
 function priceOrderItems(requestItems) {
@@ -593,8 +591,8 @@ function priceOrderItems(requestItems) {
       const designType=text(raw.design?.type)||'Колье';
       if(designType!=='Колье') throw new Error('В конструкторе доступен только тип украшения «Колье»');
       const sizeCm=num(raw.design?.size_cm);
-      const validSize=sizeCm>=30&&sizeCm<=50;
-      if(!validSize) throw new Error('Длина колье должна быть от 30 до 50 см');
+      const validSize=sizeCm>=25&&sizeCm<=50;
+      if(!validSize) throw new Error('Длина колье должна быть от 25 до 50 см');
       const priced=[]; let unit=0;
       for(const requestedStone of requested) {
         const stone=db.prepare('SELECT * FROM stones WHERE id=? AND active=1').get(int(requestedStone.id));
@@ -603,8 +601,8 @@ function priceOrderItems(requestItems) {
         priced.push({ id:stone.id,name:stone.name,price:num(stone.price),size_mm:num(stone.size_mm),color:stone.color,image:stone.image,path_ratio:requestedStone.path_ratio??null });
       }
       const usedMm=priced.reduce((sum,stone)=>sum+num(stone.size_mm),0);
-      const availableMm=sizeCm*10-clasp.reserveMm;
-      if(usedMm>availableMm+0.001) throw new Error(`Бусины не помещаются на выбранную длину с замком «${clasp.name}»`);
+      const availableMm=sizeCm*10;
+      if(usedMm>availableMm+0.001) throw new Error(`Бусины не помещаются на выбранную длину украшения`);
       const compositionMap=new Map(); priced.forEach(s=>{const key=s.id;const x=compositionMap.get(key)||{id:s.id,name:s.name,count:0,size_mm:s.size_mm};x.count++;compositionMap.set(key,x);});
       const description=[...compositionMap.values()].map(x=>`${x.name} ×${x.count}`).join(', ')+`; замок: ${clasp.name}`;
       normalized.push({ id:text(raw.id)||`custom-${Date.now()}`, custom:true, title:text(raw.title)||'Индивидуальное украшение LiVetta', category:'Конструктор', description, image:text(raw.design?.preview_image||raw.image), quantity, price:unit, sum:unit*quantity, composition:[...compositionMap.values()], design:{...raw.design,type:designType,size_cm:sizeCm,clasp,clasp_type:clasp.id,used_mm:usedMm,max_mm:availableMm,stones:priced,composition:[...compositionMap.values()],stones_count:priced.length} });
@@ -612,7 +610,12 @@ function priceOrderItems(requestItems) {
       const product=db.prepare('SELECT * FROM products WHERE id=? AND active=1').get(int(raw.id));
       if(!product) throw new Error('Один из товаров больше недоступен');
       if(product.is_child && !CHILD_PRODUCTS_ENABLED) throw new Error('Продажа детских украшений будет доступна после оформления документов о соответствии');
-      normalized.push({ id:product.id,custom:false,title:product.title,category:product.category,description:product.description,product_stones:productStones(product),image:productImages(product)[0]||'',product_images:productImages(product),quantity,price:num(product.price),sum:num(product.price)*quantity });
+      const productDesignSource = raw.design && typeof raw.design === 'object' ? raw.design : {};
+      const productLengthCm = num(productDesignSource.size_cm);
+      const productDesign = productLengthCm >= 25 && productLengthCm <= 50
+        ? { type: text(productDesignSource.type) || product.category || 'Украшение', size_cm: productLengthCm }
+        : undefined;
+      normalized.push({ id:product.id,custom:false,title:product.title,category:product.category,description:product.description,product_stones:productStones(product),image:productImages(product)[0]||'',product_images:productImages(product),quantity,price:num(product.price),sum:num(product.price)*quantity,design:productDesign });
     }
   }
   return normalized;
