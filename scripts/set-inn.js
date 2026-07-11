@@ -12,8 +12,8 @@ for (const file of fs.readdirSync(pagesDir)) {
   const full = path.join(pagesDir, file);
   const source = fs.readFileSync(full, 'utf8');
   const updated = source
-    .replaceAll('781165194751', inn)
-    .replaceAll('781165194751', inn);
+    .replaceAll('ВСТАВИТЬ ИНН ПЕРЕД ЗАПУСКОМ', inn)
+    .replaceAll('ВСТАВИТЬ ИНН', inn);
   fs.writeFileSync(full, updated, 'utf8');
 }
 console.log('ИНН добавлен в HTML-страницы. Проверьте документы перед публикацией.');

@@ -14,12 +14,12 @@ const homePopularGrid = document.querySelector('#homePopularGrid');
 
 const fallbackCarouselSlides = [
   {
-    image: '',
-    alt: 'Подарочный сертификат LiVetta'
+    image: 'img/home-slide-1.jpg',
+    alt: 'Подарочный сертификат Livetta'
   },
   {
-    image: '',
-    alt: 'Летняя коллекция украшений LiVetta'
+    image: 'img/home-slide-2.jpg',
+    alt: 'Летняя коллекция украшений Livetta'
   }
 ];
 
@@ -68,13 +68,10 @@ function renderHomeCarousel(slides) {
     const alt = typeof slide === 'string'
       ? `Фото карусели ${index + 1}`
       : (slide.alt || `Фото карусели ${index + 1}`);
-    const media = image
-      ? `<img src="${escapeHtml(resolveImageUrl(image))}" alt="${escapeHtml(alt)}">`
-      : '<span class="home-slide__monogram">LiVetta</span>';
 
     return `
       <article class="home-carousel__slide ${index === 0 ? 'is-active' : ''}">
-        ${media}
+        <img src="${escapeHtml(resolveImageUrl(image))}" alt="${escapeHtml(alt)}">
       </article>
     `;
   }).join('');
@@ -145,7 +142,7 @@ async function loadHomeCarouselImages() {
     const data = await response.json();
     renderHomeCarousel(normalizeCarouselSlides(data));
   } catch (error) {
-    console.warn('Не удалось загрузить фото карусели:', error);
+    console.warn('Не удалось загрузить фото карусели из админки:', error);
     renderHomeCarousel(fallbackCarouselSlides);
   }
 
@@ -196,8 +193,26 @@ function renderHomePopularProduct(product) {
       <div class="home-popular-card__info">
         <p>${escapeHtml(category)}</p>
         <h3>${escapeHtml(product.title)}</h3>
+        ${renderProductSizes(product)}
         <strong>${formatPrice(product.price)} ₽</strong>
       </div>
     </article>
   `;
+}
+
+
+function renderProductSizes(product) {
+  const sizes = Array.isArray(product.size_options) ? product.size_options : [];
+  if (!sizes.length) return '';
+  return `
+    <div class="product-size-badges home-product-size-badges">
+      ${sizes.map((size) => `<span>${escapeHtml(size.label)} · ${escapeHtml(formatSizeCm(size.cm))} см</span>`).join('')}
+    </div>
+    <p class="product-size-note">${escapeHtml(product.carabiner_extension_note || 'При заказе украшения с замком карабин есть удлинение 4 см.')}</p>
+  `;
+}
+
+function formatSizeCm(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? String(number).replace('.', ',') : value;
 }

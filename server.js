@@ -25,13 +25,6 @@ const OWNER_LOGIN = process.env.ADMIN_LOGIN || 'owner';
 const OWNER_PASSWORD = process.env.ADMIN_PASSWORD || 'change-me-now';
 const CHILD_PRODUCTS_ENABLED = String(process.env.CHILD_PRODUCTS_ENABLED || 'false') === 'true';
 const FREE_SHIPPING_MIN = Number(process.env.FREE_SHIPPING_MIN || 10000);
-const VOLUME_DISCOUNT_TIERS = [
-  { minItems: 5, percent: 15, label: 'Скидка 15% за комплект от 5 украшений' },
-  { minItems: 3, percent: 10, label: 'Скидка 10% за комплект от 3 украшений' },
-  { minItems: 2, percent: 5, label: 'Скидка 5% за 2 украшения' }
-];
-const GIFT_WRAP_PRICE = Number(process.env.GIFT_WRAP_PRICE || 300);
-const GIFT_CARD_PRICE = Number(process.env.GIFT_CARD_PRICE || 150);
 const RESERVATION_MINUTES = Number(process.env.RESERVATION_MINUTES || 30);
 const SELLER_INN = process.env.SELLER_INN || '';
 const SELLER_EMAIL = process.env.SELLER_EMAIL || 'livettajewerly@yandex.ru';
@@ -109,28 +102,13 @@ function sendFrontendFile(res, fileName, status = 200) {
   return res.status(status).sendFile(filePath);
 }
 
-function sendRootFile(res, fileName, status = 200) {
-  const filePath = path.join(frontendDir, fileName);
-  if (!fs.existsSync(filePath)) return res.status(404).send('Страница не найдена');
-  return res.status(status).sendFile(filePath);
-}
-
-const pages = ['catalog','constructor','product','cart','checkout','faq','delivery','about','offer','privacy','user-agreement','personal-data-consent','marketing-consent','returns','warranty','payment','contacts','payment-success','payment-failed','admin'];
-app.get('/', (req, res) => sendRootFile(res, 'index.html'));
-app.get(['/index.html', '/index.html/'], (req, res) => res.redirect(301, '/'));
+const pages = ['index','catalog','constructor','product','cart','faq','delivery','about','offer','privacy','personal-data-consent','marketing-consent','returns','warranty','payment','contacts','payment-success','payment-failed','admin'];
+app.get('/', (req, res) => sendFrontendFile(res, 'index.html'));
 for (const page of pages) {
+  app.get(`/${page}.html`, (req, res) => sendFrontendFile(res, `${page}.html`));
   app.get(`/${page}`, (req, res) => sendFrontendFile(res, `${page}.html`));
-  app.get(`/${page}.html`, (req, res) => res.redirect(301, `/${page}${getRequestQuery(req)}`));
-  app.get(`/${page}.html/`, (req, res) => res.redirect(301, `/${page}${getRequestQuery(req)}`));
 }
 app.get('/robots.txt', (req, res) => res.type('text/plain').sendFile(path.join(frontendDir, 'robots.txt')));
-app.get('/yandex_a9411ca51ebb3cea.html', (req, res) => res.type('text/html').sendFile(path.join(frontendDir, 'yandex_a9411ca51ebb3cea.html')));
-app.get('/favicon.svg', (req, res) => res.type('image/svg+xml').sendFile(path.join(frontendDir, 'favicon.svg')));
-app.get('/favicon.ico', (req, res) => res.type('image/x-icon').sendFile(path.join(frontendDir, 'favicon.ico')));
-app.get('/apple-touch-icon.png', (req, res) => res.type('image/png').sendFile(path.join(frontendDir, 'img', 'apple-touch-icon.png')));
-app.get('/favicon-32x32.png', (req, res) => res.type('image/png').sendFile(path.join(frontendDir, 'img', 'favicon-32x32.png')));
-app.get('/favicon-16x16.png', (req, res) => res.type('image/png').sendFile(path.join(frontendDir, 'img', 'favicon-16x16.png')));
-app.get('/site.webmanifest', (req, res) => res.type('application/manifest+json').sendFile(path.join(frontendDir, 'site.webmanifest')));
 app.get('/sitemap.xml', (req, res) => res.type('application/xml').sendFile(path.join(frontendDir, 'sitemap.xml')));
 
 function addColumnIfMissing(table, column, definition) {
@@ -138,12 +116,6 @@ function addColumnIfMissing(table, column, definition) {
   if (!columns.some((item) => item.name === column)) {
     db.prepare(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`).run();
   }
-}
-
-function getRequestQuery(req) {
-  const url = String(req.originalUrl || '');
-  const queryStart = url.indexOf('?');
-  return queryStart >= 0 ? url.slice(queryStart) : '';
 }
 
 function initDatabase() {
@@ -155,28 +127,26 @@ function initDatabase() {
     price REAL NOT NULL,
     image TEXT DEFAULT '',
     product_images TEXT DEFAULT '[]',
-    stones_json TEXT DEFAULT '[]',
     is_popular INTEGER DEFAULT 0,
     popular_order INTEGER DEFAULT 0,
     stock_qty INTEGER DEFAULT 0,
     reserved_qty INTEGER DEFAULT 0,
     sold_qty INTEGER DEFAULT 0,
     is_child INTEGER DEFAULT 0,
+    size_map_json TEXT DEFAULT '',
+    hide_sizes INTEGER DEFAULT 0,
     active INTEGER DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`).run();
   for (const [column, definition] of Object.entries({
-    image:"TEXT DEFAULT ''", product_images:"TEXT DEFAULT '[]'", stones_json:"TEXT DEFAULT '[]'", is_popular:'INTEGER DEFAULT 0', popular_order:'INTEGER DEFAULT 0',
-    stock_qty:'INTEGER DEFAULT 0', reserved_qty:'INTEGER DEFAULT 0', sold_qty:'INTEGER DEFAULT 0', is_child:'INTEGER DEFAULT 0', active:'INTEGER DEFAULT 1', created_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
+    image:"TEXT DEFAULT ''", product_images:"TEXT DEFAULT '[]'", is_popular:'INTEGER DEFAULT 0', popular_order:'INTEGER DEFAULT 0',
+    stock_qty:'INTEGER DEFAULT 0', reserved_qty:'INTEGER DEFAULT 0', sold_qty:'INTEGER DEFAULT 0', is_child:'INTEGER DEFAULT 0', size_map_json:"TEXT DEFAULT ''", hide_sizes:'INTEGER DEFAULT 0', active:'INTEGER DEFAULT 1', created_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
   })) addColumnIfMissing('products', column, definition);
 
   db.prepare(`CREATE TABLE IF NOT EXISTS stones (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT NOT NULL,
     description TEXT NOT NULL,
-    zodiac TEXT DEFAULT '',
-    stone_property TEXT DEFAULT '',
-    stone_shape TEXT DEFAULT 'round',
     price REAL NOT NULL,
     image TEXT NOT NULL DEFAULT '',
     size_mm REAL,
@@ -188,7 +158,7 @@ function initDatabase() {
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
   )`).run();
   for (const [column, definition] of Object.entries({
-    image:"TEXT NOT NULL DEFAULT ''", zodiac:"TEXT DEFAULT ''", stone_property:"TEXT DEFAULT ''", stone_shape:"TEXT DEFAULT 'round'", size_mm:'REAL', color:"TEXT DEFAULT '#b48a78'", stock_qty:'INTEGER DEFAULT 0', reserved_qty:'INTEGER DEFAULT 0', sold_qty:'INTEGER DEFAULT 0', active:'INTEGER DEFAULT 1', created_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
+    image:"TEXT NOT NULL DEFAULT ''", size_mm:'REAL', color:"TEXT DEFAULT '#b48a78'", stock_qty:'INTEGER DEFAULT 0', reserved_qty:'INTEGER DEFAULT 0', sold_qty:'INTEGER DEFAULT 0', active:'INTEGER DEFAULT 1', created_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
   })) addColumnIfMissing('stones', column, definition);
 
   db.prepare(`CREATE TABLE IF NOT EXISTS users (
@@ -229,8 +199,6 @@ function initDatabase() {
     items_json TEXT NOT NULL,
     inventory_json TEXT DEFAULT '{}',
     subtotal REAL DEFAULT 0,
-    discount_total REAL DEFAULT 0,
-    promo_label TEXT DEFAULT '',
     total REAL DEFAULT 0,
     status TEXT DEFAULT 'new',
     reserved_until DATETIME,
@@ -244,7 +212,7 @@ function initDatabase() {
     delivery_comment:"TEXT DEFAULT ''", shipping_cost:'REAL DEFAULT 0', shipping_resolved:'INTEGER DEFAULT 0', payment_method:"TEXT DEFAULT 'online'",
     payment_id:"TEXT DEFAULT ''", payment_status:"TEXT DEFAULT 'pending'", payment_url:"TEXT DEFAULT ''", receipt_url:"TEXT DEFAULT ''", receipt_sent_at:'DATETIME',
     tracking_number:"TEXT DEFAULT ''", admin_note:"TEXT DEFAULT ''", legal_consent:'INTEGER DEFAULT 0', marketing_consent:'INTEGER DEFAULT 0', inventory_json:"TEXT DEFAULT '{}'",
-    subtotal:'REAL DEFAULT 0', discount_total:'REAL DEFAULT 0', promo_label:"TEXT DEFAULT ''", reserved_until:'DATETIME', inventory_finalized:'INTEGER DEFAULT 0', updated_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
+    subtotal:'REAL DEFAULT 0', reserved_until:'DATETIME', inventory_finalized:'INTEGER DEFAULT 0', updated_at:'DATETIME DEFAULT CURRENT_TIMESTAMP'
   };
   for (const [column, definition] of Object.entries(orderColumns)) addColumnIfMissing('orders', column, definition);
   addColumnIfMissing('orders', 'customer_contact', "TEXT DEFAULT ''");
@@ -267,7 +235,7 @@ function initDatabase() {
 
   if (!db.prepare('SELECT id FROM users LIMIT 1').get()) {
     db.prepare('INSERT INTO users (login, password_hash, role) VALUES (?, ?, ?)').run(OWNER_LOGIN, hashPassword(OWNER_PASSWORD), 'owner');
-    console.log(`Создан владелец панели управления: ${OWNER_LOGIN}. Смените пароль в .env перед запуском.`);
+    console.log(`Создан владелец админки: ${OWNER_LOGIN}. Смените пароль в .env перед запуском.`);
   }
 
   db.prepare("UPDATE products SET stock_qty = 1 WHERE stock_qty IS NULL OR stock_qty < 0").run();
@@ -287,7 +255,7 @@ function verifyPassword(password, stored) {
   return actual.length === expected.length && crypto.timingSafeEqual(actual, expected);
 }
 function randomToken(bytes = 24) { return crypto.randomBytes(bytes).toString('hex'); }
-function bool(value) { return value === true || value === 1 || String(value).toLowerCase() === 'true' || String(value) === 'on'; }
+function bool(value) { if (Array.isArray(value)) value = value[value.length - 1]; return value === true || value === 1 || String(value).toLowerCase() === 'true' || String(value) === '1' || String(value) === 'on'; }
 function num(value, fallback = 0) { const n = Number(String(value ?? '').replace(',', '.').replace(/[^\d.-]/g, '')); return Number.isFinite(n) ? n : fallback; }
 function int(value, fallback = 0) { return Math.max(0, Math.round(num(value, fallback))); }
 function text(value) { return String(value ?? '').trim(); }
@@ -329,7 +297,7 @@ function orderRateLimit(req, res, next) {
 
 function authMiddleware(req, res, next) {
   const header = req.headers.authorization || '';
-  if (!header.startsWith('Bearer ')) return res.status(401).json({ message: 'Нужно войти в панель управления' });
+  if (!header.startsWith('Bearer ')) return res.status(401).json({ message: 'Нужно войти в админку' });
   try {
     const payload = jwt.verify(header.slice(7), JWT_SECRET);
     const user = db.prepare('SELECT id, login, role, active FROM users WHERE id = ?').get(payload.id);
@@ -388,60 +356,71 @@ function deleteLocalFile(value) {
   try { const fileName = path.basename(new URL(value, SITE_URL).pathname); const filePath = path.join(uploadsDir, fileName); if (filePath.startsWith(uploadsDir) && fs.existsSync(filePath)) fs.unlinkSync(filePath); } catch {}
 }
 
+
+const PRODUCT_SIZE_LABELS = ['XS','S','M','L','XL'];
+const DEFAULT_PRODUCT_SIZE_CM = { XS: 38, S: 40, M: 42, L: 44, XL: 46 };
+const CARABINER_EXTENSION_NOTE = 'При заказе украшения с замком карабин есть удлинение 4 см.';
+
+function isEarringsCategory(category) {
+  return /серьг/i.test(text(category));
+}
+
+function parseProductSizeMap(value) {
+  const raw = typeof value === 'string' ? safeJson(value, {}) : (value || {});
+  const result = {};
+  PRODUCT_SIZE_LABELS.forEach((label) => {
+    const candidate = raw[label] ?? raw[label.toLowerCase()];
+    const cm = num(candidate, NaN);
+    result[label] = Number.isFinite(cm) && cm > 0 ? cm : DEFAULT_PRODUCT_SIZE_CM[label];
+  });
+  return result;
+}
+
+function productSizeOptions(product) {
+  if (!product || int(product.hide_sizes) || isEarringsCategory(product.category)) return [];
+  const map = parseProductSizeMap(product.size_map_json);
+  return PRODUCT_SIZE_LABELS.map((label) => ({ label, cm: map[label] }));
+}
+
+function parseProductSizeBody(body, current = {}) {
+  const currentMap = parseProductSizeMap(current.size_map_json);
+  const map = {};
+  PRODUCT_SIZE_LABELS.forEach((label) => {
+    const field = `size_${label.toLowerCase()}_cm`;
+    const direct = body.size_map && typeof body.size_map === 'object' ? body.size_map[label] : undefined;
+    const raw = body[field] ?? direct;
+    const fallback = currentMap[label] ?? DEFAULT_PRODUCT_SIZE_CM[label];
+    const cm = raw === undefined || raw === '' ? fallback : num(raw, fallback);
+    map[label] = Number.isFinite(cm) && cm > 0 ? cm : fallback;
+  });
+  const category = text(body.category ?? current.category);
+  const hide = bool(body.hide_sizes ?? current.hide_sizes) || isEarringsCategory(category);
+  return { size_map_json: JSON.stringify(map), hide_sizes: hide ? 1 : 0 };
+}
+
+function normalizeSelectedProductSize(raw, product) {
+  const options = productSizeOptions(product);
+  if (!options.length) return null;
+  const selected = raw?.selected_size || raw?.size || raw?.size_option || null;
+  const label = text(selected?.label || selected?.name || selected).toUpperCase();
+  const match = options.find((option) => option.label === label) || options[0];
+  return { label: match.label, cm: match.cm };
+}
+
 function productImages(product) {
   const images = safeJson(product?.product_images, []);
   const result = Array.isArray(images) ? images.filter(Boolean).map(String) : [];
   if (product?.image && !result.includes(product.image)) result.unshift(product.image);
   return [...new Set(result)];
 }
-function productStones(product) {
-  const raw = safeJson(product?.stones_json, []);
-  if (!Array.isArray(raw)) return [];
-  return raw.map(normalizeProductStone).filter(Boolean);
-}
-function normalizeProductStone(stone) {
-  if (!stone || typeof stone !== 'object') return null;
-  const name = text(stone.name);
-  if (!name) return null;
-  return {
-    name,
-    description: text(stone.description),
-    zodiac: text(stone.zodiac),
-    stone_property: text(stone.stone_property ?? stone.property)
-  };
-}
-function parseProductStones(value) {
-  const raw = text(value);
-  if (!raw) return [];
-
-  if (raw.startsWith('[')) {
-    const items = safeJson(raw, []);
-    return Array.isArray(items) ? items.map(normalizeProductStone).filter(Boolean) : [];
-  }
-
-  return raw.split(/\r?\n/)
-    .map((line) => line.trim())
-    .filter(Boolean)
-    .map((line) => {
-      const [name = '', description = '', zodiac = '', stone_property = ''] = line.split('|').map((part) => text(part));
-      return normalizeProductStone({ name, description, zodiac, stone_property });
-    })
-    .filter(Boolean);
-}
 function publicProduct(product, admin = false) {
   const images = productImages(product);
   const available = Math.max(0, int(product.stock_qty) - int(product.reserved_qty));
   const purchasable = Boolean(product.active) && available > 0 && (!product.is_child || CHILD_PRODUCTS_ENABLED);
-  const stones = productStones(product);
-  const result = { ...product, image: images[0] || '', product_images: images, product_stones: stones, available_qty: available, in_stock: available > 0, purchasable, child_sale_enabled: CHILD_PRODUCTS_ENABLED };
+  const result = { ...product, image: images[0] || '', product_images: images, available_qty: available, in_stock: available > 0, purchasable, child_sale_enabled: CHILD_PRODUCTS_ENABLED, size_options: productSizeOptions(product), carabiner_extension_note: CARABINER_EXTENSION_NOTE };
   if (!admin) { delete result.stock_qty; delete result.reserved_qty; delete result.sold_qty; delete result.available_qty; }
   return result;
 }
-function normalizeStoneShape(value) {
-  const shape = text(value || 'round');
-  return ['round','square','diamond','rectangle','triangle','faceted'].includes(shape) ? shape : 'round';
-}
-
 function publicStone(stone, admin = false) {
   const available = Math.max(0, int(stone.stock_qty) - int(stone.reserved_qty));
   const result = { ...stone, available_qty: available, available: Boolean(stone.active) && available > 0 };
@@ -472,15 +451,15 @@ app.get('/api/admin/products', authMiddleware, requireRoles('owner','admin'), (r
 function parseProductBody(body, current={}) {
   const title=text(body.title ?? current.title), description=text(body.description ?? current.description), category=text(body.category ?? current.category);
   const price=num(body.price ?? current.price, -1), stock_qty=int(body.stock_qty ?? current.stock_qty), is_child=bool(body.is_child ?? current.is_child)?1:0, active=(body.active===undefined ? int(current.active,1) : (bool(body.active)?1:0));
-  const stones_json = JSON.stringify(parseProductStones(body.product_stones ?? body.stones_json ?? current.stones_json));
+  const sizeData = parseProductSizeBody(body, { ...current, category });
   if(!title || !description || !category || price<0) return {error:'Заполните название, описание, категорию и цену'};
-  return {title,description,category,price,stock_qty,is_child,active,stones_json};
+  return {title,description,category,price,stock_qty,is_child,active,...sizeData};
 }
 app.post('/api/products', authMiddleware, requireRoles('owner','admin'), uploadAny, (req,res)=>{
   const p=parseProductBody(req.body); if(p.error) return res.status(400).json({message:p.error});
   const files=uploaded(req,['image','images','productImage','productImages']); const images=files.map(f=>uploadUrl(req,f));
   const popular=bool(req.body.is_popular)?1:0, order=int(req.body.popular_order);
-  const result=db.prepare('INSERT INTO products (title,description,category,price,image,product_images,stones_json,is_popular,popular_order,stock_qty,is_child,active) VALUES (?,?,?,?,?,?,?,?,?,?,?,?)').run(p.title,p.description,p.category,p.price,images[0]||'',JSON.stringify(images),p.stones_json,popular,order,p.stock_qty,p.is_child,p.active);
+  const result=db.prepare('INSERT INTO products (title,description,category,price,image,product_images,is_popular,popular_order,stock_qty,is_child,active,size_map_json,hide_sizes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)').run(p.title,p.description,p.category,p.price,images[0]||'',JSON.stringify(images),popular,order,p.stock_qty,p.is_child,p.active,p.size_map_json,p.hide_sizes);
   res.status(201).json(publicProduct(db.prepare('SELECT * FROM products WHERE id=?').get(result.lastInsertRowid),true));
 });
 app.put('/api/products/:id', authMiddleware, requireRoles('owner','admin'), uploadAny, (req,res)=>{
@@ -491,7 +470,7 @@ app.put('/api/products/:id', authMiddleware, requireRoles('owner','admin'), uplo
   if(replace) old.forEach(deleteLocalFile);
   const popular=req.body.is_popular===undefined?current.is_popular:(bool(req.body.is_popular)?1:0), order=int(req.body.popular_order ?? current.popular_order);
   if(p.stock_qty<int(current.reserved_qty)) return res.status(409).json({message:`Остаток не может быть меньше резерва (${int(current.reserved_qty)})`});
-  db.prepare('UPDATE products SET title=?,description=?,category=?,price=?,image=?,product_images=?,stones_json=?,is_popular=?,popular_order=?,stock_qty=?,is_child=?,active=? WHERE id=?').run(p.title,p.description,p.category,p.price,images[0]||'',JSON.stringify([...new Set(images)]),p.stones_json,popular,order,p.stock_qty,p.is_child,p.active,req.params.id);
+  db.prepare('UPDATE products SET title=?,description=?,category=?,price=?,image=?,product_images=?,is_popular=?,popular_order=?,stock_qty=?,is_child=?,active=?,size_map_json=?,hide_sizes=? WHERE id=?').run(p.title,p.description,p.category,p.price,images[0]||'',JSON.stringify([...new Set(images)]),popular,order,p.stock_qty,p.is_child,p.active,p.size_map_json,p.hide_sizes,req.params.id);
   res.json(publicProduct(db.prepare('SELECT * FROM products WHERE id=?').get(req.params.id),true));
 });
 app.delete('/api/products/:id/images/:index', authMiddleware, requireRoles('owner','admin'), (req,res)=>{ const p=db.prepare('SELECT * FROM products WHERE id=?').get(req.params.id); if(!p) return res.status(404).json({message:'Товар не найден'}); const images=productImages(p); const index=int(req.params.index,-1); if(index<0||index>=images.length) return res.status(400).json({message:'Фото не найдено'}); const [removed]=images.splice(index,1); deleteLocalFile(removed); db.prepare('UPDATE products SET image=?,product_images=? WHERE id=?').run(images[0]||'',JSON.stringify(images),req.params.id); res.json(publicProduct(db.prepare('SELECT * FROM products WHERE id=?').get(req.params.id),true)); });
@@ -508,21 +487,8 @@ app.put('/api/popular-products', authMiddleware, requireRoles('owner','admin'), 
 
 app.get('/api/stones', (req,res)=>{ cleanupExpiredReservations(); res.json(db.prepare('SELECT * FROM stones WHERE active=1 ORDER BY created_at DESC,id DESC').all().map(row=>publicStone(row))); });
 app.get('/api/admin/stones', authMiddleware, requireRoles('owner','admin','master'), (req,res)=>res.json(db.prepare('SELECT * FROM stones ORDER BY created_at DESC,id DESC').all().map(row=>publicStone(row,true))));
-function parseStoneBody(body, current = {}) {
-  const name = text(body.name ?? current.name);
-  const description = text(body.description ?? current.description);
-  const zodiac = text(body.zodiac ?? current.zodiac ?? '');
-  const stone_property = text(body.stone_property ?? current.stone_property ?? '');
-  const stone_shape = normalizeStoneShape(body.stone_shape ?? current.stone_shape ?? 'round');
-  const price = num(body.price ?? current.price, -1);
-  const size_mm = num(body.size_mm ?? current.size_mm, -1);
-  const color = normalizeColor(body.color ?? current.color);
-  const stock_qty = int(body.stock_qty ?? current.stock_qty);
-  const active = (body.active === undefined ? int(current.active, 1) : (bool(body.active) ? 1 : 0));
-  if (!name || !description || price < 0 || size_mm <= 0) return { error: 'Заполните название, описание, цену и размер' };
-  return { name, description, zodiac, stone_property, stone_shape, price, size_mm, color, stock_qty, active };
-}
-app.post('/api/stones', authMiddleware, requireRoles('owner','admin'), uploadAny, (req,res)=>{ const s=parseStoneBody(req.body); if(s.error)return res.status(400).json({message:s.error}); const f=uploaded(req,['image','stoneImage'])[0]; const result=db.prepare('INSERT INTO stones (name,description,zodiac,stone_property,stone_shape,price,image,size_mm,color,stock_qty,active) VALUES (?,?,?,?,?,?,?,?,?,?,?)').run(s.name,s.description,s.zodiac,s.stone_property,s.stone_shape,s.price,uploadUrl(req,f),s.size_mm,s.color,s.stock_qty,s.active); res.status(201).json(publicStone(db.prepare('SELECT * FROM stones WHERE id=?').get(result.lastInsertRowid),true)); });
+function parseStoneBody(body,current={}) { const name=text(body.name??current.name),description=text(body.description??current.description),price=num(body.price??current.price,-1),size_mm=num(body.size_mm??current.size_mm,-1),color=normalizeColor(body.color??current.color),stock_qty=int(body.stock_qty??current.stock_qty),active=(body.active===undefined?int(current.active,1):(bool(body.active)?1:0)); if(!name||!description||price<0||size_mm<=0)return{error:'Заполните название, описание, цену и размер'}; return{name,description,price,size_mm,color,stock_qty,active}; }
+app.post('/api/stones', authMiddleware, requireRoles('owner','admin'), uploadAny, (req,res)=>{ const s=parseStoneBody(req.body); if(s.error)return res.status(400).json({message:s.error}); const f=uploaded(req,['image','stoneImage'])[0]; const result=db.prepare('INSERT INTO stones (name,description,price,image,size_mm,color,stock_qty,active) VALUES (?,?,?,?,?,?,?,?)').run(s.name,s.description,s.price,uploadUrl(req,f),s.size_mm,s.color,s.stock_qty,s.active); res.status(201).json(publicStone(db.prepare('SELECT * FROM stones WHERE id=?').get(result.lastInsertRowid),true)); });
 app.put('/api/stones/:id', authMiddleware, requireRoles('owner','admin'), uploadAny, (req,res)=>{
   const current=db.prepare('SELECT * FROM stones WHERE id=?').get(req.params.id);
   if(!current) return res.status(404).json({message:'Камень не найден'});
@@ -532,8 +498,8 @@ app.put('/api/stones/:id', authMiddleware, requireRoles('owner','admin'), upload
   const file=uploaded(req,['image','stoneImage'])[0];
   const image=file?uploadUrl(req,file):current.image;
   if(file) deleteLocalFile(current.image);
-  db.prepare('UPDATE stones SET name=?,description=?,zodiac=?,stone_property=?,stone_shape=?,price=?,image=?,size_mm=?,color=?,stock_qty=?,active=? WHERE id=?')
-    .run(stone.name,stone.description,stone.zodiac,stone.stone_property,stone.stone_shape,stone.price,image,stone.size_mm,stone.color,stone.stock_qty,stone.active,current.id);
+  db.prepare('UPDATE stones SET name=?,description=?,price=?,image=?,size_mm=?,color=?,stock_qty=?,active=? WHERE id=?')
+    .run(stone.name,stone.description,stone.price,image,stone.size_mm,stone.color,stone.stock_qty,stone.active,current.id);
   res.json(publicStone(db.prepare('SELECT * FROM stones WHERE id=?').get(current.id),true));
 });
 app.put('/api/inventory/stones/:id', authMiddleware, requireRoles('owner','admin','master'), (req,res)=>{
@@ -573,9 +539,11 @@ function calculateInventory(items) {
 }
 
 const ALLOWED_CLASPS = {
-  'lobster-steel': { id:'lobster-steel', name:'Карабин', reserveMm:18 },
-  'toggle-steel': { id:'toggle-steel', name:'Тоггл', reserveMm:24 },
-  'magnetic-steel': { id:'magnetic-steel', name:'Магнитный замок', reserveMm:20 }
+  'lobster-steel': { id:'lobster-steel', name:'Карабин', material:'Нержавеющая сталь', reserveMm:18 },
+  'toggle-steel': { id:'toggle-steel', name:'Тоггл', material:'Нержавеющая сталь', reserveMm:24 },
+  'magnetic-steel': { id:'magnetic-steel', name:'Магнитный замок', material:'Нержавеющая сталь', reserveMm:20 },
+  'screw-steel': { id:'screw-steel', name:'Винтовой замок', material:'Нержавеющая сталь', reserveMm:16 },
+  'hook-steel': { id:'hook-steel', name:'Замок-крючок', material:'Нержавеющая сталь', reserveMm:18 }
 };
 
 function priceOrderItems(requestItems) {
@@ -591,8 +559,8 @@ function priceOrderItems(requestItems) {
       const designType=text(raw.design?.type)||'Колье';
       if(designType!=='Колье') throw new Error('В конструкторе доступен только тип украшения «Колье»');
       const sizeCm=num(raw.design?.size_cm);
-      const validSize=sizeCm>=25&&sizeCm<=50;
-      if(!validSize) throw new Error('Длина колье должна быть от 25 до 50 см');
+      const validSize=[38,40,42,44,46].includes(Number(sizeCm));
+      if(!validSize) throw new Error('Выберите размер колье XS, S, M, L или XL');
       const priced=[]; let unit=0;
       for(const requestedStone of requested) {
         const stone=db.prepare('SELECT * FROM stones WHERE id=? AND active=1').get(int(requestedStone.id));
@@ -601,49 +569,19 @@ function priceOrderItems(requestItems) {
         priced.push({ id:stone.id,name:stone.name,price:num(stone.price),size_mm:num(stone.size_mm),color:stone.color,image:stone.image,path_ratio:requestedStone.path_ratio??null });
       }
       const usedMm=priced.reduce((sum,stone)=>sum+num(stone.size_mm),0);
-      const availableMm=sizeCm*10;
-      if(usedMm>availableMm+0.001) throw new Error(`Бусины не помещаются на выбранную длину украшения`);
+      const availableMm=sizeCm*10-clasp.reserveMm;
+      if(usedMm>availableMm+0.001) throw new Error(`Бусины не помещаются на выбранную длину с замком «${clasp.name}»`);
       const compositionMap=new Map(); priced.forEach(s=>{const key=s.id;const x=compositionMap.get(key)||{id:s.id,name:s.name,count:0,size_mm:s.size_mm};x.count++;compositionMap.set(key,x);});
       const description=[...compositionMap.values()].map(x=>`${x.name} ×${x.count}`).join(', ')+`; замок: ${clasp.name}`;
-      normalized.push({ id:text(raw.id)||`custom-${Date.now()}`, custom:true, title:text(raw.title)||'Индивидуальное украшение LiVetta', category:'Конструктор', description, image:text(raw.design?.preview_image||raw.image), quantity, price:unit, sum:unit*quantity, composition:[...compositionMap.values()], design:{...raw.design,type:designType,size_cm:sizeCm,clasp,clasp_type:clasp.id,used_mm:usedMm,max_mm:availableMm,stones:priced,composition:[...compositionMap.values()],stones_count:priced.length} });
+      normalized.push({ id:text(raw.id)||`custom-${Date.now()}`, custom:true, title:text(raw.title)||'Индивидуальное украшение Livetta', category:'Конструктор', description, image:text(raw.design?.preview_image||raw.image), quantity, price:unit, sum:unit*quantity, composition:[...compositionMap.values()], design:{...raw.design,type:designType,size_cm:sizeCm,size_label:text(raw.design?.size_label)||'',clasp,clasp_type:clasp.id,used_mm:usedMm,max_mm:availableMm,stones:priced,composition:[...compositionMap.values()],stones_count:priced.length} });
     } else {
       const product=db.prepare('SELECT * FROM products WHERE id=? AND active=1').get(int(raw.id));
       if(!product) throw new Error('Один из товаров больше недоступен');
       if(product.is_child && !CHILD_PRODUCTS_ENABLED) throw new Error('Продажа детских украшений будет доступна после оформления документов о соответствии');
-      const productDesignSource = raw.design && typeof raw.design === 'object' ? raw.design : {};
-      const productLengthCm = num(productDesignSource.size_cm);
-      const productDesign = productLengthCm >= 25 && productLengthCm <= 50
-        ? { type: text(productDesignSource.type) || product.category || 'Украшение', size_cm: productLengthCm }
-        : undefined;
-      normalized.push({ id:product.id,custom:false,title:product.title,category:product.category,description:product.description,product_stones:productStones(product),image:productImages(product)[0]||'',product_images:productImages(product),quantity,price:num(product.price),sum:num(product.price)*quantity,design:productDesign });
+      const selectedSize=normalizeSelectedProductSize(raw, product); normalized.push({ id:product.id,custom:false,title:product.title,category:product.category,description:product.description,image:productImages(product)[0]||'',product_images:productImages(product),quantity,price:num(product.price),sum:num(product.price)*quantity,selected_size:selectedSize,size_options:productSizeOptions(product),carabiner_extension_note:CARABINER_EXTENSION_NOTE });
     }
   }
   return normalized;
-}
-
-function getOrderItemsCount(items) {
-  return items.reduce((sum, item) => sum + Math.max(1, int(item.quantity, 1)), 0);
-}
-
-function calculateVolumeDiscount(subtotal, itemsCount) {
-  const tier = VOLUME_DISCOUNT_TIERS.find((item) => itemsCount >= item.minItems);
-  if (!tier || subtotal <= 0) return { amount: 0, label: '', percent: 0 };
-  return {
-    amount: Math.round((subtotal * tier.percent) / 100),
-    label: tier.label,
-    percent: tier.percent
-  };
-}
-
-function calculateGiftOptions(body) {
-  const wrap = bool(body?.gift_wrap);
-  const card = bool(body?.gift_card);
-  const message = card ? text(body?.gift_message).slice(0, 500) : '';
-  const total = (wrap ? GIFT_WRAP_PRICE : 0) + (card ? GIFT_CARD_PRICE : 0);
-  const labels = [];
-  if (wrap) labels.push(`Подарочная упаковка +${GIFT_WRAP_PRICE} ₽`);
-  if (card) labels.push(`Открытка +${GIFT_CARD_PRICE} ₽${message ? `: ${message}` : ''}`);
-  return { wrap, card, message, total, labels };
 }
 
 function requirementsAvailable(inventory) {
@@ -693,7 +631,7 @@ async function quoteCdek({postal_code,country_code='RU'}) {
 async function calculateShipping(body, subtotal) {
   const country=text(body.country)||'Россия', city=text(body.city), method=text(body.delivery_method)||'spb_courier', withinKad=bool(body.within_kad);
   if(subtotal>=FREE_SHIPPING_MIN && /россия/i.test(country)) return {resolved:true,cost:0,label:'Бесплатная доставка от 10 000 ₽'};
-  if(method==='spb_courier' && /санкт[- ]?петербург|спб/i.test(city) && withinKad) return {resolved:true,cost:700,label:'Курьер LiVetta в пределах КАД'};
+  if(method==='spb_courier' && /санкт[- ]?петербург|спб/i.test(city) && withinKad) return {resolved:true,cost:700,label:'Курьер Livetta в пределах КАД'};
   if(method==='cdek') {
     const postal=text(body.postal_code); if(!postal) return {resolved:false,cost:0,label:'Для расчёта СДЭК нужен индекс'};
     const countryCodes={Россия:'RU',Казахстан:'KZ',Беларусь:'BY'};
@@ -709,7 +647,7 @@ app.post('/api/shipping/quote', async (req,res)=>{ try { const subtotal=num(req.
 
 function orderResponse(order, includePrivate=true) {
   const items=safeJson(order.items_json,[]), history=includePrivate?db.prepare('SELECT * FROM order_history WHERE order_id=? ORDER BY id DESC').all(order.id):[];
-  const data={id:order.id,public_token:order.public_token,customer_name:order.customer_name,customer_phone:order.customer_phone,customer_telegram:order.customer_telegram,customer_email:order.customer_email,country:order.country,city:order.city,postal_code:order.postal_code,address:order.address,delivery_method:order.delivery_method,delivery_comment:order.delivery_comment,shipping_cost:order.shipping_cost,shipping_resolved:Boolean(order.shipping_resolved),payment_method:order.payment_method,payment_status:order.payment_status,payment_url:order.payment_url,receipt_url:order.receipt_url,receipt_sent_at:order.receipt_sent_at,tracking_number:order.tracking_number,customer_comment:order.customer_comment,items,subtotal:order.subtotal,discount_total:order.discount_total||0,promo_label:order.promo_label||'',total:order.total,status:order.status,reserved_until:order.reserved_until,created_at:order.created_at,updated_at:order.updated_at};
+  const data={id:order.id,public_token:order.public_token,customer_name:order.customer_name,customer_phone:order.customer_phone,customer_telegram:order.customer_telegram,customer_email:order.customer_email,country:order.country,city:order.city,postal_code:order.postal_code,address:order.address,delivery_method:order.delivery_method,delivery_comment:order.delivery_comment,shipping_cost:order.shipping_cost,shipping_resolved:Boolean(order.shipping_resolved),payment_method:order.payment_method,payment_status:order.payment_status,payment_url:order.payment_url,receipt_url:order.receipt_url,receipt_sent_at:order.receipt_sent_at,tracking_number:order.tracking_number,customer_comment:order.customer_comment,items,subtotal:order.subtotal,total:order.total,status:order.status,reserved_until:order.reserved_until,created_at:order.created_at,updated_at:order.updated_at};
   if(includePrivate){data.admin_note=order.admin_note;data.history=history;data.marketing_consent=Boolean(order.marketing_consent);} else {delete data.customer_phone;delete data.customer_telegram;delete data.customer_email;delete data.address;}
   return data;
 }
@@ -723,7 +661,7 @@ async function createYooPayment(order) {
     throw new Error('ЮKassa ещё не подключена. Добавьте YOOKASSA_SHOP_ID и YOOKASSA_SECRET_KEY в .env');
   }
   const idempotence=randomToken(16);
-  const response=await fetch('https://api.yookassa.ru/v3/payments',{method:'POST',headers:{Authorization:`Basic ${Buffer.from(`${YOOKASSA_SHOP_ID}:${YOOKASSA_SECRET_KEY}`).toString('base64')}`,'Idempotence-Key':idempotence,'Content-Type':'application/json'},body:JSON.stringify({amount:{value:Number(order.total).toFixed(2),currency:'RUB'},confirmation:{type:'redirect',return_url:`${SITE_URL}/payment-success.html?order=${order.id}&token=${order.public_token}`},capture:true,description:`Заказ LiVetta №${order.id}`,metadata:{order_id:String(order.id),public_token:order.public_token}})});
+  const response=await fetch('https://api.yookassa.ru/v3/payments',{method:'POST',headers:{Authorization:`Basic ${Buffer.from(`${YOOKASSA_SHOP_ID}:${YOOKASSA_SECRET_KEY}`).toString('base64')}`,'Idempotence-Key':idempotence,'Content-Type':'application/json'},body:JSON.stringify({amount:{value:Number(order.total).toFixed(2),currency:'RUB'},confirmation:{type:'redirect',return_url:`${SITE_URL}/payment-success.html?order=${order.id}&token=${order.public_token}`},capture:true,description:`Заказ Livetta №${order.id}`,metadata:{order_id:String(order.id),public_token:order.public_token}})});
   const data=await response.json(); if(!response.ok) throw new Error(data.description||'Не удалось создать платёж ЮKassa');
   const url=data.confirmation?.confirmation_url||'';
   db.prepare("UPDATE orders SET payment_id=?,payment_status=?,payment_url=?,updated_at=CURRENT_TIMESTAMP WHERE id=?").run(data.id,data.status||'pending',url,order.id);
@@ -748,7 +686,7 @@ function markPaid(order,paymentId,actor='system',details='Оплата подт�
   db.prepare("UPDATE orders SET payment_id=?,payment_status='succeeded',status='paid',reserved_until=NULL,updated_at=CURRENT_TIMESTAMP WHERE id=?")
     .run(paymentId||current.payment_id||`manual-${Date.now()}`,current.id);
   addHistory(current.id,'payment_succeeded',details,actor);
-  sendOrderEmail(current.id,'Оплачен новый заказ LiVetta');
+  sendOrderEmail(current.id,'Оплачен новый заказ Livetta');
   scheduleOrdersExcelSync();
   return db.prepare('SELECT * FROM orders WHERE id=?').get(current.id);
 }
@@ -762,21 +700,20 @@ app.post('/api/orders', orderRateLimit, async (req,res)=>{
     if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(customer_email)) return res.status(400).json({message:'Проверьте правильность email'});
     if(customer_phone.replace(/\D/g,'').length < 10) return res.status(400).json({message:'Проверьте номер телефона'});
     const rawItems=Array.isArray(req.body?.items)?req.body.items:[]; if(!rawItems.length)return res.status(400).json({message:'Корзина пустая'});
-    const items=priceOrderItems(rawItems), subtotal=items.reduce((s,x)=>s+x.sum,0), itemsCount=getOrderItemsCount(items), discount=calculateVolumeDiscount(subtotal,itemsCount), gift=calculateGiftOptions(req.body), shipping=await calculateShipping(req.body,subtotal), total=Math.max(0,subtotal-discount.amount)+gift.total+shipping.cost;
+    const items=priceOrderItems(rawItems), subtotal=items.reduce((s,x)=>s+x.sum,0), shipping=await calculateShipping(req.body,subtotal), total=subtotal+shipping.cost;
     const payment_method=text(req.body.payment_method)||'online';
-    if(['cash_on_delivery','sbp_on_delivery'].includes(payment_method) && !(text(req.body.delivery_method)==='spb_courier' && bool(req.body.within_kad))) return res.status(400).json({message:'Оплата при получении доступна только для доставки LiVetta в пределах КАД'});
+    if(['cash_on_delivery','sbp_on_delivery'].includes(payment_method) && !(text(req.body.delivery_method)==='spb_courier' && bool(req.body.within_kad))) return res.status(400).json({message:'Оплата при получении доступна только для доставки Livetta в пределах КАД'});
     const inventory=calculateInventory(items); if(!requirementsAvailable(inventory)) return res.status(409).json({message:'Некоторых товаров или бусин уже недостаточно на складе'});
     const token=randomToken(); const reservedUntil=plusMinutes(!shipping.resolved ? 1440 : (payment_method==='online'?RESERVATION_MINUTES:1440));
     const initialStatus=!shipping.resolved?'awaiting_shipping_quote':(payment_method==='online'?'awaiting_payment':'new');
-    const customerComment=[text(req.body.customer_comment), ...gift.labels].filter(Boolean).join('\n');
     const insert=db.transaction(()=>{
       reserveInventory(inventory,1);
-      const result=db.prepare(`INSERT INTO orders (public_token,customer_name,customer_phone,customer_telegram,customer_email,country,city,postal_code,address,delivery_method,delivery_comment,shipping_cost,shipping_resolved,payment_method,payment_status,customer_comment,legal_consent,marketing_consent,items_json,inventory_json,subtotal,discount_total,promo_label,total,status,reserved_until) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(token,customer_name,customer_phone,text(req.body.customer_telegram),customer_email,text(req.body.country)||'Россия',text(req.body.city),text(req.body.postal_code),text(req.body.address),text(req.body.delivery_method),text(req.body.delivery_comment),shipping.cost,shipping.resolved?1:0,payment_method,'pending',customerComment,1,bool(req.body.marketing_consent)?1:0,JSON.stringify(items),JSON.stringify(inventory),subtotal+gift.total,discount.amount,discount.label,total,initialStatus,reservedUntil);
+      const result=db.prepare(`INSERT INTO orders (public_token,customer_name,customer_phone,customer_telegram,customer_email,country,city,postal_code,address,delivery_method,delivery_comment,shipping_cost,shipping_resolved,payment_method,payment_status,customer_comment,legal_consent,marketing_consent,items_json,inventory_json,subtotal,total,status,reserved_until) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).run(token,customer_name,customer_phone,text(req.body.customer_telegram),customer_email,text(req.body.country)||'Россия',text(req.body.city),text(req.body.postal_code),text(req.body.address),text(req.body.delivery_method),text(req.body.delivery_comment),shipping.cost,shipping.resolved?1:0,payment_method,'pending',text(req.body.customer_comment),1,bool(req.body.marketing_consent)?1:0,JSON.stringify(items),JSON.stringify(inventory),subtotal,total,initialStatus,reservedUntil);
       addHistory(result.lastInsertRowid,'order_created','Заказ создан','customer'); return result.lastInsertRowid;
     });
     const id=insert(); let order=db.prepare('SELECT * FROM orders WHERE id=?').get(id); let payment_url='';
     if(payment_method==='online' && shipping.resolved) { try { payment_url=await createYooPayment(order); } catch(error) { addHistory(id,'payment_error',error.message); } }
-    order=db.prepare('SELECT * FROM orders WHERE id=?').get(id); sendOrderEmail(id,'Новый заказ LiVetta'); scheduleOrdersExcelSync();
+    order=db.prepare('SELECT * FROM orders WHERE id=?').get(id); sendOrderEmail(id,'Новый заказ Livetta'); scheduleOrdersExcelSync();
     res.status(201).json({message:shipping.resolved?'Заказ создан':'Заказ создан. Доставка требует подтверждения',order:orderResponse(order,false),payment_url,payment_error:payment_method==='online'&&shipping.resolved&&!payment_url?'Платёжный модуль ещё не настроен':''});
   } catch(error) { res.status(400).json({message:error.message||'Не удалось оформить заказ'}); }
 });
@@ -819,7 +756,7 @@ app.put('/api/orders/:id/status', authMiddleware, requireRoles('owner','admin'),
   if(!order) return res.status(404).json({message:'Заказ не найден'});
   try {
     if(status==='paid') {
-      const paid=markPaid(order,order.payment_id||`manual-${Date.now()}`,req.admin.login,'Оплата подтверждена вручную в панели управления');
+      const paid=markPaid(order,order.payment_id||`manual-${Date.now()}`,req.admin.login,'Оплата подтверждена вручную в админке');
       return res.json(orderResponse(paid,true));
     }
     if(status==='cancelled'&&order.payment_status!=='succeeded') releaseOrderReservation(order);
@@ -829,13 +766,13 @@ app.put('/api/orders/:id/status', authMiddleware, requireRoles('owner','admin'),
     res.json(orderResponse(db.prepare('SELECT * FROM orders WHERE id=?').get(order.id),true));
   } catch(error) { res.status(409).json({message:error.message}); }
 });
-app.put('/api/orders/:id/details', authMiddleware, requireRoles('owner','admin'), async (req,res)=>{ const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id); if(!order)return res.status(404).json({message:'Заказ не найден'}); const tracking=text(req.body.tracking_number), receipt=text(req.body.receipt_url), receiptSent=bool(req.body.receipt_sent); db.prepare('UPDATE orders SET admin_note=?,tracking_number=?,receipt_url=?,receipt_sent_at=CASE WHEN ? THEN COALESCE(receipt_sent_at,CURRENT_TIMESTAMP) ELSE NULL END,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(text(req.body.admin_note),tracking,receipt,receiptSent?1:0,order.id); addHistory(order.id,'details_updated','Обновлены данные заказа',req.admin.login); if(receiptSent&&receipt&&!order.receipt_sent_at)await sendCustomerEmail(order.id,'Чек по заказу LiVetta',`<p>Чек по заказу №${order.id}: <a href="${receipt}">открыть чек</a>.</p>`); if(tracking&&tracking!==order.tracking_number)await sendCustomerEmail(order.id,'Заказ LiVetta передан в доставку',`<p>Трек-номер заказа №${order.id}: <b>${tracking}</b>.</p>`); scheduleOrdersExcelSync(); res.json(orderResponse(db.prepare('SELECT * FROM orders WHERE id=?').get(order.id),true)); });
+app.put('/api/orders/:id/details', authMiddleware, requireRoles('owner','admin'), async (req,res)=>{ const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id); if(!order)return res.status(404).json({message:'Заказ не найден'}); const tracking=text(req.body.tracking_number), receipt=text(req.body.receipt_url), receiptSent=bool(req.body.receipt_sent); db.prepare('UPDATE orders SET admin_note=?,tracking_number=?,receipt_url=?,receipt_sent_at=CASE WHEN ? THEN COALESCE(receipt_sent_at,CURRENT_TIMESTAMP) ELSE NULL END,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(text(req.body.admin_note),tracking,receipt,receiptSent?1:0,order.id); addHistory(order.id,'details_updated','Обновлены данные заказа',req.admin.login); if(receiptSent&&receipt&&!order.receipt_sent_at)await sendCustomerEmail(order.id,'Чек по заказу Livetta',`<p>Чек по заказу №${order.id}: <a href="${receipt}">открыть чек</a>.</p>`); if(tracking&&tracking!==order.tracking_number)await sendCustomerEmail(order.id,'Заказ Livetta передан в доставку',`<p>Трек-номер заказа №${order.id}: <b>${tracking}</b>.</p>`); scheduleOrdersExcelSync(); res.json(orderResponse(db.prepare('SELECT * FROM orders WHERE id=?').get(order.id),true)); });
 app.put('/api/orders/:id/shipping', authMiddleware, requireRoles('owner','admin'), async (req,res)=>{
   const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id);
   if(!order) return res.status(404).json({message:'Заказ не найден'});
   if(order.payment_status==='succeeded') return res.status(409).json({message:'Нельзя менять стоимость уже оплаченного заказа'});
   const cost=Math.max(0,num(req.body.shipping_cost));
-  const total=Math.max(0,num(order.subtotal)-num(order.discount_total))+cost;
+  const total=num(order.subtotal)+cost;
   const resettable=new Set(['awaiting_shipping_quote','awaiting_payment','new']);
   const nextStatus=resettable.has(order.status) ? (order.payment_method==='online'?'awaiting_payment':'new') : order.status;
   db.prepare('UPDATE orders SET shipping_cost=?,shipping_resolved=1,total=?,status=?,updated_at=CURRENT_TIMESTAMP WHERE id=?')
@@ -844,7 +781,7 @@ app.put('/api/orders/:id/shipping', authMiddleware, requireRoles('owner','admin'
   scheduleOrdersExcelSync();
   res.json(orderResponse(db.prepare('SELECT * FROM orders WHERE id=?').get(order.id),true));
 });
-app.post('/api/orders/:id/payment-link', authMiddleware, requireRoles('owner','admin'), async (req,res)=>{ const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id); if(!order)return res.status(404).json({message:'Заказ не найден'}); if(order.payment_status==='succeeded')return res.status(409).json({message:'Заказ уже оплачен'}); if(!order.shipping_resolved)return res.status(409).json({message:'Сначала подтвердите стоимость доставки'}); try{const payment_url=await createYooPayment(order); await sendCustomerEmail(order.id,'Ссылка на оплату заказа LiVetta',`Оплатить заказ можно по ссылке: <a href="${payment_url}">перейти к оплате</a>`);res.json({payment_url});}catch(error){res.status(400).json({message:error.message});} });
+app.post('/api/orders/:id/payment-link', authMiddleware, requireRoles('owner','admin'), async (req,res)=>{ const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id); if(!order)return res.status(404).json({message:'Заказ не найден'}); if(order.payment_status==='succeeded')return res.status(409).json({message:'Заказ уже оплачен'}); if(!order.shipping_resolved)return res.status(409).json({message:'Сначала подтвердите стоимость доставки'}); try{const payment_url=await createYooPayment(order); await sendCustomerEmail(order.id,'Ссылка на оплату заказа Livetta',`Оплатить заказ можно по ссылке: <a href="${payment_url}">перейти к оплате</a>`);res.json({payment_url});}catch(error){res.status(400).json({message:error.message});} });
 app.delete('/api/orders/:id', authMiddleware, requireRoles('owner'), (req,res)=>{ const order=db.prepare('SELECT * FROM orders WHERE id=?').get(req.params.id); if(!order)return res.status(404).json({message:'Заказ не найден'}); if(!order.inventory_finalized)releaseOrderReservation(order); db.prepare('DELETE FROM orders WHERE id=?').run(order.id); scheduleOrdersExcelSync(); res.json({message:'Заказ удалён'}); });
 const ORDER_STATUS_LABELS={new:'Новый',awaiting_payment:'Ожидает оплаты',awaiting_shipping_quote:'Расчёт доставки',paid:'Оплачен',work:'В работе',ready:'Готов',shipped:'Передан в доставку',delivered:'Доставлен',cancelled:'Отменён',refund:'Возврат',expired:'Резерв истёк'};
 const ORDER_STATUS_BY_LABEL=Object.fromEntries(Object.entries(ORDER_STATUS_LABELS).flatMap(([code,label])=>[[code,code],[label.toLowerCase(),code]]));
@@ -852,16 +789,16 @@ let excelSyncTimer=null;
 let excelSyncPromise=Promise.resolve();
 
 function getExcelOrders(){return db.prepare('SELECT * FROM orders ORDER BY id DESC').all();}
-function orderItemsText(order){return safeJson(order.items_json,[]).map(item=>`${item.title||'Украшение'} ×${int(item.quantity,1)}${item.design?.clasp?.name?` · замок ${item.design.clasp.name}`:''}`).join('; ');}
+function orderItemsText(order){return safeJson(order.items_json,[]).map(item=>`${item.title||'Украшение'} ×${int(item.quantity,1)}${item.selected_size?` · размер ${item.selected_size.label} (${item.selected_size.cm} см)`:''}${item.design?.size_label?` · размер ${item.design.size_label} (${item.design.size_cm} см)`:''}${item.design?.clasp?.name?` · замок ${item.design.clasp.name}`:''}`).join('; ');}
 async function buildOrdersWorkbook(){
-  const workbook=new ExcelJS.Workbook(); workbook.creator='LiVetta'; workbook.modified=new Date();
+  const workbook=new ExcelJS.Workbook(); workbook.creator='Livetta'; workbook.modified=new Date();
   const sheet=workbook.addWorksheet('Заказы',{views:[{state:'frozen',ySplit:1}]});
   sheet.columns=[
     {header:'ID',key:'id',width:9},{header:'Дата',key:'created_at',width:21},{header:'Статус',key:'status',width:23},{header:'Статус оплаты',key:'payment_status',width:18},
     {header:'Имя',key:'customer_name',width:24},{header:'Телефон',key:'customer_phone',width:18},{header:'Email',key:'customer_email',width:28},{header:'Telegram',key:'customer_telegram',width:20},
     {header:'Страна',key:'country',width:16},{header:'Город',key:'city',width:18},{header:'Индекс',key:'postal_code',width:12},{header:'Адрес',key:'address',width:34},
     {header:'Доставка',key:'delivery_method',width:22},{header:'Стоимость доставки',key:'shipping_cost',width:20},{header:'Сумма заказа',key:'total',width:17},{header:'Трек-номер',key:'tracking_number',width:22},
-    {header:'Служебный комментарий',key:'admin_note',width:34},{header:'Ссылка на чек',key:'receipt_url',width:34},{header:'Чек отправлен',key:'receipt_sent',width:16},{header:'Состав заказа',key:'items',width:55}
+    {header:'Комментарий администратора',key:'admin_note',width:34},{header:'Ссылка на чек',key:'receipt_url',width:34},{header:'Чек отправлен',key:'receipt_sent',width:16},{header:'Состав заказа',key:'items',width:55}
   ];
   for(const order of getExcelOrders()) sheet.addRow({id:order.id,created_at:order.created_at,status:ORDER_STATUS_LABELS[order.status]||order.status,payment_status:order.payment_status,customer_name:order.customer_name,customer_phone:order.customer_phone,customer_email:order.customer_email,customer_telegram:order.customer_telegram,country:order.country,city:order.city,postal_code:order.postal_code,address:order.address,delivery_method:order.delivery_method,shipping_cost:Number(order.shipping_cost||0),total:Number(order.total||0),tracking_number:order.tracking_number,admin_note:order.admin_note,receipt_url:order.receipt_url,receipt_sent:order.receipt_sent_at?'Да':'Нет',items:orderItemsText(order)});
   const header=sheet.getRow(1); header.height=28; header.font={bold:true,color:{argb:'FFFFFFFF'}}; header.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFEE9AC5'}}; header.alignment={vertical:'middle',horizontal:'center'};
@@ -869,8 +806,8 @@ async function buildOrdersWorkbook(){
   sheet.eachRow((row,index)=>{if(index>1){row.alignment={vertical:'top',wrapText:true}; if(index%2===0) row.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFFFF7FB'}}; row.height=34;}});
   for(let row=2;row<=sheet.rowCount;row++) sheet.getCell(`C${row}`).dataValidation={type:'list',allowBlank:false,formulae:['"Новый,Ожидает оплаты,Расчёт доставки,Оплачен,В работе,Готов,Передан в доставку,Доставлен,Отменён,Возврат,Резерв истёк"']};
   sheet.getColumn('shipping_cost').numFmt='#,##0.00 ₽'; sheet.getColumn('total').numFmt='#,##0.00 ₽';
-  const itemsSheet=workbook.addWorksheet('Состав',{views:[{state:'frozen',ySplit:1}]}); itemsSheet.columns=[{header:'ID заказа',key:'order_id',width:12},{header:'Украшение',key:'title',width:30},{header:'Количество',key:'quantity',width:12},{header:'Цена',key:'price',width:14},{header:'Тип',key:'type',width:16},{header:'Размер, см',key:'size',width:13},{header:'Замок',key:'clasp',width:28},{header:'Состав',key:'composition',width:55}];
-  for(const order of getExcelOrders()) for(const item of safeJson(order.items_json,[])) itemsSheet.addRow({order_id:order.id,title:item.title,quantity:int(item.quantity,1),price:num(item.price),type:item.design?.type||item.category,size:item.design?.size_cm||'',clasp:item.design?.clasp?.name||'',composition:(item.composition||[]).map(x=>`${x.name} ×${x.count}`).join(', ')});
+  const itemsSheet=workbook.addWorksheet('Состав',{views:[{state:'frozen',ySplit:1}]}); itemsSheet.columns=[{header:'ID заказа',key:'order_id',width:12},{header:'Украшение',key:'title',width:30},{header:'Количество',key:'quantity',width:12},{header:'Цена',key:'price',width:14},{header:'Тип',key:'type',width:16},{header:'Размер',key:'size',width:18},{header:'Замок',key:'clasp',width:28},{header:'Состав',key:'composition',width:55}];
+  for(const order of getExcelOrders()) for(const item of safeJson(order.items_json,[])) itemsSheet.addRow({order_id:order.id,title:item.title,quantity:int(item.quantity,1),price:num(item.price),type:item.design?.type||item.category,size:item.selected_size?`${item.selected_size.label} (${item.selected_size.cm} см)`:item.design?.size_label?`${item.design.size_label} (${item.design.size_cm} см)`:item.design?.size_cm||'',clasp:item.design?.clasp?.name||'',composition:(item.composition||[]).map(x=>`${x.name} ×${x.count}`).join(', ')});
   const h2=itemsSheet.getRow(1); h2.font={bold:true,color:{argb:'FFFFFFFF'}}; h2.fill={type:'pattern',pattern:'solid',fgColor:{argb:'FFB88ADF'}}; h2.alignment={vertical:'middle',horizontal:'center'}; itemsSheet.autoFilter={from:'A1',to:'H1'}; itemsSheet.eachRow((row,index)=>{if(index>1)row.alignment={vertical:'top',wrapText:true};});
   return workbook;
 }
@@ -914,13 +851,12 @@ app.post('/api/orders-import.xlsx',authMiddleware,requireRoles('owner','admin'),
 
         const shipping=headers['Стоимость доставки']?Math.max(0,num(row.getCell(headers['Стоимость доставки']).value,order.shipping_cost)):num(order.shipping_cost);
         const tracking=headers['Трек-номер']?text(row.getCell(headers['Трек-номер']).text):order.tracking_number;
-        const noteHeader=headers['Служебный комментарий'];
-        const note=noteHeader?text(row.getCell(noteHeader).text):order.admin_note;
+        const note=headers['Комментарий администратора']?text(row.getCell(headers['Комментарий администратора']).text):order.admin_note;
         const receipt=headers['Ссылка на чек']?text(row.getCell(headers['Ссылка на чек']).text):order.receipt_url;
         const receiptSent=headers['Чек отправлен']?/^(да|yes|true|1)$/i.test(text(row.getCell(headers['Чек отправлен']).text)):Boolean(order.receipt_sent_at);
 
-    if(order.payment_status!=='succeeded'&&shipping!==Number(order.shipping_cost)){
-      db.prepare('UPDATE orders SET shipping_cost=?,shipping_resolved=1,total=MAX(0,subtotal-COALESCE(discount_total,0))+?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(shipping,shipping,id);
+        if(order.payment_status!=='succeeded'&&shipping!==Number(order.shipping_cost)){
+          db.prepare('UPDATE orders SET shipping_cost=?,shipping_resolved=1,total=subtotal+?,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(shipping,shipping,id);
         }
         db.prepare('UPDATE orders SET tracking_number=?,admin_note=?,receipt_url=?,receipt_sent_at=CASE WHEN ? THEN COALESCE(receipt_sent_at,CURRENT_TIMESTAMP) ELSE NULL END,updated_at=CURRENT_TIMESTAMP WHERE id=?').run(tracking,note,receipt,receiptSent?1:0,id);
 
@@ -971,7 +907,7 @@ app.delete('/api/users/:id',authMiddleware,requireRoles('owner'),(req,res)=>{
 });
 
 const carouselFile=path.join(dataDir,'carousel.json');
-function readCarousel(){try{const d=safeJson(fs.readFileSync(carouselFile,'utf8'),{});return Array.isArray(d)?d:(Array.isArray(d.slides)?d.slides:[]);}catch{return[{id:'default-1',image:''},{id:'default-2',image:''}];}}
+function readCarousel(){try{const d=safeJson(fs.readFileSync(carouselFile,'utf8'),{});return Array.isArray(d)?d:(Array.isArray(d.slides)?d.slides:[]);}catch{return[{id:'default-1',image:'/uploads/home-slide-1.jpg'},{id:'default-2',image:'/uploads/home-slide-2.jpg'}];}}
 function writeCarousel(slides){fs.writeFileSync(carouselFile,JSON.stringify({slides},null,2));}
 app.get('/api/carousel',(req,res)=>res.json({slides:readCarousel()}));
 app.post('/api/carousel',authMiddleware,requireRoles('owner','admin'),upload.array('slides',50),(req,res)=>{const slides=[...readCarousel(),...(req.files||[]).map(f=>({id:`slide-${Date.now()}-${randomToken(4)}`,image:`/uploads/${f.filename}`}))];writeCarousel(slides);res.json({slides});});
@@ -979,13 +915,13 @@ app.put('/api/carousel/order',authMiddleware,requireRoles('owner','admin'),(req,
 app.delete('/api/carousel/:id',authMiddleware,requireRoles('owner','admin'),(req,res)=>{const old=readCarousel(),target=old.find(x=>String(x.id)===String(req.params.id)),slides=old.filter(x=>String(x.id)!==String(req.params.id));if(!target)return res.status(404).json({message:'Слайд не найден'});writeCarousel(slides);if(String(target.image).startsWith('/uploads/'))deleteLocalFile(target.image);res.json({slides});});
 
 app.get('/api/health',(req,res)=>res.json({ok:true,time:new Date().toISOString()}));
-app.get('/api/public-config',(req,res)=>res.json({site_url:SITE_URL,metrika_id:YANDEX_METRIKA_ID,child_products_enabled:CHILD_PRODUCTS_ENABLED,free_shipping_min:FREE_SHIPPING_MIN,volume_discount_tiers:VOLUME_DISCOUNT_TIERS,gift_wrap_price:GIFT_WRAP_PRICE,gift_card_price:GIFT_CARD_PRICE,telegram:'https://t.me/livettastore',seller_email:SELLER_EMAIL,seller_phone:SELLER_PHONE}));
+app.get('/api/public-config',(req,res)=>res.json({site_url:SITE_URL,metrika_id:YANDEX_METRIKA_ID,child_products_enabled:CHILD_PRODUCTS_ENABLED,free_shipping_min:FREE_SHIPPING_MIN,telegram:'https://t.me/livettastore',seller_email:SELLER_EMAIL,seller_phone:SELLER_PHONE}));
 
 function getMailer(){ if(!nodemailer||!process.env.SMTP_HOST||!process.env.SMTP_USER||!process.env.SMTP_PASSWORD)return null; return nodemailer.createTransport({host:process.env.SMTP_HOST,port:Number(process.env.SMTP_PORT||465),secure:String(process.env.SMTP_SECURE||'true')==='true',auth:{user:process.env.SMTP_USER,pass:process.env.SMTP_PASSWORD}}); }
-async function sendCustomerEmail(orderId, subject, content='') { const transporter=getMailer(); if(!transporter)return; try{const order=db.prepare('SELECT * FROM orders WHERE id=?').get(orderId);if(!order?.customer_email)return;await transporter.sendMail({from:process.env.SMTP_FROM||SELLER_EMAIL,to:order.customer_email,subject,html:`<h2>LiVetta · заказ №${order.id}</h2><p>Здравствуйте, ${order.customer_name||''}!</p>${content||`<p>Ваш заказ сохранён. Сумма: ${order.total} ₽.</p>`}<p>По вопросам: ${SELLER_PHONE}, ${SELLER_EMAIL}</p>`});}catch(error){console.warn('Письмо покупателю не отправлено:',error.message);} }
+async function sendCustomerEmail(orderId, subject, content='') { const transporter=getMailer(); if(!transporter)return; try{const order=db.prepare('SELECT * FROM orders WHERE id=?').get(orderId);if(!order?.customer_email)return;await transporter.sendMail({from:process.env.SMTP_FROM||SELLER_EMAIL,to:order.customer_email,subject,html:`<h2>Livetta · заказ №${order.id}</h2><p>Здравствуйте, ${order.customer_name||''}!</p>${content||`<p>Ваш заказ сохранён. Сумма: ${order.total} ₽.</p>`}<p>По вопросам: ${SELLER_PHONE}, ${SELLER_EMAIL}</p>`});}catch(error){console.warn('Письмо покупателю не отправлено:',error.message);} }
 async function sendOrderEmail(orderId, subject) {
   const transporter=getMailer(); if(!transporter)return;
-  try{const order=db.prepare('SELECT * FROM orders WHERE id=?').get(orderId);await transporter.sendMail({from:process.env.SMTP_FROM||SELLER_EMAIL,to:SELLER_EMAIL,subject,html:`<h2>Заказ №${order.id}</h2><p>${order.customer_name}, ${order.customer_phone}</p><p>Сумма: ${order.total} ₽</p><p><a href="${SITE_URL}/admin.html">Открыть панель заказов</a></p>`});await sendCustomerEmail(orderId,`LiVetta: заказ №${order.id}`,order.payment_status==='succeeded'?'<p>Оплата подтверждена. Мы приступаем к подготовке украшения.</p>':'<p>Заказ получен. Мы сообщим о следующих шагах.</p>');}catch(error){console.warn('Email не отправлен:',error.message);}
+  try{const order=db.prepare('SELECT * FROM orders WHERE id=?').get(orderId);await transporter.sendMail({from:process.env.SMTP_FROM||SELLER_EMAIL,to:SELLER_EMAIL,subject,html:`<h2>Заказ №${order.id}</h2><p>${order.customer_name}, ${order.customer_phone}</p><p>Сумма: ${order.total} ₽</p><p><a href="${SITE_URL}/admin.html">Открыть админку</a></p>`});await sendCustomerEmail(orderId,`Livetta: заказ №${order.id}`,order.payment_status==='succeeded'?'<p>Оплата подтверждена. Мы приступаем к подготовке украшения.</p>':'<p>Заказ получен. Мы сообщим о следующих шагах.</p>');}catch(error){console.warn('Email не отправлен:',error.message);}
 }
 
 app.post('/api/admin/backup',authMiddleware,requireRoles('owner'),(req,res)=>{const stamp=new Date().toISOString().replace(/[:.]/g,'-');const target=path.join(backupsDir,`database-${stamp}.sqlite`);db.backup(target).then(()=>res.json({message:'Резервная копия создана',file:path.basename(target)})).catch(error=>res.status(500).json({message:error.message}));});
@@ -995,7 +931,7 @@ app.use((req,res)=>{if(req.path.startsWith('/api/'))return res.status(404).json(
 
 if (require.main === module) {
   scheduleOrdersExcelSync();
-  app.listen(PORT, () => console.log(`LiVetta server: http://localhost:${PORT}`));
+  app.listen(PORT, () => console.log(`Livetta server: http://localhost:${PORT}`));
 }
 
 module.exports = app;

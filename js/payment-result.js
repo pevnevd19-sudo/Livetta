@@ -55,7 +55,6 @@ function renderPaymentStatus(order) {
     <div class="payment-result__card">
       <span>Заказ №${escapeHtml(order.id)}</span>
       <strong>${formatPrice(order.total)} ₽</strong>
-      ${Number(order.discount_total) > 0 ? `<small>${escapeHtml(order.promo_label || 'Скидка')}: −${formatPrice(order.discount_total)} ₽</small>` : ''}
       <small>Статус: ${escapeHtml(order.status)}</small>
     </div>
   `;

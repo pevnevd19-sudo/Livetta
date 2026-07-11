@@ -1,14 +1,4 @@
 const App = window.Livetta;
-
-if (!App) {
-  const startupMessage = document.querySelector('#sceneMessage');
-  if (startupMessage) {
-    startupMessage.hidden = false;
-    startupMessage.textContent = 'Не удалось запустить конструктор: не загрузился common.js.';
-  }
-  throw new Error('Livetta common.js is not loaded');
-}
-
 const API_URL = App.getApiUrl();
 
 const sceneMessage = document.querySelector('#sceneMessage');
@@ -26,15 +16,6 @@ const selectedType = document.querySelector('#selectedType');
 const selectedSize = document.querySelector('#selectedSize');
 const claspType = document.querySelector('#claspType');
 const selectedClasp = document.querySelector('#selectedClasp');
-const claspMaterial = document.querySelector('#claspMaterial');
-const selectedClaspMaterial = document.querySelector('#selectedClaspMaterial');
-const stoneSearch = document.querySelector('#stoneSearch');
-const clearStoneSearch = document.querySelector('#clearStoneSearch');
-const selectedStonesList = document.querySelector('#selectedStonesList');
-const openStonesCatalog = document.querySelector('#openStonesCatalog');
-const closeStoneCatalog = document.querySelector('#closeStoneCatalog');
-const stoneCatalogModal = document.querySelector('#stoneCatalogModal');
-const stoneCatalogList = document.querySelector('#stoneCatalogList');
 
 const neckStage = document.querySelector('#neckStage');
 const necklaceBeads = document.querySelector('#necklaceBeads');
@@ -43,15 +24,24 @@ const necklaceFullPath = document.querySelector('#necklaceFullPath');
 
 const TYPE_CONFIG = {
   'Колье': {
-    min: 25,
+    min: 30,
     max: 50,
-    defaultSize: 45,
+    defaultSize: 42,
     claspRatio: 0.08,
     minClasp: 14,
     maxClasp: 30,
     title: 'Колье'
   }
 };
+
+const NECKLACE_SIZE_OPTIONS = [
+  { label: 'XS', cm: 38 },
+  { label: 'S', cm: 40 },
+  { label: 'M', cm: 42 },
+  { label: 'L', cm: 44 },
+  { label: 'XL', cm: 46 }
+];
+
 
 // Чем меньше число, тем плотнее камни.
 // Это физический зазор для расчёта занятости.
@@ -77,20 +67,15 @@ const BEAD_CAPACITY_SIZE_FACTOR = 1;
 // Недрагоценные варианты замков. reserveMm — часть общей длины,
 // которую занимает сам замок и соединительные элементы.
 const CLASP_OPTIONS = {
-  'lobster-steel': { id: 'lobster-steel', name: 'Карабин', reserveMm: 18 },
-  'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', reserveMm: 24 },
-  'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', reserveMm: 20 }
-};
-
-const CLASP_MATERIALS = {
-  steel: { id: 'steel', name: 'Нержавеющая сталь' },
-  brass: { id: 'brass', name: 'Латунь' },
-  rhodium: { id: 'rhodium', name: 'Родий' }
+  'lobster-steel': { id: 'lobster-steel', name: 'Карабин', material: 'Нержавеющая сталь', reserveMm: 18, extensionCm: 4 },
+  'toggle-steel': { id: 'toggle-steel', name: 'Тоггл', material: 'Нержавеющая сталь', reserveMm: 24 },
+  'magnetic-steel': { id: 'magnetic-steel', name: 'Магнитный замок', material: 'Нержавеющая сталь', reserveMm: 20 },
+  'screw-steel': { id: 'screw-steel', name: 'Винтовой замок', material: 'Нержавеющая сталь', reserveMm: 16 },
+  'hook-steel': { id: 'hook-steel', name: 'Замок-крючок', material: 'Нержавеющая сталь', reserveMm: 18 }
 };
 const DEFAULT_CLASP_RESERVE_MM = 20;
 
 let stonesCatalog = [];
-let favoriteStones = [];
 let selectedStones = [];
 let draggedBead = null;
 let currentBeadLayout = [];
@@ -105,31 +90,23 @@ async function init() {
     createSizeOptions();
     bindEvents();
 
-    // Сначала запускаем сам конструктор. Загрузка каталога не может
-    // заблокировать нить, кнопки и перемещение уже добавленных камней.
-    stonesCatalog = [];
+    stonesCatalog = await loadStonesCatalog();
+
     rebuildNecklace();
     renderStonesCatalog();
     updateSummary();
-    sceneMessage.hidden = true;
-    window.__livettaConstructorReady = true;
 
-    // Камни подгружаются отдельно с тайм-аутом. Даже если API недоступен,
-    // вечной надписи «Загрузка конструктора...» больше не будет.
-    stonesCatalog = await loadStonesCatalog();
-    renderStonesCatalog();
-    updateSummary();
+    sceneMessage.hidden = true;
   } catch (error) {
     console.error(error);
-    window.__livettaConstructorReady = false;
     sceneMessage.hidden = false;
-    sceneMessage.textContent = 'Не удалось запустить конструктор. Обновите страницу через Ctrl + F5.';
+    sceneMessage.textContent = 'Не удалось запустить конструктор. Проверь консоль браузера.';
   }
 }
 
 async function loadStonesCatalog() {
   try {
-    const response = await fetchWithTimeout(`${API_URL}/stones?cache=${Date.now()}`, 6000);
+    const response = await fetch(`${API_URL}/stones?cache=${Date.now()}`);
 
     if (!response.ok) {
       throw new Error('Камни не загрузились');
@@ -139,32 +116,15 @@ async function loadStonesCatalog() {
     const stones = Array.isArray(data) ? data.map(normalizeStone).filter(Boolean) : [];
 
     if (!stones.length) {
-      capacityHint.textContent = 'Камни пока не добавлены. Конструктор станет доступен после добавления камней.';
+      capacityHint.textContent = 'Камни пока не добавлены. Добавьте их в админке, чтобы конструктор стал доступен.';
     }
 
     return stones;
   } catch (error) {
     console.warn('Камни не загрузились:', error.message);
-    capacityHint.textContent = 'Камни не загрузились. Проверьте подключение или список камней.';
+    capacityHint.textContent = 'Камни не загрузились. Проверьте сервер или добавьте их в админке.';
     return [];
   }
-}
-
-
-function fetchWithTimeout(url, timeoutMs = 6000) {
-  if (typeof AbortController === 'undefined') {
-    return fetch(url, { cache: 'no-store' });
-  }
-
-  const controller = new AbortController();
-  const timer = window.setTimeout(() => controller.abort(), timeoutMs);
-
-  return fetch(url, {
-    cache: 'no-store',
-    signal: controller.signal
-  }).finally(() => {
-    window.clearTimeout(timer);
-  });
 }
 
 function normalizeStone(stone) {
@@ -180,8 +140,6 @@ function normalizeStone(stone) {
     id: String(stone.id ?? name),
     name,
     description: String(stone.description || 'Камень для сборки').trim(),
-    property: String(stone.stone_property || stone.property || '').trim(),
-    zodiac: String(stone.zodiac || '').trim(),
     price: Number.isFinite(price) && price >= 0 ? price : 0,
     sizeMm,
     color: normalizeColor(stone.color),
@@ -193,17 +151,14 @@ function normalizeStone(stone) {
 function createSizeOptions() {
   const config = getTypeConfig();
   const oldSize = Number(jewelrySize.value || config.defaultSize);
-  const safeSize = clamp(oldSize, config.min, config.max);
-  const options = [];
+  const selected = NECKLACE_SIZE_OPTIONS.find((item) => item.cm === oldSize) || NECKLACE_SIZE_OPTIONS.find((item) => item.cm === config.defaultSize) || NECKLACE_SIZE_OPTIONS[0];
 
-  for (let size = config.min; size <= config.max; size += 1) {
-    options.push(`<option value="${size}">${size} см</option>`);
-  }
-
-  jewelrySize.innerHTML = options.join('');
-  jewelrySize.value = String(Number.isFinite(safeSize) ? safeSize : config.defaultSize);
+  jewelrySize.innerHTML = NECKLACE_SIZE_OPTIONS.map((size) => `
+    <option value="${size.cm}" data-size-label="${size.label}">${size.label} · ${size.cm} см</option>
+  `).join('');
+  jewelrySize.value = String(selected.cm);
   selectedType.textContent = jewelryType.value;
-  selectedSize.textContent = jewelrySize.value;
+  selectedSize.textContent = getSelectedSizeLabel();
 }
 
 function bindEvents() {
@@ -223,13 +178,8 @@ function bindEvents() {
     updateSummary();
   });
 
-  claspMaterial?.addEventListener('change', () => {
-    claspMaterial.classList.remove('is-invalid');
-    updateSummary();
-  });
-
   jewelrySize.addEventListener('change', () => {
-    selectedSize.textContent = jewelrySize.value;
+    selectedSize.textContent = getSelectedSizeLabel();
     trimToCapacity();
     rebuildNecklace();
     renderStonesCatalog();
@@ -252,67 +202,15 @@ function bindEvents() {
 
   addCustomToCart.addEventListener('click', addDesignToCart);
 
-  stoneSearch?.addEventListener('input', renderStoneCatalogModal);
-
-  clearStoneSearch?.addEventListener('click', () => {
-    if (stoneSearch) stoneSearch.value = '';
-    renderStoneCatalogModal();
-  });
-
-  openStonesCatalog?.addEventListener('click', openStoneCatalog);
-  closeStoneCatalog?.addEventListener('click', closeStoneCatalogModal);
-
-  stoneCatalogModal?.addEventListener('click', (event) => {
-    if (event.target.closest('[data-close-stone-catalog]')) closeStoneCatalogModal();
-  });
-
-  stoneCatalogList?.addEventListener('click', (event) => {
-    const favorite = event.target.closest('[data-favorite-stone]');
-    if (!favorite) return;
-    addFavoriteStone(favorite.dataset.favoriteStone);
-  });
-
-  selectedStonesList?.addEventListener('click', (event) => {
-    const remove = event.target.closest('[data-remove-selected-stone]');
-    if (!remove) return;
-
-    const index = Number(remove.dataset.removeSelectedStone);
-    if (!Number.isInteger(index)) return;
-
-    selectedStones.splice(index, 1);
-    rebuildNecklace();
-    renderStonesCatalog();
-    updateSummary();
-  });
-
   stonesList.addEventListener('click', (event) => {
-    const remove = event.target.closest('[data-remove-favorite]');
-    if (remove) {
-      event.stopPropagation();
-      removeFavoriteStone(remove.dataset.removeFavorite);
+    const card = event.target.closest('[data-stone-id]');
+
+    if (!card || card.disabled) {
       return;
     }
 
-    const wear = event.target.closest('[data-wear-favorite]');
-    if (!wear || wear.getAttribute('aria-disabled') === 'true') return;
-
-    const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
+    const stone = stonesCatalog.find((item) => item.id === card.dataset.stoneId);
     addStone(stone);
-  });
-
-  stonesList.addEventListener('keydown', (event) => {
-    if (event.key !== 'Enter' && event.key !== ' ') return;
-
-    const wear = event.target.closest('[data-wear-favorite]');
-    if (!wear || wear.getAttribute('aria-disabled') === 'true') return;
-
-    event.preventDefault();
-    const stone = favoriteStones.find((item) => String(item.id) === String(wear.dataset.wearFavorite));
-    addStone(stone);
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') closeStoneCatalogModal();
   });
 
   necklaceBeads.addEventListener('pointerdown', handleBeadPointerDown);
@@ -346,177 +244,45 @@ function bindEvents() {
   });
 }
 
+
+function getSelectedSizeLabel() {
+  const option = NECKLACE_SIZE_OPTIONS.find((item) => Number(item.cm) === Number(jewelrySize.value));
+  return option ? `${option.label} · ${option.cm} см` : `${jewelrySize.value} см`;
+}
+
+function getSelectedSizeCode() {
+  const option = NECKLACE_SIZE_OPTIONS.find((item) => Number(item.cm) === Number(jewelrySize.value));
+  return option?.label || '';
+}
+
 function getTypeConfig() {
   return TYPE_CONFIG[jewelryType.value] || TYPE_CONFIG['Колье'];
 }
 
-function openStoneCatalog() {
-  if (!stoneCatalogModal) return;
-  stoneCatalogModal.hidden = false;
-  document.body.classList.add('is-stone-catalog-open');
-  renderStoneCatalogModal();
-  window.setTimeout(() => stoneSearch?.focus(), 0);
-}
-
-function closeStoneCatalogModal() {
-  if (!stoneCatalogModal || stoneCatalogModal.hidden) return;
-  stoneCatalogModal.hidden = true;
-  document.body.classList.remove('is-stone-catalog-open');
-}
-
-function addFavoriteStone(stoneId) {
-  const stone = stonesCatalog.find((item) => String(item.id) === String(stoneId));
-  if (!stone) return;
-
-  if (!favoriteStones.some((item) => String(item.id) === String(stone.id))) {
-    favoriteStones.push(stone);
-  }
-
-  renderStonesCatalog();
-}
-
-function removeFavoriteStone(stoneId) {
-  favoriteStones = favoriteStones.filter((item) => String(item.id) !== String(stoneId));
-  renderStonesCatalog();
-}
-
-function isFavoriteStone(stone) {
-  return favoriteStones.some((item) => String(item.id) === String(stone.id));
-}
-
-function getStoneSearchQuery() {
-  return String(stoneSearch?.value || '').trim().toLowerCase();
-}
-
-function getFilteredStones() {
-  const query = getStoneSearchQuery();
-  if (!query) return stonesCatalog;
-
-  return stonesCatalog.filter((stone) => {
-    return [stone.name, stone.description, stone.property, stone.zodiac, stone.color]
-      .join(' ')
-      .toLowerCase()
-      .includes(query);
-  });
-}
-
 function renderStonesCatalog() {
-  if (!stonesList) return;
-
-  if (!favoriteStones.length) {
-    stonesList.innerHTML = '<p class="muted-text">В избранном пока пусто. Открой каталог камней и добавь нужные камни.</p>';
-    renderStoneCatalogModal();
+  if (!stonesCatalog.length) {
+    stonesList.innerHTML = '<p class="muted-text">Камней пока нет. Добавь их в админке.</p>';
     return;
   }
 
-  stonesList.innerHTML = favoriteStones.map((stone) => {
+  stonesList.innerHTML = stonesCatalog.map((stone) => {
     const canAdd = getCanAddCount(stone);
     const disabled = stone.available === false || canAdd <= 0;
-    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '<span class="stone-card__gem"></span>';
+    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '';
 
     return `
-      <article class="favorite-stone-card${disabled ? ' is-disabled' : ''}" data-wear-favorite="${escapeHtml(stone.id)}" tabindex="${disabled ? '-1' : '0'}" role="button" aria-disabled="${disabled ? 'true' : 'false'}">
-        <span class="favorite-stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
-        <span class="favorite-stone-card__body">
+      <button class="stone-card constructor-stone-card ${disabled ? 'stone-card--disabled' : ''}" type="button" data-stone-id="${escapeHtml(stone.id)}" ${disabled ? 'disabled' : ''}>
+        <span class="stone-card__thumb" style="--stone-color:${escapeHtml(stone.color)}">
+          ${image || '<span class="stone-card__gem"></span>'}
+        </span>
+
+        <span class="stone-card__content">
           <strong>${escapeHtml(stone.name)}</strong>
-          ${stone.description ? `<small>${escapeHtml(stone.description)}</small>` : ''}
-          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
-          ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
-          <span class="favorite-stone-card__size">Размер: ${formatNumber(stone.sizeMm)} мм</span>
+          <small>${escapeHtml(stone.description)}</small>
+          <span class="stone-meta">${formatPrice(stone.price)} ₽ / ${formatNumber(stone.sizeMm)} мм</span>
+          <b>${stone.available === false ? 'Нет в наличии' : (disabled ? 'Не помещается' : `Можно добавить: ${canAdd} шт.`)}</b>
         </span>
-        <span class="favorite-stone-card__actions">
-          <button type="button" data-remove-favorite="${escapeHtml(stone.id)}" aria-label="Убрать из избранного">×</button>
-        </span>
-        <strong class="favorite-stone-card__price">${formatPrice(stone.price)} ₽</strong>
-      </article>
-    `;
-  }).join('');
-
-  renderStoneCatalogModal();
-}
-
-function renderStoneCatalogModal() {
-  if (!stoneCatalogList) return;
-
-  if (!stonesCatalog.length) {
-    stoneCatalogList.innerHTML = '<p class="muted-text">Камней пока нет.</p>';
-    return;
-  }
-
-  const visibleStones = getFilteredStones();
-
-  if (!visibleStones.length) {
-    stoneCatalogList.innerHTML = '<p class="muted-text">По такому запросу камней нет.</p>';
-    return;
-  }
-
-  stoneCatalogList.innerHTML = visibleStones.map((stone) => {
-    const added = isFavoriteStone(stone);
-    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="${escapeHtml(stone.name)}" loading="lazy">` : '<span class="stone-card__gem"></span>';
-
-    return `
-      <article class="stone-catalog-card">
-        <div class="stone-catalog-card__image" style="--stone-color:${escapeHtml(stone.color)}">${image}</div>
-        <div class="stone-catalog-card__body">
-          <h3>${escapeHtml(stone.name)}</h3>
-          ${stone.description ? `<p>${escapeHtml(stone.description)}</p>` : ''}
-          ${stone.property ? `<p><b>Свойства:</b> ${escapeHtml(stone.property)}</p>` : ''}
-          ${stone.zodiac ? `<p><b>Зодиак:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
-          <span class="stone-catalog-card__size">Размер: ${formatNumber(stone.sizeMm)} мм</span>
-        </div>
-        <div class="stone-catalog-card__bottom">
-          <strong class="stone-catalog-card__price">${formatPrice(stone.price)} ₽</strong>
-          <button type="button" data-favorite-stone="${escapeHtml(stone.id)}" ${added ? 'disabled' : ''}>${added ? 'В избранном' : 'В избранное'}</button>
-        </div>
-      </article>
-    `;
-  }).join('');
-}
-
-function getSelectedStoneGroups() {
-  const map = new Map();
-
-  selectedStones.forEach((stone, index) => {
-    const key = `${stone.id || stone.name}-${stone.sizeMm || ''}`;
-    const current = map.get(key) || {
-      stone,
-      firstIndex: index,
-      count: 0,
-      totalPrice: 0
-    };
-
-    current.count += 1;
-    current.totalPrice += Number(stone.price || 0);
-    map.set(key, current);
-  });
-
-  return Array.from(map.values()).sort((a, b) => a.stone.name.localeCompare(b.stone.name, 'ru'));
-}
-
-function renderSelectedStones() {
-  if (!selectedStonesList) return;
-
-  if (!selectedStones.length) {
-    selectedStonesList.innerHTML = '<p class="muted-text">Камни пока не выбраны.</p>';
-    return;
-  }
-
-  selectedStonesList.innerHTML = getSelectedStoneGroups().map((item) => {
-    const stone = item.stone;
-    const image = stone.image ? `<img src="${escapeHtml(stone.image)}" alt="">` : '<span></span>';
-
-    return `
-      <article class="selected-stone-row selected-stone-row--stacked">
-        <span class="selected-stone-row__thumb" style="--stone-color:${escapeHtml(stone.color)}">${image}</span>
-        <span class="selected-stone-row__body">
-          <strong>${escapeHtml(stone.name)}</strong>
-          <small>${formatNumber(stone.sizeMm)} мм · ${formatPrice(item.totalPrice)} ₽</small>
-          ${stone.property ? `<small>${escapeHtml(stone.property)}</small>` : ''}
-          ${stone.zodiac ? `<small>Зодиак: ${escapeHtml(stone.zodiac)}</small>` : ''}
-        </span>
-        <span class="selected-stone-row__count">${item.count} шт</span>
-        <button type="button" data-remove-selected-stone="${item.firstIndex}" aria-label="Убрать один камень">×</button>
-      </article>
+      </button>
     `;
   }).join('');
 }
@@ -729,9 +495,6 @@ function buildBeadLayout(stones) {
     return {
       stone: item.stone,
       originalIndex: item.originalIndex,
-      svgX: point.x,
-      svgY: point.y,
-      diameterSvg: item.radius * 2,
       x: point.x / 1000 * stageRect.width,
       y: point.y / 1000 * stageRect.height,
       diameter: item.radiusPx * 2,
@@ -794,41 +557,31 @@ function applyPathCollisions(items, pathLength, customGap = VISUAL_GAP_PX) {
   }
 }
 function renderBead(item, index, animate) {
-  const radius = item.diameterSvg / 2;
-  const safeIndex = String(index).replace(/[^\w-]/g, '');
-  const clipId = `necklaceStoneClip-${safeIndex}`;
-  const gradientId = `necklaceStoneGradient-${safeIndex}`;
-  const style = `--stone-color:${escapeHtml(item.stone.color)}`;
+  const style = [
+    `left:${item.x}px`,
+    `top:${item.y}px`,
+    `width:${item.diameter}px`,
+    `height:${item.diameter}px`,
+    `--stone-color:${escapeHtml(item.stone.color)}`,
+    `--bead-rotate:${item.angle}deg`
+  ].join(';');
+
   const image = item.stone.image
-    ? `<image class="necklace-svg-bead__image" href="${escapeHtml(item.stone.image)}" x="${-radius}" y="${-radius}" width="${item.diameterSvg}" height="${item.diameterSvg}" preserveAspectRatio="xMidYMid slice" clip-path="url(#${clipId})"></image>`
-    : '';
+    ? `<img src="${escapeHtml(item.stone.image)}" alt="${escapeHtml(item.stone.name)}" loading="lazy">`
+    : '<span></span>';
 
   return `
-    <g
-      class="necklace-svg-bead ${animate ? 'necklace-svg-bead--new' : ''}"
+    <button
+      class="necklace-bead ${animate ? 'necklace-bead--new' : ''}"
+      type="button"
       data-bead-index="${index}"
-      transform="translate(${item.svgX} ${item.svgY}) rotate(${item.angle})"
+      title="Удалить ${escapeHtml(item.stone.name)}"
       style="${style}">
-      <title>Удалить ${escapeHtml(item.stone.name)}</title>
-      <defs>
-        <radialGradient id="${gradientId}" cx="32%" cy="25%" r="76%">
-          <stop offset="0%" stop-color="#fff" stop-opacity=".96"></stop>
-          <stop offset="42%" stop-color="${escapeHtml(item.stone.color)}"></stop>
-          <stop offset="100%" stop-color="${escapeHtml(item.stone.color)}" stop-opacity=".72"></stop>
-        </radialGradient>
-        <clipPath id="${clipId}">
-          <circle cx="0" cy="0" r="${radius}"></circle>
-        </clipPath>
-      </defs>
-      <g class="necklace-svg-bead__visual">
-        <circle class="necklace-svg-bead__base" cx="0" cy="0" r="${radius}" fill="url(#${gradientId})"></circle>
-        ${image}
-        <circle class="necklace-svg-bead__stroke" cx="0" cy="0" r="${radius}"></circle>
-        <ellipse class="necklace-svg-bead__shine" cx="${-radius * 0.28}" cy="${-radius * 0.34}" rx="${radius * 0.22}" ry="${radius * 0.14}"></ellipse>
-      </g>
-    </g>
+      ${image}
+    </button>
   `;
 }
+
 function getBeadDiameter(sizeMm) {
   const realSizeMm = Number(sizeMm || 8);
   const necklaceLengthMm = getMaxLength();
@@ -873,39 +626,34 @@ function updateSummary() {
   const free = Math.max(max - used, 0);
 
   const clasp = getSelectedClasp();
-  const material = getSelectedClaspMaterial();
   selectedType.textContent = jewelryType.value;
-  selectedSize.textContent = jewelrySize.value;
-  if (selectedClasp) selectedClasp.textContent = clasp ? `${clasp.name}` : 'Не выбран';
+  selectedSize.textContent = getSelectedSizeLabel();
+  if (selectedClasp) selectedClasp.textContent = clasp ? `${clasp.name}${clasp.id === 'lobster-steel' ? ' · +4 см удлинение' : ''}` : 'Не выбран';
   totalPrice.textContent = `${formatPrice(total)} ₽`;
   usedLength.textContent = formatNumber(used);
   maxLength.textContent = formatNumber(max);
 
   undoStone.disabled = selectedStones.length === 0;
   clearConstructor.disabled = selectedStones.length === 0;
-  addCustomToCart.disabled = selectedStones.length === 0 || !clasp || !material;
+  addCustomToCart.disabled = selectedStones.length === 0 || !clasp;
 
   if (!clasp) {
     capacityHint.textContent = selectedStones.length
-      ? `Выберите тип замка. Сейчас доступно ${formatNumber(max)} мм под камни.`
+      ? `Выберите тип замка. Сейчас расчёт выполнен с запасом ${DEFAULT_CLASP_RESERVE_MM} мм.`
       : `Сначала выберите замок, затем добавляйте камни. Под камни доступно ${formatNumber(max)} мм.`;
-  } else if (!material) {
-    capacityHint.textContent = 'Выберите материал застежки.';
   } else if (!selectedStones.length) {
-    capacityHint.textContent = `Нить свободна. С учётом замка «${clasp.name}» доступно ${formatNumber(max)} мм под камни.`;
+    capacityHint.textContent = `Нить свободна. С учётом замка «${clasp.name}» доступно ${formatNumber(max)} мм под камни.${clasp.id === 'lobster-steel' ? ' Карабин даёт удлинение 4 см.' : ''}`;
   } else {
-    capacityHint.textContent = `Бусин: ${selectedStones.length}. Занято ${formatNumber(used)} из ${formatNumber(max)} мм, свободно ${formatNumber(free)} мм. Двойной клик удаляет камень.`;
+    capacityHint.textContent = `Бусин: ${selectedStones.length}. Занято ${formatNumber(used)} из ${formatNumber(max)} мм, свободно ${formatNumber(free)} мм. Двойной клик удаляет камень.${clasp.id === 'lobster-steel' ? ' Карабин: +4 см удлинение.' : ''}`;
   }
 
   updateRealCapacitySummary();
-  renderSelectedStones();
 }
 
 async function addDesignToCart() {
   if (!selectedStones.length) return;
 
   const clasp = getSelectedClasp();
-  const material = getSelectedClaspMaterial();
   if (!clasp) {
     claspType?.classList.add('is-invalid');
     claspType?.focus();
@@ -913,22 +661,13 @@ async function addDesignToCart() {
     return;
   }
   claspType?.classList.remove('is-invalid');
-
-  if (!material) {
-    claspMaterial?.classList.add('is-invalid');
-    claspMaterial?.focus();
-    capacityHint.textContent = 'Выберите материал застежки.';
-    return;
-  }
-
-  claspMaterial?.classList.remove('is-invalid');
   addCustomToCart.disabled = true;
 
   try {
     rebuildNecklace(false);
 
     const cart = readCart();
-    const title = `${jewelryType.value} LiVetta custom`;
+    const title = `${jewelryType.value} Livetta custom`;
     const total = selectedStones.reduce((sum, stone) => sum + stone.price, 0);
     const composition = getDesignComposition(selectedStones);
     const previewImage = await createDesignPreviewImage();
@@ -946,10 +685,9 @@ async function addDesignToCart() {
       design: {
         type: jewelryType.value,
         size_cm: Number(jewelrySize.value),
-        clasp: { ...clasp, material: material.name },
+        size_label: getSelectedSizeCode(),
+        clasp: { ...clasp },
         clasp_type: clasp.id,
-        clasp_material: material.id,
-        clasp_material_name: material.name,
         used_mm: getPhysicalUsedLength(selectedStones),
         max_mm: getMaxLength(),
         preview_image: previewImage,
@@ -958,9 +696,6 @@ async function addDesignToCart() {
         stones: selectedStones.map((stone) => ({
           id: stone.id,
           name: stone.name,
-          description: stone.description,
-          property: stone.property,
-          zodiac: stone.zodiac,
           price: stone.price,
           size_mm: stone.sizeMm,
           color: stone.color,
@@ -974,7 +709,7 @@ async function addDesignToCart() {
     animateConstructorCartButton(addCustomToCart);
   } finally {
     window.setTimeout(() => {
-      addCustomToCart.disabled = selectedStones.length === 0 || !getSelectedClasp() || !getSelectedClaspMaterial();
+      addCustomToCart.disabled = selectedStones.length === 0 || !getSelectedClasp();
     }, 1250);
   }
 }
@@ -1002,7 +737,7 @@ function handleBeadPointerDown(event) {
   };
 
   bead.setPointerCapture?.(event.pointerId);
-  bead.classList.add('necklace-svg-bead--dragging');
+  bead.classList.add('necklace-bead--dragging');
   neckStage.classList.add('neck-constructor-stage--dragging');
 
   moveDraggedBeadToPointer(event);
@@ -1067,10 +802,9 @@ function handleBeadPointerCancel(event) {
 
 function finishBeadDrag() {
   if (draggedBead?.bead) {
-    draggedBead.bead.classList.remove('necklace-svg-bead--dragging');
+    draggedBead.bead.classList.remove('necklace-bead--dragging');
     draggedBead.bead.style.left = '';
     draggedBead.bead.style.top = '';
-    draggedBead.bead.removeAttribute('data-dragging');
   }
 
   neckStage?.classList.remove('neck-constructor-stage--dragging');
@@ -1084,8 +818,8 @@ function moveDraggedBeadToPointer(event) {
 
   const position = getClosestPathPositionFromPointer(event);
 
-  draggedBead.bead.setAttribute('transform', `translate(${position.svgX} ${position.svgY})`);
-  draggedBead.bead.setAttribute('data-dragging', 'true');
+  draggedBead.bead.style.left = `${position.x}px`;
+  draggedBead.bead.style.top = `${position.y}px`;
 }
 
 function getDropIndexFromPointer(event) {
@@ -1152,8 +886,6 @@ function getClosestPathPositionFromPointer(event) {
   }
 
   return {
-    svgX: bestPoint.x,
-    svgY: bestPoint.y,
     x: bestPoint.x / 1000 * stageRect.width,
     y: bestPoint.y / 1000 * stageRect.height,
     length: bestLength
@@ -1205,7 +937,7 @@ function getPhysicalUsedLength(stones) {
 }
 
 function getMaxLength() {
-  return getSelectedNecklaceLengthMm();
+  return getAvailableBeadLengthMm();
 }
 
 function readCart() {
@@ -1289,11 +1021,6 @@ function getSelectedNecklaceLengthMm() {
 
 function getSelectedClasp() {
   return CLASP_OPTIONS[String(claspType?.value || '')] || null;
-}
-
-function getSelectedClaspMaterial() {
-  const id = String(claspMaterial?.value || '');
-  return CLASP_MATERIALS[id] || null;
 }
 
 function getClaspReserveMm() {
@@ -1448,9 +1175,6 @@ function getDesignComposition(stones) {
       count: 0,
       size_mm: stone.sizeMm,
       price: stone.price || 0,
-      description: stone.description || '',
-      property: stone.property || '',
-      zodiac: stone.zodiac || '',
       color: stone.color || '#ee9ac5',
       image: stone.image || ''
     };

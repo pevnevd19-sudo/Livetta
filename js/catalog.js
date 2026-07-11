@@ -101,7 +101,7 @@ function renderProducts() {
 function renderProduct(product) {
   const images = getProductImages(product);
   const image = resolveImageUrl(images[0] || product.image);
-  const productUrl = `/product?id=${encodeURIComponent(product.id)}`;
+  const productUrl = `product.html?id=${encodeURIComponent(product.id)}`;
   const canBuy = product.purchasable !== false;
 
   return `
@@ -116,6 +116,9 @@ function renderProduct(product) {
         <h3 class="product-card__title">
           <a href="${productUrl}">${escapeHtml(product.title)}</a>
         </h3>
+
+        <p class="product-card__description">${escapeHtml(product.description)}</p>
+        ${renderProductSizes(product)}
 
         <div class="catalog-product-card__bottom">
           <strong class="product-card__price">${formatPrice(product.price)} ₽</strong>
@@ -133,6 +136,23 @@ function renderProduct(product) {
       </div>
     </article>
   `;
+}
+
+
+function renderProductSizes(product) {
+  const sizes = Array.isArray(product.size_options) ? product.size_options : [];
+  if (!sizes.length) return '';
+  return `
+    <div class="product-size-badges" aria-label="Доступные размеры">
+      ${sizes.map((size) => `<span>${escapeHtml(size.label)} · ${escapeHtml(formatSizeCm(size.cm))} см</span>`).join('')}
+    </div>
+    <p class="product-size-note">${escapeHtml(product.carabiner_extension_note || 'При заказе украшения с замком карабин есть удлинение 4 см.')}</p>
+  `;
+}
+
+function formatSizeCm(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? String(number).replace('.', ',') : value;
 }
 
 function addToCart(product, button = null) {

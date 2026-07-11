@@ -1,9 +1,5 @@
 const App = window.Livetta;
 const API_URL = App.getApiUrl();
-const PRODUCT_LENGTH_MIN = 25;
-const PRODUCT_LENGTH_MAX = 50;
-const PRODUCT_LENGTH_DEFAULT = 45;
-
 const EMPTY_LIGHTBOX_IMAGE = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==';
 
 const productDetail = document.querySelector('#productDetail');
@@ -13,6 +9,7 @@ const lightboxClose = document.querySelector('#productLightboxClose');
 
 let currentProduct = null;
 let currentImages = [];
+let selectedProductSize = null;
 
 loadProduct();
 
@@ -20,7 +17,7 @@ async function loadProduct() {
   const id = new URLSearchParams(window.location.search).get('id');
 
   if (!id) {
-    document.title = 'Товар не найден — LiVetta';
+    document.title = 'Товар не найден — Livetta';
     productDetail.innerHTML = `
       <div class="premium-product-info">
         <div class="premium-product-info__top">
@@ -44,10 +41,11 @@ async function loadProduct() {
     currentProduct = await response.json();
     currentImages = getProductImages(currentProduct);
 
+    selectedProductSize = getDefaultProductSize(currentProduct);
     renderProductDetail(currentProduct);
   } catch (error) {
     console.error(error);
-    document.title = 'Товар не найден — LiVetta';
+    document.title = 'Товар не найден — Livetta';
     productDetail.innerHTML = `
       <div class="premium-product-info">
         <div class="premium-product-info__top">
@@ -66,7 +64,7 @@ function renderProductDetail(product) {
   const mainImage = resolveImageUrl(images[0] || product.image);
   const canBuy = product.purchasable !== false;
 
-  document.title = `${product.title} — LiVetta`;
+  document.title = `${product.title} — Livetta`;
 
   productDetail.innerHTML = `
     <div class="premium-product-gallery">
@@ -95,28 +93,27 @@ function renderProductDetail(product) {
         <span class="premium-product-eyebrow">${escapeHtml(product.category)}</span>
         <h1>${escapeHtml(product.title)}</h1>
         <strong class="premium-product-price">${formatPrice(product.price)} ₽</strong>
-        ${renderProductLengthSelector(product)}
       </div>
 
       <div class="premium-product-description">
         <h2>Об украшении</h2>
-        <p>${formatTextBlock(product.description)}</p>
+        <p>${escapeHtml(product.description)}</p>
       </div>
 
-      ${renderProductStones(product)}
+      ${renderProductSizeSelector(product)}
 
       <div class="premium-product-benefits">
         <div>
           <strong>Подарочная подача</strong>
-          <span>При желании мы можем упаковать украшение сразу на подарок вашему близкому и не очень человеку, дайте нам только знать об этом.</span>
+          <span>аккуратно и эстетично</span>
         </div>
         <div>
           <strong>Фото перед отправкой</strong>
-          <span>Покажем украшения до отправки, если вам что то не понравится, переделаем бесплатно.</span>
+          <span>покажем украшение до покупки</span>
         </div>
         <div>
           <strong>Ручной подбор</strong>
-          <span>Каждое наше украшение, камень, форма и настроение подбирается под конкретного человека, знак зодиака или характер, у нас вы точно сможете найти, то украшение, которое подойдет именно вам.</span>
+          <span>камни, форма и настроение</span>
         </div>
       </div>
 
@@ -148,92 +145,19 @@ function renderProductDetail(product) {
   productDetail.addEventListener('click', handleProductDetailClick);
 }
 
-function renderProductStones(product) {
-  const stones = getProductStones(product);
-
-  if (!stones.length) {
-    return '';
-  }
-
-  return `
-    <div class="premium-product-stones">
-      <h2>Камни в украшении</h2>
-      <div class="premium-product-stones__list">
-        ${stones.map((stone) => {
-          const property = String(stone.stone_property || stone.description || '').trim();
-          return `
-          <article class="premium-product-stone">
-            <h3>${escapeHtml(stone.name)}</h3>
-            ${property ? `<p><b>${escapeHtml(stone.name)}</b> — ${formatTextBlock(property)}</p>` : ''}
-            ${stone.zodiac ? `<p><b>Знаки зодиака:</b> ${escapeHtml(stone.zodiac)}</p>` : ''}
-          </article>
-        `;
-        }).join('')}
-      </div>
-    </div>
-  `;
-}
-
-function renderProductLengthSelector(product) {
-  if (product.purchasable === false) {
-    return '';
-  }
-
-  const options = [];
-  for (let length = PRODUCT_LENGTH_MIN; length <= PRODUCT_LENGTH_MAX; length += 1) {
-    const selected = length === PRODUCT_LENGTH_DEFAULT ? ' selected' : '';
-    options.push(`<option value="${length}"${selected}>${length} см</option>`);
-  }
-
-  return `
-    <label class="premium-product-length" for="productLength">
-      <span>Длина украшения</span>
-      <select id="productLength" name="productLength">${options.join('')}</select>
-    </label>
-  `;
-}
-
-function getSelectedProductLength() {
-  const field = document.querySelector('#productLength');
-  const value = Number(field?.value || PRODUCT_LENGTH_DEFAULT);
-  return Math.min(PRODUCT_LENGTH_MAX, Math.max(PRODUCT_LENGTH_MIN, Number.isFinite(value) ? value : PRODUCT_LENGTH_DEFAULT));
-}
-
-function getProductStones(product) {
-  if (Array.isArray(product?.product_stones)) {
-    return product.product_stones.map(normalizeProductStone).filter(Boolean);
-  }
-
-  return [];
-}
-
-function normalizeProductStone(stone) {
-  if (!stone || typeof stone !== 'object') {
-    return null;
-  }
-
-  const name = String(stone.name || '').trim();
-
-  if (!name) {
-    return null;
-  }
-
-  return {
-    name,
-    description: String(stone.description || '').trim(),
-    stone_property: String(stone.stone_property || stone.property || '').trim(),
-    zodiac: String(stone.zodiac || '').trim()
-  };
-}
-
-function formatTextBlock(value) {
-  return escapeHtml(value).replace(/\n/g, '<br>');
-}
-
 function handleProductDetailClick(event) {
   const thumb = event.target.closest('[data-action="change-main-image"]');
   const lightboxButton = event.target.closest('[data-action="open-lightbox"]');
   const buyButton = event.target.closest('[data-action="buy-product"]');
+  const sizeButton = event.target.closest('[data-action="select-product-size"]');
+
+  if (sizeButton) {
+    selectedProductSize = { label: sizeButton.dataset.sizeLabel, cm: Number(sizeButton.dataset.sizeCm) };
+    document.querySelectorAll('[data-action="select-product-size"]').forEach((button) => {
+      button.classList.toggle('is-active', button === sizeButton);
+    });
+    return;
+  }
 
   if (thumb) {
     const src = thumb.dataset.image;
@@ -300,36 +224,8 @@ function addToCart(product, button = null) {
     return;
   }
 
-  const lengthCm = getSelectedProductLength();
-  const cart = App.readCart();
-  const productId = product.id ?? product.slug ?? product.title;
-  const existing = cart.find((item) => String(item.id) === String(productId) && !item.custom && Number(item.design?.size_cm || 0) === lengthCm);
-  const images = getProductImages(product);
-
-  if (existing) {
-    existing.quantity = Number(existing.quantity || 1) + 1;
-    existing.design = { ...(existing.design || {}), type: product.category || 'Украшение', size_cm: lengthCm };
-  } else {
-    cart.push({
-      id: productId,
-      product_id: product.id,
-      custom: false,
-      title: product.title,
-      category: product.category,
-      description: product.description,
-      product_stones: product.product_stones || [],
-      image: resolveImageUrl(images[0] || product.image),
-      product_images: images,
-      price: Number(product.price || 0),
-      quantity: 1,
-      design: {
-        type: product.category || 'Украшение',
-        size_cm: lengthCm
-      }
-    });
-  }
-
-  App.writeCart(cart);
+  const productForCart = { ...product, selected_size: selectedProductSize || getDefaultProductSize(product) };
+  App.addProductToCart(productForCart);
   animateBuyButton(button);
 }
 
@@ -339,6 +235,41 @@ function animateBuyButton(button) {
 
 function getProductImages(product) {
   return App.getProductImages(product);
+}
+
+
+function getProductSizes(product) {
+  return Array.isArray(product?.size_options) ? product.size_options : [];
+}
+
+function getDefaultProductSize(product) {
+  const sizes = getProductSizes(product);
+  return sizes[0] || null;
+}
+
+function renderProductSizeSelector(product) {
+  const sizes = getProductSizes(product);
+  if (!sizes.length) return '';
+  const selected = selectedProductSize || sizes[0];
+  return `
+    <div class="premium-product-sizes">
+      <h2>Размер</h2>
+      <div class="product-size-selector" role="radiogroup" aria-label="Выбор размера украшения">
+        ${sizes.map((size) => `
+          <button type="button" data-action="select-product-size" data-size-label="${escapeHtml(size.label)}" data-size-cm="${escapeHtml(size.cm)}" class="${selected?.label === size.label ? 'is-active' : ''}">
+            <b>${escapeHtml(size.label)}</b>
+            <span>${escapeHtml(formatSizeCm(size.cm))} см</span>
+          </button>
+        `).join('')}
+      </div>
+      <p class="product-size-note">${escapeHtml(product.carabiner_extension_note || 'При заказе украшения с замком карабин есть удлинение 4 см.')}</p>
+    </div>
+  `;
+}
+
+function formatSizeCm(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? String(number).replace('.', ',') : value;
 }
 
 function resolveImageUrl(image) {

@@ -48,7 +48,6 @@ function getApiUrl() {
 function init() {
   loginForm?.addEventListener('submit', handleLogin);
   productForm?.addEventListener('submit', handleProductCreate);
-  productForm?.addEventListener('click', handleProductStoneEditorClick);
   stoneForm?.addEventListener('submit', handleStoneCreate);
   categoryForm?.addEventListener('submit', handleCategoryCreate);
   adminCategories?.addEventListener('click', handleCategoryClick);
@@ -57,7 +56,6 @@ function init() {
   popularProductsAdmin?.addEventListener('click', handlePopularProductsClick);
   adminProducts?.addEventListener('submit', handleProductEditSubmit);
   adminProducts?.addEventListener('click', handleProductClick);
-  adminProducts?.addEventListener('click', handleProductStoneEditorClick);
   adminStones?.addEventListener('submit', handleStoneEditSubmit);
   adminStones?.addEventListener('click', handleStoneClick);
   adminOrders?.addEventListener('click', handleOrderClick);
@@ -203,7 +201,7 @@ function logoutAdmin(showMessage = true) {
   loginSection.hidden = false;
   loginForm?.reset();
   if (showMessage) {
-    setLoginMessage('Вы вышли из панели.');
+    setLoginMessage('Вы вышли из админки.');
   }
 }
 
@@ -379,8 +377,9 @@ function renderOrderItem(item) {
       ${image ? `<div class="admin-order-item__image"><img src="${escapeHtml(image)}" alt="${escapeHtml(item.title || 'Украшение')}"></div>` : ''}
 
       <div>
-        <strong>${escapeHtml(item.title || 'Украшение LiVetta')}</strong>
+        <strong>${escapeHtml(item.title || 'Украшение Livetta')}</strong>
         <span>${escapeHtml(item.category || (item.custom ? 'Индивидуальная сборка' : 'Украшение'))}</span>
+        ${item.selected_size ? `<small>Размер: ${escapeHtml(item.selected_size.label)} · ${escapeHtml(formatSizeCm(item.selected_size.cm))} см</small><small>Карабин: +4 см удлинение</small>` : ''}
         ${design ? `<small>${renderOrderDesign(design)}</small>` : ''}
         ${composition.length ? `<small><b>Состав:</b> ${composition.map((part) => `${escapeHtml(part.name)} ×${Number(part.count || 0)}`).join(', ')}</small>` : ''}
       </div>
@@ -393,8 +392,8 @@ function renderOrderItem(item) {
 function renderOrderDesign(design) {
   return [
     design.type ? `Тип: ${design.type}` : '',
-    design.size_cm ? `Размер: ${design.size_cm} см` : '',
-    design.clasp?.name ? `Замок: ${design.clasp.name}${design.clasp.material ? ` · ${design.clasp.material}` : ''}` : '',
+    design.size_cm ? `Размер: ${design.size_label ? `${design.size_label} · ` : ''}${formatSizeCm(design.size_cm)} см` : '',
+    design.clasp?.name ? `Замок: ${design.clasp.name}${design.clasp.material ? ` · ${design.clasp.material}` : ''}${design.clasp.id === 'lobster-steel' ? ' · удлинение 4 см' : ''}` : '',
     design.stones_count ? `Бусин: ${design.stones_count}` : '',
     !design.stones_count && Array.isArray(design.stones) ? `Бусин: ${design.stones.length}` : ''
   ].filter(Boolean).map(escapeHtml).join(' · ');
@@ -600,14 +599,12 @@ async function handleProductCreate(event) {
   event.preventDefault();
   const button = event.submitter;
   const formData = new FormData(productForm);
-  syncProductStonesField(productForm, formData);
   normalizeProductImagesField(formData, productForm.querySelector('#productImage'));
 
   setButtonBusy(button, true);
   try {
     await apiFetch('/products', { method: 'POST', body: formData });
     productForm.reset();
-    resetProductStonesEditor(productForm);
     renderCategorySelect();
     await Promise.all([loadProducts(), loadPopularProducts()]);
     showAdminToast('Украшение добавлено');
@@ -661,7 +658,6 @@ function renderProduct(product) {
   const reserved = Number(product.reserved_qty || 0);
   const available = Math.max(0, stock - reserved);
   const sold = Number(product.sold_qty || 0);
-  const productStones = getProductStones(product);
 
   return `
     <article class="product-card admin-product-card admin-catalog-card">
@@ -673,6 +669,7 @@ function renderProduct(product) {
           <span class="admin-chip">${escapeHtml(product.category)}</span>
           <h3>${escapeHtml(product.title)}</h3>
           <strong class="admin-price-badge">${formatPrice(product.price)} ₽</strong>
+          ${renderProductSizeBadges(product)}
         </div>
       </header>
 
@@ -680,13 +677,6 @@ function renderProduct(product) {
         <span>Описание для карточки</span>
         <p>${formatAdminDescription(product.description)}</p>
       </div>
-
-      ${productStones.length ? `
-        <div class="admin-product-stones">
-          <span>Камни в украшении</span>
-          ${productStones.map(renderAdminProductStone).join('')}
-        </div>
-      ` : ''}
 
       <div class="admin-stock-chips">
         <span>Доступно: <b>${available}</b></span>
@@ -729,11 +719,11 @@ function renderProduct(product) {
               <span>Общий остаток</span>
               <input name="stock_qty" type="number" min="0" value="${stock}" required>
             </label>
+            ${renderProductSizeEditor(product)}
             <label class="admin-field admin-field--wide">
               <span>Описание</span>
               <textarea name="description" required>${escapeHtml(product.description)}</textarea>
             </label>
-            ${renderProductStonesEditor(productStones)}
             <label class="file-field admin-file-field admin-field--wide">
               <span>Добавить фотографии</span>
               <input name="images" type="file" accept="image/*" multiple>
@@ -762,167 +752,62 @@ function renderProduct(product) {
   `;
 }
 
+
+function getProductSizeOptions(product) {
+  return Array.isArray(product?.size_options) ? product.size_options : [];
+}
+
+function getProductSizeMap(product) {
+  const defaults = { XS: 38, S: 40, M: 42, L: 44, XL: 46 };
+  const result = { ...defaults };
+  getProductSizeOptions(product).forEach((item) => {
+    if (item?.label) result[item.label] = item.cm;
+  });
+  return result;
+}
+
+function isEarringsCategory(category) {
+  return /серьг/i.test(String(category || ''));
+}
+
+function renderProductSizeBadges(product) {
+  const sizes = getProductSizeOptions(product);
+  if (!sizes.length || isEarringsCategory(product.category)) {
+    return '<span class="admin-size-muted">Размер не показывается</span>';
+  }
+
+  return `
+    <div class="admin-size-badges">
+      ${sizes.map((size) => `<span>${escapeHtml(size.label)} · ${escapeHtml(formatSizeCm(size.cm))} см</span>`).join('')}
+    </div>
+    <small class="admin-size-note">Карабин: +4 см удлинение</small>
+  `;
+}
+
+function renderProductSizeEditor(product) {
+  const map = getProductSizeMap(product);
+  const hideChecked = !getProductSizeOptions(product).length || isEarringsCategory(product.category);
+  return `
+    <div class="admin-size-editor admin-field--wide">
+      <span class="admin-size-editor__title">Размеры украшения</span>
+      <label>XS, см<input name="size_xs_cm" type="number" step="0.1" min="1" value="${escapeHtml(map.XS)}"></label>
+      <label>S, см<input name="size_s_cm" type="number" step="0.1" min="1" value="${escapeHtml(map.S)}"></label>
+      <label>M, см<input name="size_m_cm" type="number" step="0.1" min="1" value="${escapeHtml(map.M)}"></label>
+      <label>L, см<input name="size_l_cm" type="number" step="0.1" min="1" value="${escapeHtml(map.L)}"></label>
+      <label>XL, см<input name="size_xl_cm" type="number" step="0.1" min="1" value="${escapeHtml(map.XL)}"></label>
+      <input type="hidden" name="hide_sizes" value="0"><label class="admin-check admin-check--wide"><input name="hide_sizes" type="checkbox" value="1" ${hideChecked ? 'checked' : ''}> Не показывать размер</label>
+      <small class="admin-size-editor__hint">Для категории «Серьги» размер скрывается автоматически. Для браслетов можно поставить свои значения, например XS = 16 см.</small>
+    </div>
+  `;
+}
+
+function formatSizeCm(value) {
+  const number = Number(value);
+  return Number.isFinite(number) ? String(number).replace('.', ',') : value;
+}
+
 function formatAdminDescription(value) {
   return escapeHtml(value || '').replace(/\n/g, '<br>');
-}
-
-function getProductStones(product) {
-  if (Array.isArray(product?.product_stones)) {
-    return product.product_stones.map(normalizeProductStone).filter(Boolean);
-  }
-
-  try {
-    const parsed = JSON.parse(product?.stones_json || '[]');
-    return Array.isArray(parsed) ? parsed.map(normalizeProductStone).filter(Boolean) : [];
-  } catch {
-    return [];
-  }
-}
-
-function normalizeProductStone(stone) {
-  if (!stone || typeof stone !== 'object') {
-    return null;
-  }
-
-  const name = String(stone.name || '').trim();
-
-  if (!name) {
-    return null;
-  }
-
-  return {
-    name,
-    description: String(stone.description || '').trim(),
-    zodiac: String(stone.zodiac || '').trim(),
-    stone_property: String(stone.stone_property || stone.property || '').trim()
-  };
-}
-
-function renderAdminProductStone(stone) {
-  const property = getProductStoneProperty(stone);
-
-  return `
-    <article>
-      <strong>${escapeHtml(stone.name)}</strong>
-      ${property ? `<p>${escapeHtml(stone.name)} — ${formatAdminDescription(property)}</p>` : ''}
-      ${stone.zodiac ? `<small><b>Знаки зодиака:</b> ${escapeHtml(stone.zodiac)}</small>` : ''}
-    </article>
-  `;
-}
-
-function getProductStoneProperty(stone) {
-  return String(stone?.stone_property || stone?.property || stone?.description || '').trim();
-}
-
-function renderProductStonesEditor(stones = []) {
-  const normalized = (Array.isArray(stones) ? stones : []).map(normalizeProductStone).filter(Boolean);
-  const rows = normalized.length ? normalized : [{}];
-
-  return `
-    <section class="admin-product-stone-editor admin-field--wide" data-product-stones-editor>
-      <input name="product_stones" type="hidden" value="${escapeHtml(JSON.stringify(normalized))}">
-      <header class="admin-product-stone-editor__head">
-        <div>
-          <span>Камни в украшении</span>
-          <small>Название камня, его свойства и подходящие знаки зодиака</small>
-        </div>
-        <button type="button" data-add-product-stone>Добавить камень</button>
-      </header>
-      <div class="admin-product-stone-editor__list" data-product-stones-list>
-        ${rows.map(renderProductStoneEditorRow).join('')}
-      </div>
-    </section>
-  `;
-}
-
-function renderProductStoneEditorRow(stone = {}) {
-  const property = getProductStoneProperty(stone);
-
-  return `
-    <article class="admin-product-stone-row" data-product-stone-row>
-      <label>
-        <span>Камень</span>
-        <input data-product-stone-name value="${escapeHtml(stone.name || '')}" placeholder="Например: аметист">
-      </label>
-      <label>
-        <span>Свойства</span>
-        <textarea data-product-stone-property placeholder="Например: обладает мягкой успокаивающей энергией">${escapeHtml(property)}</textarea>
-      </label>
-      <label>
-        <span>Знаки зодиака</span>
-        <input data-product-stone-zodiac value="${escapeHtml(stone.zodiac || '')}" placeholder="Например: Рыбы, Водолей, Дева">
-      </label>
-      <button type="button" data-remove-product-stone>Удалить</button>
-    </article>
-  `;
-}
-
-function handleProductStoneEditorClick(event) {
-  const addButton = event.target.closest('[data-add-product-stone]');
-  const removeButton = event.target.closest('[data-remove-product-stone]');
-
-  if (addButton) {
-    event.preventDefault();
-    addProductStoneRow(addButton.closest('[data-product-stones-editor]'));
-    return;
-  }
-
-  if (removeButton) {
-    event.preventDefault();
-    const editor = removeButton.closest('[data-product-stones-editor]');
-    const row = removeButton.closest('[data-product-stone-row]');
-    const rows = editor ? Array.from(editor.querySelectorAll('[data-product-stone-row]')) : [];
-
-    if (row && rows.length > 1) {
-      row.remove();
-    } else if (row) {
-      row.querySelectorAll('input, textarea').forEach((field) => {
-        field.value = '';
-      });
-    }
-
-    syncProductStonesField(removeButton.closest('form'));
-  }
-}
-
-function addProductStoneRow(editor, stone = {}) {
-  const list = editor?.querySelector('[data-product-stones-list]');
-  if (!list) return;
-  list.insertAdjacentHTML('beforeend', renderProductStoneEditorRow(stone));
-}
-
-function resetProductStonesEditor(form) {
-  const editor = form?.querySelector('[data-product-stones-editor]');
-  const list = editor?.querySelector('[data-product-stones-list]');
-  if (!list) return;
-  list.innerHTML = renderProductStoneEditorRow({});
-  syncProductStonesField(form);
-}
-
-function syncProductStonesField(form, formData = null) {
-  const stones = readProductStonesEditor(form);
-  const value = JSON.stringify(stones);
-  const hidden = form?.querySelector('[name="product_stones"]');
-
-  if (hidden) {
-    hidden.value = value;
-  }
-
-  if (formData) {
-    formData.set('product_stones', value);
-  }
-
-  return stones;
-}
-
-function readProductStonesEditor(form) {
-  return Array.from(form?.querySelectorAll('[data-product-stone-row]') || [])
-    .map((row) => normalizeProductStone({
-      name: row.querySelector('[data-product-stone-name]')?.value,
-      stone_property: row.querySelector('[data-product-stone-property]')?.value,
-      zodiac: row.querySelector('[data-product-stone-zodiac]')?.value
-    }))
-    .filter(Boolean);
 }
 
 async function handleProductEditSubmit(event) {
@@ -948,7 +833,6 @@ async function handleProductEditSubmit(event) {
   event.preventDefault();
   const button = event.submitter;
   const formData = new FormData(form);
-  syncProductStonesField(form, formData);
   normalizeProductImagesField(formData, form.querySelector('input[type="file"]'));
   if (form.querySelector('[name="active"]') && !form.querySelector('[name="active"]').checked) {
     formData.set('active', 'false');
@@ -1013,8 +897,6 @@ async function handleStoneCreate(event) {
     stoneForm.reset();
     const colorInput = document.querySelector('#stoneColor');
     if (colorInput) colorInput.value = '#b48a78';
-    const shapeInput = document.querySelector('#stoneShape');
-    if (shapeInput) shapeInput.value = 'round';
     await loadStones();
     showAdminToast('Камень добавлен');
   } catch (error) {
@@ -1061,7 +943,7 @@ function renderStonesStockSummary(stones) {
 }
 
 function renderStone(stone) {
-  const image=resolveImage(stone.image),color=normalizeColor(stone.color),shape=normalizeStoneShape(stone.stone_shape),canEdit=currentUser?.role!=='master';
+  const image=resolveImage(stone.image),color=normalizeColor(stone.color),canEdit=currentUser?.role!=='master';
   const stock = Number(stone.stock_qty || 0);
   const reserved = Number(stone.reserved_qty || 0);
   const available = Math.max(0, stock - reserved);
@@ -1074,14 +956,12 @@ function renderStone(stone) {
           ${image ? `<img src="${escapeHtml(image)}" alt="${escapeHtml(stone.name)}">` : `<span style="background:${escapeHtml(color)}"></span>`}
         </div>
         <div>
-          <span class="admin-chip">${formatNumber(stone.size_mm)} мм</span>\n          <span class="admin-chip">${getStoneShapeLabel(shape)}</span>
+          <span class="admin-chip">${formatNumber(stone.size_mm)} мм</span>
           <h3>${escapeHtml(stone.name)}</h3>
           <strong class="admin-price-badge">${formatPrice(stone.price)} ₽ / шт.</strong>
         </div>
       </header>
       <div class="admin-product-description"><span>Описание камня</span><p>${formatAdminDescription(stone.description)}</p></div>
-      ${stone.zodiac ? `<div class="admin-product-description"><span>Знак зодиака</span><p>${formatAdminDescription(stone.zodiac)}</p></div>` : ''}
-      ${stone.stone_property ? `<div class="admin-product-description"><span>Свойство камня</span><p>${formatAdminDescription(stone.stone_property)}</p></div>` : ''}
       <div class="admin-stock-chips">
         <span>Доступно: <b>${available}</b></span>
         <span>В активных заказах: <b>${reserved}</b></span>
@@ -1109,31 +989,12 @@ function renderStone(stone) {
                 <textarea name="description" required>${escapeHtml(stone.description)}</textarea>
               </label>
               <label class="admin-field">
-                <span>Знак зодиака</span>
-                <input name="zodiac" value="${escapeHtml(stone.zodiac || '')}" placeholder="Например: Лев, Весы">
-              </label>
-              <label class="admin-field admin-field--wide">
-                <span>Свойство камня</span>
-                <textarea name="stone_property" placeholder="Короткое свойство камня">${escapeHtml(stone.stone_property || '')}</textarea>
-              </label>
-              <label class="admin-field">
                 <span>Цена за одну бусину, ₽</span>
                 <input name="price" inputmode="decimal" value="${escapeHtml(stone.price)}" required>
               </label>
               <label class="admin-field">
                 <span>Размер бусины, мм</span>
                 <input name="size_mm" inputmode="decimal" value="${escapeHtml(stone.size_mm)}" required>
-              </label>
-              <label class="admin-field">
-                <span>Форма камня</span>
-                <select name="stone_shape">
-                  <option value="round" ${shape === 'round' ? 'selected' : ''}>Круг</option>
-                  <option value="square" ${shape === 'square' ? 'selected' : ''}>Квадрат</option>
-                  <option value="diamond" ${shape === 'diamond' ? 'selected' : ''}>Ромб</option>
-                  <option value="rectangle" ${shape === 'rectangle' ? 'selected' : ''}>Прямоугольник</option>
-                  <option value="triangle" ${shape === 'triangle' ? 'selected' : ''}>Треугольник</option>
-                  <option value="faceted" ${shape === 'faceted' ? 'selected' : ''}>Многогранный</option>
-                </select>
               </label>
               <label class="admin-field">
                 <span>Общий остаток</span>
@@ -1492,7 +1353,7 @@ async function apiFetch(path, options = {}) {
 
   if (options.auth !== false) {
     const token = getToken();
-    if (!token) throw new Error('Сначала войдите в панель');
+    if (!token) throw new Error('Сначала войдите в админку');
     headers.Authorization = `Bearer ${token}`;
   }
 
@@ -1559,22 +1420,6 @@ function getProductImages(product) {
 
 function resolveImage(image) {
   return App.resolveImageUrl(image);
-}
-
-function normalizeStoneShape(value) {
-  const shape = String(value || 'round').trim();
-  return ['round','square','diamond','rectangle','triangle','faceted'].includes(shape) ? shape : 'round';
-}
-
-function getStoneShapeLabel(shape) {
-  return {
-    round: 'Круг',
-    square: 'Квадрат',
-    diamond: 'Ромб',
-    rectangle: 'Прямоугольник',
-    triangle: 'Треугольник',
-    faceted: 'Многогранный'
-  }[normalizeStoneShape(shape)] || 'Круг';
 }
 
 function normalizeColor(color) {

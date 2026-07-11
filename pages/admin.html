@@ -2,18 +2,10 @@
 <html lang="ru">
 
 <head>
-
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Панель LiVetta</title>
-    <link rel="stylesheet" href="css/style.css?v=20260703-fit-admin-cards">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-    <link rel="icon" href="/favicon.ico" sizes="any">
-    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-    <link rel="apple-touch-icon" sizes="180x180" href="/img/apple-touch-icon.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <meta name="theme-color" content="#f09ab5">
-
+    <title>Админка Livetta</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -26,16 +18,16 @@
     </div>
 
     <div>
-        <a href="/" aria-label="Перейти на главную LiVetta">
-            <img src="img/Logo.png" alt="Логотип LiVetta" class="logo">
+        <a href="index.html" aria-label="Перейти на главную Livetta">
+            <img src="img/Logo.png" alt="Логотип Livetta" class="logo">
         </a>
     </div>
 
     <main class="admin">
         <section id="loginSection" class="admin-card admin-login-card">
             <span class="admin-eyebrow">Управление магазином</span>
-            <h1>Вход в LiVetta</h1>
-            <p class="muted-text">Введите данные владельца, менеджера или мастера.</p>
+            <h1>Вход в Livetta</h1>
+            <p class="muted-text">Введите данные владельца, администратора или мастера.</p>
 
             <form id="loginForm" class="admin-form">
                 <input id="login" name="login" type="text" placeholder="Логин" autocomplete="username" required>
@@ -49,7 +41,7 @@
             <header class="admin-session-bar">
                 <div class="admin-session-bar__title">
                     <span class="admin-eyebrow">Панель управления</span>
-                    <h1>Управление LiVetta</h1>
+                    <h1>Управление Livetta</h1>
                     <span id="adminUserBadge">Загрузка профиля…</span>
                 </div>
                 <div class="admin-session-actions">
@@ -59,7 +51,7 @@
                 </div>
             </header>
 
-            <nav id="adminTabs" class="admin-tabs" aria-label="Разделы панели">
+            <nav id="adminTabs" class="admin-tabs" aria-label="Разделы админки">
                 <button type="button" data-admin-tab="orders" data-roles="owner,admin">Заказы</button>
                 <button type="button" data-admin-tab="products" data-roles="owner,admin">Украшения</button>
                 <button type="button" data-admin-tab="stones" data-roles="owner,admin,master">Склад камней</button>
@@ -100,25 +92,17 @@
                         </select>
                         <input id="price" name="price" type="text" inputmode="decimal" placeholder="Цена, например 2500" required>
                         <textarea id="description" name="description" placeholder="Описание" required></textarea>
-                        <input id="productStones" name="product_stones" type="hidden" value="[]">
-                        <section class="admin-product-stone-editor admin-field--wide" data-product-stones-editor>
-                            <header class="admin-product-stone-editor__head">
-                                <div>
-                                    <span>Камни в украшении</span>
-                                    <small>Название камня, его свойства и подходящие знаки зодиака</small>
-                                </div>
-                                <button type="button" data-add-product-stone>Добавить камень</button>
-                            </header>
-                            <div class="admin-product-stone-editor__list" data-product-stones-list>
-                                <article class="admin-product-stone-row" data-product-stone-row>
-                                    <label><span>Камень</span><input data-product-stone-name placeholder="Например: аметист"></label>
-                                    <label><span>Свойства</span><textarea data-product-stone-property placeholder="Например: обладает мягкой успокаивающей энергией"></textarea></label>
-                                    <label><span>Знаки зодиака</span><input data-product-stone-zodiac placeholder="Например: Рыбы, Водолей, Дева"></label>
-                                    <button type="button" data-remove-product-stone>Удалить</button>
-                                </article>
-                            </div>
-                        </section>
                         <input id="productStock" name="stock_qty" type="number" min="0" value="1" placeholder="Остаток готовых изделий" required>
+                        <div class="admin-size-editor">
+                            <span class="admin-size-editor__title">Размеры украшения</span>
+                            <label>XS, см<input name="size_xs_cm" type="number" step="0.1" min="1" value="38"></label>
+                            <label>S, см<input name="size_s_cm" type="number" step="0.1" min="1" value="40"></label>
+                            <label>M, см<input name="size_m_cm" type="number" step="0.1" min="1" value="42"></label>
+                            <label>L, см<input name="size_l_cm" type="number" step="0.1" min="1" value="44"></label>
+                            <label>XL, см<input name="size_xl_cm" type="number" step="0.1" min="1" value="46"></label>
+                            <input type="hidden" name="hide_sizes" value="0"><label class="admin-check admin-check--wide"><input name="hide_sizes" type="checkbox" value="1"> Не показывать размер для этого украшения</label>
+                            <small class="admin-size-editor__hint">Для категории «Серьги» размеры скрываются автоматически. Для браслета можно поставить, например, XS = 16 см.</small>
+                        </div>
                         <label class="admin-check"><input name="is_child" type="checkbox" value="1"> Детское украшение</label>
                         <input type="hidden" name="active" value="true">
                         <label class="file-field">
@@ -156,21 +140,8 @@
                     <form id="stoneForm" class="admin-form" enctype="multipart/form-data">
                         <input id="stoneName" name="name" type="text" placeholder="Название камня" required>
                         <textarea id="stoneDescription" name="description" placeholder="Описание камня" required></textarea>
-                        <input id="stoneZodiac" name="zodiac" type="text" placeholder="Знак зодиака, например: Лев, Весы">
-                        <textarea id="stoneProperty" name="stone_property" placeholder="Свойство камня"></textarea>
                         <input id="stonePrice" name="price" type="text" inputmode="decimal" placeholder="Цена за 1 камень" required>
                         <input id="stoneSize" name="size_mm" type="text" inputmode="decimal" placeholder="Размер камня, мм, например 8" required>
-                        <label>
-                            Форма камня
-                            <select name="stone_shape" id="stoneShape" required>
-                            <option value="round" selected>Круг</option>
-                            <option value="square">Квадрат</option>
-                            <option value="diamond">Ромб</option>
-                            <option value="rectangle">Прямоугольник</option>
-                            <option value="triangle">Треугольник</option>
-                            <option value="faceted">Многогранный</option>
-                        </select>
-                        </label>
                         <input id="stoneStock" name="stock_qty" type="number" min="0" value="0" placeholder="Количество бусин на складе" required>
                         <input type="hidden" name="active" value="true">
                         <label>
@@ -216,13 +187,13 @@
 
             <section class="admin-page" data-admin-page="users" data-roles="owner">
                 <section class="admin-card admin-card--accent">
-                    <h2>Пользователи панели</h2>
-                    <p class="muted-text">Владелец видит всё; менеджер — заказы, товары и остатки; мастер — только склад бусин.</p>
+                    <h2>Пользователи админки</h2>
+                    <p class="muted-text">Владелец видит всё; администратор — заказы, товары и остатки; мастер — только склад бусин.</p>
                     <form id="userForm" class="admin-form">
                         <input name="login" placeholder="Логин" required>
                         <input name="password" type="password" minlength="8" placeholder="Временный пароль, минимум 8 символов" required>
                         <select name="role">
-                            <option value="admin">Менеджер</option>
+                            <option value="admin">Администратор</option>
                             <option value="master">Мастер</option>
                             <option value="owner">Владелец</option>
                         </select>
@@ -237,7 +208,7 @@
     <div id="adminToast" class="admin-toast" role="status" aria-live="polite" aria-atomic="true"></div>
 
     <script src="js/common.js"></script>
-    <script src="js/admin.js?v=20260703-fit-admin-cards"></script>
+    <script src="js/admin.js"></script>
 </body>
 
 </html>

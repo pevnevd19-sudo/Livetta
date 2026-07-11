@@ -141,7 +141,7 @@
 
 
 
-/* LiVetta unified catalog buttons */
+/* Livetta unified catalog buttons */
 .product-card__actions {
   display: grid !important;
   grid-template-columns: repeat(2, minmax(0, 1fr)) !important;

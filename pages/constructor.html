@@ -4,9 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Конструктор украшений LiVetta</title>
-    <link rel="stylesheet" href="css/style.css?v=20260711-order-product-legal-constructor">
-    <link rel="stylesheet" href="css/constructor-restore.css?v=20260711-order-product-legal-constructor">
+    <title>Конструктор украшений Livetta</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
@@ -19,7 +18,7 @@
     </div>
 
     <div>
-        <img src="img/Logo.png" alt="Логотип LiVetta" class="logo">
+        <img src="img/Logo.png" alt="Логотип Livetta" class="logo">
     </div>
 
     <nav class="nav">
@@ -34,47 +33,37 @@
 
     <main class="constructor garnet-builder">
         <section class="constructor-preview glass-card">
-            <p class="eyebrow">LiVetta custom</p>
+            <p class="eyebrow">Livetta custom</p>
             <h1>Конструктор ожерелья</h1>
             <p class="constructor-lead">
-                Здесь вы сможете собрать свое уникальное украшение, которое будет только у вас
+                Выбирай камни справа, и они будут надеваться на нить в 3D. Размер берётся из админки в миллиметрах,
+                бусины ставятся с зазором и не залезают друг на друга.
             </p>
-
-            <div class="constructor-disclaimer" role="note"><strong>Важно:</strong> украшение в конструкторе может немного отличаться от украшения вживую из-за натурального оттенка, формы и рисунка камней.</div>
 
             <div class="constructor-options">
                 <label>
                     Тип украшения
                     <select id="jewelryType">
-                        <option value="Колье">Колье</option>
-                    </select>
+    <option value="Колье">Колье</option>
+</select>
                 </label>
 
                 <label>
-                    Размер, см
+                    Размер
                     <select id="jewelrySize"></select>
                 </label>
 
                 <label class="constructor-clasp-field">
-                    <span class="constructor-label-text">Тип замка <span class="required-mark" aria-hidden="true">*</span></span>
+                    Тип замка <span class="required-mark">*</span>
                     <select id="claspType" required>
                         <option value="">Выберите замок</option>
-                        <option value="lobster-steel">Карабин</option>
-                        <option value="toggle-steel">Тоггл</option>
-                        <option value="magnetic-steel">Магнитный</option>
+                        <option value="lobster-steel">Карабин — нержавеющая сталь</option>
+                        <option value="toggle-steel">Тоггл — нержавеющая сталь</option>
+                        <option value="magnetic-steel">Магнитный — нержавеющая сталь</option>
+                        <option value="screw-steel">Винтовой — нержавеющая сталь</option>
+                        <option value="hook-steel">Крючок — нержавеющая сталь</option>
                     </select>
-                    <small>Замок обязателен для оформления сборки.</small>
-                </label>
-
-                <label class="constructor-clasp-material-field">
-                    <span class="constructor-label-text">Материал застежки <span class="required-mark" aria-hidden="true">*</span></span>
-                    <select id="claspMaterial" required>
-                        <option value="">Выберите материал</option>
-                        <option value="steel">Нержавеющая сталь</option>
-                        <option value="brass">Латунь</option>
-                        <option value="rhodium">Родий</option>
-                    </select>
-                    <small>Материал обязателен для оформления сборки.</small>
+                    <small>Замок обязателен. При выборе карабина есть удлинение 4 см.</small>
                 </label>
             </div>
 
@@ -93,13 +82,12 @@
 
                     <!-- Невидимый путь для бусин. Камни идут по всей видимой части до захода за шею. -->
                     <path id="necklacePath" class="necklace-layout-path" d="M 340 430 C 245 570, 360 735, 500 750 C 640 735, 755 570, 660 430" />
-                    <g id="necklaceBeads" class="necklace-svg-beads"></g>
                 </svg>
 
                 <div class="neck-photo-mask neck-photo-mask--left" aria-hidden="true"></div>
                 <div class="neck-photo-mask neck-photo-mask--right" aria-hidden="true"></div>
 
-                <div id="necklaceBeadsFallback" class="necklace-beads necklace-beads--fallback" aria-hidden="true"></div>
+                <div id="necklaceBeads" class="necklace-beads"></div>
                 <div id="sceneMessage" class="scene-message">Загрузка конструктора...</div>
             </div>
 
@@ -114,15 +102,11 @@
                 </div>
                 <div>
                     <span>Размер</span>
-                    <strong><span id="selectedSize">45</span> см</strong>
+                    <strong id="selectedSize">M · 42 см</strong>
                 </div>
                 <div>
                     <span>Замок</span>
                     <strong id="selectedClasp">Не выбран</strong>
-                </div>
-                <div>
-                    <span>Материал</span>
-                    <strong id="selectedClaspMaterial">Не выбран</strong>
                 </div>
                 <div>
                     <span>Камни</span>
@@ -142,53 +126,18 @@
         </section>
 
         <aside class="stones-panel glass-card">
-            <div class="stones-panel__head constructor-stones-head">
-                <div>
-                    <span class="page-eyebrow">Камни</span>
-                    <h2>Избранные камни</h2>
-                </div>
-                <button id="openStonesCatalog" class="stones-panel__catalog-button" type="button">Каталог камней</button>
-            </div>
-
+            <h2>Камни из админки</h2>
             <p class="muted-text">
-                Открой каталог, добавь камни в избранное, а потом надевай их на нить из этого списка.
+                Камни подтягиваются из базы. Если сервер не запущен, конструктор покажет тестовый гранат.
             </p>
 
-            <div id="stonesList" class="favorite-stones-list"></div>
-
-            <section class="selected-stones-panel" aria-label="Состав украшения">
-                <h3>Состав украшения</h3>
-                <div id="selectedStonesList"></div>
-            </section>
+            <div id="stonesList"></div>
         </aside>
-
-        <div id="stoneCatalogModal" class="stone-catalog-modal" hidden>
-            <div class="stone-catalog-modal__backdrop" data-close-stone-catalog></div>
-            <section class="stone-catalog-modal__dialog glass-card" role="dialog" aria-modal="true" aria-labelledby="stoneCatalogTitle">
-                <header class="stone-catalog-modal__head">
-                    <div>
-                        <span class="page-eyebrow">Каталог камней</span>
-                        <h2 id="stoneCatalogTitle">Каталог камней</h2>
-                    </div>
-                    <button id="closeStoneCatalog" class="stone-catalog-modal__close" type="button" aria-label="Закрыть каталог">×</button>
-                </header>
-
-                <div class="constructor-catalog-toolbar">
-                    <label class="constructor-search-field">
-                        <span>Поиск камней</span>
-                        <input id="stoneSearch" type="search" placeholder="Название, свойства, знак зодиака">
-                    </label>
-                    <button id="clearStoneSearch" type="button">Сброс</button>
-                </div>
-
-                <div id="stoneCatalogList" class="stone-catalog-list"></div>
-            </section>
-        </div>
     </main>
 
     <script src="js/common.js"></script>
-    <script type="module" src="js/constructor.js?v=20260711-order-product-legal-constructor"></script>
-<footer class="site-footer"><div class="site-footer__brand"><strong>LiVetta</strong><p>Украшения ручной работы из натуральных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="user-agreement.html">Пользовательское соглашение</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: 781165194751 · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
+    <script type="module" src="js/constructor.js"></script>
+<footer class="site-footer"><div class="site-footer__brand"><strong>Livetta</strong><p>Украшения ручной работы из натуральных поделочных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: ВСТАВИТЬ ИНН · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
 <script src="js/legal.js"></script>
 </body>
 

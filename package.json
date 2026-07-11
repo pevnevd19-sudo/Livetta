@@ -2,7 +2,7 @@
   "name": "livetta-store",
   "version": "2.0.0",
   "private": true,
-  "description": "LiVetta handmade jewelry store",
+  "description": "Livetta handmade jewelry store",
   "main": "server.js",
   "type": "commonjs",
   "engines": {

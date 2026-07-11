@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/style.css">
+    <title>Livetta — украшения ручной работы</title>
+</head>
+
+<body>
+
+    <div class="lava-background">
+        <div class="blob blob1"></div>
+        <div class="blob blob2"></div>
+        <div class="blob blob3"></div>
+        <div class="blob blob4"></div>
+        <div class="blob blob5"></div>
+    </div>
+
+    <div>
+        <img src="img/Logo.png" alt="Логотип" class="logo">
+    </div>
+
+    <nav class="nav">
+        <a href="index.html">ГЛАВНАЯ</a>
+        <a href="catalog.html">КАТАЛОГ</a>
+        <a href="delivery.html">ДОСТАВКА</a>
+        <a href="faq.html">ВОПРОСЫ</a>
+        <a href="constructor.html">КОНСТРУКТОР</a>
+        <a href="cart.html">КОРЗИНА</a>
+        <a href="about.html">О НАС</a>
+    </nav>
+    <main class="home-page">
+        <h1 class="visually-hidden">Livetta — украшения ручной работы</h1>
+        <section class="home-carousel" aria-label="Главная карусель Livetta">
+            <div class="home-carousel__viewport">
+                <div class="home-carousel__track" id="homeCarouselTrack">
+                    <article class="home-carousel__slide is-active">
+                        <img src="img/home-slide-1.jpg" alt="Подарочный сертификат Livetta">
+                    </article>
+
+                    <article class="home-carousel__slide">
+                        <img src="img/home-slide-2.jpg" alt="Летняя коллекция украшений Livetta">
+                    </article>
+                </div>
+
+                <button class="home-carousel__button home-carousel__button--prev" type="button" id="homeCarouselPrev" aria-label="Предыдущий слайд">
+                    ‹
+                </button>
+
+                <button class="home-carousel__button home-carousel__button--next" type="button" id="homeCarouselNext" aria-label="Следующий слайд">
+                    ›
+                </button>
+
+                <div class="home-carousel__dots" id="homeCarouselDots" aria-label="Переключатели слайдов"></div>
+            </div>
+        </section>
+
+        <section class="home-popular" aria-label="Популярные товары Livetta">
+            <div class="home-popular__header">
+                <div>
+                    <span>Выбор покупателей</span>
+                    <h2>Популярные товары</h2>
+                </div>
+
+                <a href="catalog.html" class="home-popular__all">Показать все</a>
+            </div>
+
+            <div class="home-popular__grid" id="homePopularGrid">
+                <p class="muted-text">Загрузка популярных товаров...</p>
+            </div>
+        </section>
+    </main>
+
+        <script src="js/common.js"></script>
+    <script src="js/home.js"></script>
+
+
+<footer class="site-footer"><div class="site-footer__brand"><strong>Livetta</strong><p>Украшения ручной работы из натуральных поделочных камней и культивированного жемчуга.</p></div><div><b>Покупателям</b><a href="delivery.html">Доставка</a><a href="payment.html">Оплата</a><a href="returns.html">Возврат и обмен</a><a href="warranty.html">Гарантия и уход</a></div><div><b>Документы</b><a href="offer.html">Публичная оферта</a><a href="privacy.html">Политика данных</a><a href="personal-data-consent.html">Согласие на обработку</a><a href="marketing-consent.html">Согласие на рассылку</a></div><div><b>Контакты</b><a href="tel:+79062281944">+7 906 228-19-44</a><a href="mailto:livettajewerly@yandex.ru">livettajewerly@yandex.ru</a><a href="https://t.me/livettastore" target="_blank" rel="noopener">Telegram</a><a href="contacts.html">Реквизиты</a></div><small>Самозанятая Горгопко Елизавета Андреевна · ИНН: ВСТАВИТЬ ИНН · 193091, Санкт-Петербург, Ультрамариновая ул., д. 10</small></footer>
+<script src="js/legal.js"></script>
+</body>
+
+</html>
