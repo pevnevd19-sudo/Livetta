@@ -40,8 +40,6 @@
 
   function createCartProduct(product) {
     const images = getProductImages(product);
-    const sizeOptions = Array.isArray(product.size_options) ? product.size_options : [];
-    const selectedSize = product.selected_size || product._selected_size || (sizeOptions.length ? sizeOptions[0] : null);
     return {
       id: product.id,
       title: product.title,
@@ -50,9 +48,6 @@
       price: Number(product.price) || 0,
       image: images[0] || product.image || '',
       product_images: images,
-      selected_size: selectedSize,
-      size_options: sizeOptions,
-      carabiner_extension_note: product.carabiner_extension_note || '',
       quantity: 1
     };
   }
@@ -61,8 +56,7 @@
     if (!product || product.purchasable === false) return readCart();
 
     const cart = readCart();
-    const selectedSize = product.selected_size || product._selected_size || (Array.isArray(product.size_options) && product.size_options[0]) || null;
-    const existingItem = cart.find((item) => String(item.id) === String(product.id) && !item.custom && JSON.stringify(item.selected_size || null) === JSON.stringify(selectedSize || null));
+    const existingItem = cart.find((item) => String(item.id) === String(product.id) && !item.custom);
 
     if (existingItem) {
       existingItem.quantity = Number(existingItem.quantity || 1) + 1;

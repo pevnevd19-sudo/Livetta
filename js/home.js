@@ -193,26 +193,8 @@ function renderHomePopularProduct(product) {
       <div class="home-popular-card__info">
         <p>${escapeHtml(category)}</p>
         <h3>${escapeHtml(product.title)}</h3>
-        ${renderProductSizes(product)}
         <strong>${formatPrice(product.price)} ₽</strong>
       </div>
     </article>
   `;
-}
-
-
-function renderProductSizes(product) {
-  const sizes = Array.isArray(product.size_options) ? product.size_options : [];
-  if (!sizes.length) return '';
-  return `
-    <div class="product-size-badges home-product-size-badges">
-      ${sizes.map((size) => `<span>${escapeHtml(size.label)} · ${escapeHtml(formatSizeCm(size.cm))} см</span>`).join('')}
-    </div>
-    <p class="product-size-note">${escapeHtml(product.carabiner_extension_note || 'При заказе украшения с замком карабин есть удлинение 4 см.')}</p>
-  `;
-}
-
-function formatSizeCm(value) {
-  const number = Number(value);
-  return Number.isFinite(number) ? String(number).replace('.', ',') : value;
 }
